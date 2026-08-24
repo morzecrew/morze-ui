@@ -1,0 +1,273 @@
+/* ==========================================================================
+   Select · DropdownMenu · Popover · Dialog · Tooltip
+   Shared floating surface (.mz-panel) plus per-part trim.
+   ========================================================================== */
+
+/* -------------------------------- Select -------------------------------- */
+.mz-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px 0 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--mz-text);
+  font-family: var(--mz-font-sans);
+  font-size: 14px;
+  white-space: nowrap;
+  border-radius: var(--mz-radius);
+  background: var(--mz-face);
+  border: 1px solid var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
+  outline: none;
+  transition:
+    background var(--mz-duration) ease,
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease;
+}
+.mz-select-trigger--sm { height: 34px; font-size: 13px; }
+.mz-select-trigger:hover {
+  background: var(--mz-face-hover);
+  border-color: rgba(var(--mz-tone-rgb), 0.45);
+}
+.mz-select-trigger:focus-visible,
+.mz-select-trigger[data-state='open'] {
+  border-color: rgba(var(--mz-tone-rgb), 0.65);
+  box-shadow:
+    inset 0 1px 0 var(--mz-face-top),
+    0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
+    0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.7);
+}
+.mz-select-trigger[data-placeholder] { color: var(--mz-text-muted); }
+.mz-select-trigger[data-disabled] { opacity: 0.5; cursor: not-allowed; }
+.mz-select-trigger__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition: transform var(--mz-duration) var(--mz-ease);
+}
+.mz-select-trigger[data-state='open'] .mz-select-trigger__icon { transform: rotate(180deg); }
+
+.mz-select-content {
+  position: relative;
+  z-index: 60;
+  min-width: 10rem;
+  max-height: var(--radix-select-content-available-height);
+  overflow: hidden;
+  padding: 6px;
+}
+.mz-select-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
+.mz-select-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-select-content--popper[data-side='bottom'] { margin-top: 6px; }
+.mz-select-content--popper[data-side='top'] { margin-bottom: 6px; }
+.mz-select-viewport { padding: 0; }
+.mz-select-viewport--popper {
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+  height: var(--radix-select-trigger-height);
+  scroll-margin: 6px;
+}
+.mz-select-scroll-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  cursor: default;
+  color: var(--mz-text-muted);
+}
+
+/* ---------------------------- Menu-ish items ---------------------------- */
+.mz-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px 8px 30px;
+  border-radius: var(--mz-radius-sm);
+  color: var(--mz-text);
+  font-size: 14px;
+  line-height: 1.2;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: background 0.14s ease, color 0.14s ease, box-shadow 0.14s ease;
+}
+.mz-item > svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+.mz-item--inset { padding-left: 30px; }
+.mz-item--plain { padding-left: 10px; }
+
+/* Radix drives highlight state for both pointer and keyboard, so there is no
+   separate :hover rule — that would double-highlight during keyboard nav. */
+.mz-item[data-highlighted] {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--mz-tone-rgb), 0.22) 0%,
+    rgba(var(--mz-tone-rgb), 0.1) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.28);
+  color: var(--mz-text);
+}
+.mz-item[data-state='checked'] { color: rgb(var(--mz-tone-rgb)); font-weight: 600; }
+.mz-item[data-disabled] { opacity: 0.45; pointer-events: none; }
+.mz-item--destructive { --mz-tone-rgb: var(--mz-danger-rgb); color: rgb(var(--mz-danger-rgb)); }
+
+.mz-item__indicator {
+  position: absolute;
+  left: 8px;
+  display: grid;
+  place-content: center;
+  width: 16px;
+  height: 16px;
+}
+.mz-item__indicator svg { width: 14px; height: 14px; }
+
+.mz-menu-label {
+  padding: 8px 10px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mz-text-muted);
+}
+.mz-menu-label--inset { padding-left: 30px; }
+
+.mz-menu-separator {
+  height: 1px;
+  margin: 6px -2px;
+  background: var(--mz-border);
+}
+
+.mz-menu-shortcut {
+  margin-left: auto;
+  font-family: var(--mz-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--mz-text-muted);
+}
+
+/* ----------------------------- Dropdown menu ---------------------------- */
+.mz-menu-content {
+  z-index: 60;
+  min-width: 12rem;
+  max-height: var(--radix-dropdown-menu-content-available-height);
+  overflow: hidden auto;
+  padding: 6px;
+}
+.mz-menu-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
+.mz-menu-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+
+.mz-menu-sub-trigger[data-state='open'] {
+  background: rgba(var(--mz-text-rgb), 0.06);
+}
+.mz-menu-sub-trigger__icon { margin-left: auto; width: 14px; height: 14px; }
+
+/* -------------------------------- Popover ------------------------------- */
+.mz-popover-content {
+  z-index: 60;
+  width: 18rem;
+  padding: 16px;
+  outline: none;
+}
+.mz-popover-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
+.mz-popover-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-popover-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.mz-popover-title { font-size: 15px; font-weight: 700; }
+.mz-popover-description { font-size: 13px; color: var(--mz-text-dim); }
+
+/* -------------------------------- Dialog -------------------------------- */
+.mz-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--mz-overlay);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.mz-dialog-overlay[data-state='open'] { animation: mz-fade-in 0.2s ease; }
+.mz-dialog-overlay[data-state='closed'] { animation: mz-fade-out 0.16s ease; }
+
+.mz-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 51;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: calc(100% - 32px);
+  max-width: 32rem;
+  max-height: calc(100dvh - 64px);
+  overflow: auto;
+  padding: 22px;
+  border-radius: var(--mz-radius-lg);
+  outline: none;
+}
+.mz-dialog-content[data-state='open'] { animation: mz-dialog-in 0.22s var(--mz-ease); }
+.mz-dialog-content[data-state='closed'] { animation: mz-dialog-out 0.16s var(--mz-ease); }
+
+@keyframes mz-dialog-in {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.96) }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+}
+@keyframes mz-dialog-out {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1) }
+  to { opacity: 0; transform: translate(-50%, -46%) scale(0.96) }
+}
+
+.mz-dialog-header { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.mz-dialog-title { font-family: var(--mz-font-display); font-size: 18px; font-weight: 700; line-height: 1.3; }
+.mz-dialog-description { font-size: 14px; color: var(--mz-text-dim); }
+.mz-dialog-footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.mz-dialog-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-dim);
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+.mz-dialog-close:hover {
+  background: rgba(var(--mz-text-rgb), 0.08);
+  border-color: var(--mz-border);
+  color: var(--mz-text);
+}
+.mz-dialog-close svg { width: 15px; height: 15px; }
+
+/* -------------------------------- Tooltip ------------------------------- */
+.mz-tooltip-content {
+  z-index: 70;
+  max-width: 20rem;
+  padding: 7px 11px;
+  border-radius: var(--mz-radius-sm);
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  border: 1px solid var(--mz-convex-hairline);
+  box-shadow:
+    0 10px 30px -10px rgba(var(--mz-primary-rgb), 0.6),
+    inset 0 1px 0 var(--mz-convex-top);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  text-shadow: var(--mz-convex-text-shadow);
+}
+.mz-tooltip-content[data-state='delayed-open'] { animation: mz-pop-in 0.14s var(--mz-ease); }
+.mz-tooltip-content[data-state='closed'] { animation: mz-pop-out 0.1s var(--mz-ease); }
+.mz-tooltip-arrow {
+  fill: rgb(var(--mz-primary-rgb));
+  z-index: 1;
+  translate: 0 -1px;
+  border-radius: 2px;
+}

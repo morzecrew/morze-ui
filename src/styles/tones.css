@@ -1,0 +1,12 @@
+/* ==========================================================================
+   Tone overrides.
+   Imported last so an explicit `tone` prop always wins over a component's
+   own default (including variant defaults such as .mz-btn--destructive).
+   ========================================================================== */
+
+[data-tone='primary'] { --mz-tone-rgb: var(--mz-primary-rgb); }
+[data-tone='accent'] { --mz-tone-rgb: var(--mz-accent-rgb); }
+[data-tone='danger'] { --mz-tone-rgb: var(--mz-danger-rgb); }
+[data-tone='warning'] { --mz-tone-rgb: var(--mz-warning-rgb); }
+[data-tone='info'] { --mz-tone-rgb: var(--mz-info-rgb); }
+[data-tone='success'] { --mz-tone-rgb: var(--mz-success-rgb); }

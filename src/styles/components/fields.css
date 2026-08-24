@@ -1,0 +1,109 @@
+/* ==========================================================================
+   Input · Textarea · Label · Field · Select trigger
+   Text entry is the inverse of the convex fill: a sunken well that lights up
+   on focus with the tone rim.
+   ========================================================================== */
+
+.mz-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--mz-text-dim);
+  user-select: none;
+  cursor: default;
+}
+.mz-label[data-disabled],
+.mz-label:has(+ :disabled) { opacity: 0.5; }
+
+.mz-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mz-field__hint {
+  font-size: 12px;
+  color: var(--mz-text-muted);
+}
+.mz-field__error {
+  font-size: 12px;
+  color: rgb(var(--mz-danger-rgb));
+}
+
+.mz-input,
+.mz-textarea {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0 12px;
+  height: 40px;
+  color: var(--mz-text);
+  font-family: var(--mz-font-sans);
+  font-size: 14px;
+  border-radius: var(--mz-radius);
+  background: var(--mz-well);
+  border: 1px solid var(--mz-border-strong);
+  box-shadow: var(--mz-well-inset);
+  outline: none;
+  transition:
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    background var(--mz-duration) ease;
+}
+.mz-textarea {
+  height: auto;
+  min-height: 96px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.mz-input::placeholder,
+.mz-textarea::placeholder { color: var(--mz-text-muted); }
+
+.mz-input:hover,
+.mz-textarea:hover { border-color: rgba(var(--mz-text-rgb), 0.24); }
+
+.mz-input:focus-visible,
+.mz-textarea:focus-visible {
+  border-color: rgba(var(--mz-tone-rgb), 0.65);
+  box-shadow:
+    var(--mz-well-inset),
+    0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
+    0 8px 26px -14px rgba(var(--mz-tone-rgb), 0.7);
+}
+
+.mz-input:disabled,
+.mz-textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.mz-input[aria-invalid='true'],
+.mz-textarea[aria-invalid='true'] {
+  --mz-tone-rgb: var(--mz-danger-rgb);
+  border-color: rgba(var(--mz-danger-rgb), 0.6);
+}
+
+.mz-input--sm { height: 34px; font-size: 13px; padding: 0 10px; }
+.mz-input--lg { height: 48px; font-size: 15px; padding: 0 14px; }
+
+.mz-input[type='file'] {
+  align-items: center;
+  padding-top: 9px;
+  font-size: 13px;
+}
+.mz-input[type='file']::file-selector-button {
+  margin-right: 12px;
+  padding: 5px 10px;
+  border: 1px solid var(--mz-border-strong);
+  border-radius: var(--mz-radius-sm);
+  background: var(--mz-face);
+  box-shadow: inset 0 1px 0 var(--mz-face-top);
+  color: var(--mz-text);
+  font-family: var(--mz-label-font);
+  font-size: 13px;
+  font-weight: var(--mz-label-weight);
+  letter-spacing: var(--mz-label-tracking);
+  text-transform: var(--mz-label-transform);
+  cursor: pointer;
+}

@@ -1,0 +1,396 @@
+/* ==========================================================================
+   Checkbox · Radio · Switch · Toggle · ToggleGroup · Slider
+   Idle = raised neutral face; active/checked = the convex tone fill.
+   ========================================================================== */
+
+/* ------------------------------- Checkbox ------------------------------- */
+.mz-checkbox {
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 5px;
+  background: var(--mz-face);
+  border: 1px solid var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
+  color: #fff;
+  transition:
+    background var(--mz-duration) ease,
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    transform 0.15s var(--mz-ease);
+}
+.mz-checkbox:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
+.mz-checkbox:active { transform: scale(0.94); }
+
+.mz-checkbox[data-state='checked'],
+.mz-checkbox[data-state='indeterminate'] {
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  border-color: var(--mz-convex-hairline);
+  box-shadow:
+    0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.7),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+}
+
+.mz-checkbox__indicator {
+  display: grid;
+  place-content: center;
+  color: currentColor;
+}
+.mz-checkbox__indicator svg {
+  width: 12px;
+  height: 12px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+/* Both glyphs are rendered; the root's data-state picks one. Reading it from
+   props would miss uncontrolled and Radix-driven indeterminate states. */
+.mz-checkbox__dash { display: none; }
+.mz-checkbox[data-state='indeterminate'] .mz-checkbox__check { display: none; }
+.mz-checkbox[data-state='indeterminate'] .mz-checkbox__dash { display: block; }
+.mz-checkbox[data-state='checked'] .mz-checkbox__indicator {
+  animation: mz-pop-in 0.18s var(--mz-ease);
+}
+
+.mz-checkbox--sm { width: 15px; height: 15px; border-radius: 4px; }
+.mz-checkbox--sm .mz-checkbox__indicator svg { width: 10px; height: 10px; }
+.mz-checkbox--lg { width: 22px; height: 22px; border-radius: 6px; }
+.mz-checkbox--lg .mz-checkbox__indicator svg { width: 16px; height: 16px; }
+
+/* -------------------------------- Radio --------------------------------- */
+.mz-radio-group {
+  display: grid;
+  gap: 12px;
+}
+.mz-radio-group[data-orientation='horizontal'] {
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 20px;
+}
+
+.mz-radio {
+  position: relative;
+  display: inline-grid;
+  place-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--mz-radius-pill);
+  background: var(--mz-face);
+  border: 1px solid var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
+  transition:
+    background var(--mz-duration) ease,
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    transform 0.15s var(--mz-ease);
+}
+.mz-radio:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
+.mz-radio:active { transform: scale(0.94); }
+
+.mz-radio[data-state='checked'] {
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  border-color: var(--mz-convex-hairline);
+  box-shadow:
+    0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.7),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+}
+
+.mz-radio__indicator {
+  display: grid;
+  place-content: center;
+}
+.mz-radio__indicator::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: var(--mz-radius-pill);
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 8px rgba(255, 255, 255, 0.6);
+  animation: mz-pop-in 0.18s var(--mz-ease);
+}
+
+/* -------------------------------- Switch -------------------------------- */
+.mz-switch {
+  --mz-switch-h: 24px;
+  --mz-switch-w: 44px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: var(--mz-switch-w);
+  height: var(--mz-switch-h);
+  padding: 2px;
+  cursor: pointer;
+  border-radius: var(--mz-radius-sm);
+  background: var(--mz-well);
+  border: 1px solid var(--mz-border-strong);
+  box-shadow: var(--mz-well-inset);
+  transition:
+    background var(--mz-duration) ease,
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    transform 0.15s var(--mz-ease);
+}
+.mz-switch--sm { --mz-switch-h: 20px; --mz-switch-w: 36px; border-radius: 5px; }
+.mz-switch--lg { --mz-switch-h: 30px; --mz-switch-w: 54px; border-radius: 8px; }
+
+.mz-switch[data-state='checked'] {
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  border-color: var(--mz-convex-hairline);
+  box-shadow:
+    0 4px 12px -6px rgba(var(--mz-tone-rgb), 0.75),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+}
+
+.mz-switch__thumb {
+  display: block;
+  width: calc(var(--mz-switch-h) - 8px);
+  height: calc(var(--mz-switch-h) - 8px);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #dcdae8 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.14);
+  /* Rail is the content box: track width minus 2px border and 2x2px padding.
+     Travel = rail - thumb = (w - 6) - (h - 8) = w - h + 2, which leaves the
+     same 3px on both ends. */
+  transform: translateX(0);
+  transition: transform var(--mz-duration) var(--mz-ease);
+  will-change: transform;
+}
+.mz-switch[data-state='checked'] .mz-switch__thumb {
+  transform: translateX(calc(var(--mz-switch-w) - var(--mz-switch-h) + 2px));
+}
+/* Press scales the whole control, like the buttons — widening the thumb pushed
+   it past the rail in the checked position. */
+.mz-switch:active { transform: scale(var(--mz-press-scale)); }
+
+/* -------------------------------- Toggle -------------------------------- */
+.mz-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  flex-shrink: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: var(--mz-radius-control);
+  background: transparent;
+  color: var(--mz-text-dim);
+  font-family: var(--mz-label-font);
+  font-weight: var(--mz-label-weight);
+  letter-spacing: var(--mz-label-tracking);
+  text-transform: var(--mz-label-transform);
+  transition:
+    background var(--mz-duration) ease,
+    color var(--mz-duration) ease,
+    border-color var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    transform 0.15s var(--mz-ease);
+}
+.mz-toggle > svg { width: 1.15em; height: 1.15em; flex-shrink: 0; pointer-events: none; }
+
+.mz-toggle--sm { height: 34px; min-width: 34px; padding: 0 12px; font-size: 13px; }
+.mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: 14px; }
+.mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: 15px; }
+
+.mz-toggle--outline {
+  background: var(--mz-face);
+  border-color: var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
+}
+
+.mz-toggle:hover {
+  color: var(--mz-text);
+  background: var(--mz-face-hover);
+  border-color: var(--mz-border-strong);
+}
+
+.mz-toggle[data-state='on'] {
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  color: #fff;
+  border-color: var(--mz-convex-hairline);
+  box-shadow:
+    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+  text-shadow: var(--mz-convex-text-shadow);
+}
+.mz-toggle:active { transform: scale(var(--mz-press-scale)); }
+
+/* ----------------------------- ToggleGroup ------------------------------ */
+.mz-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  gap: var(--mz-toggle-group-gap, 0px);
+}
+.mz-toggle-group[data-orientation='vertical'] { flex-direction: column; }
+
+/* Segmented: one sunken well holding the items, active item pops out. */
+.mz-toggle-group--segmented {
+  padding: 4px;
+  border-radius: var(--mz-radius);
+  background: var(--mz-well);
+  border: 1px solid var(--mz-border);
+  box-shadow: var(--mz-well-inset);
+}
+.mz-toggle-group--segmented .mz-toggle {
+  border-radius: var(--mz-radius-sm);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+/* Restated here because .mz-toggle:hover has the same specificity as the rule
+   above and loses on source order. Inside a group an unselected item only
+   highlights: giving it a face and a border would make it look like its own
+   secondary button rather than part of one control. */
+.mz-toggle-group--segmented .mz-toggle:hover {
+  background: rgba(var(--mz-text-rgb), 0.08);
+  color: var(--mz-text);
+}
+.mz-toggle-group--segmented .mz-toggle[data-state='on'] {
+  border-color: var(--mz-convex-hairline);
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  box-shadow:
+    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+}
+
+/* Joined: items share edges, like a single convex bar. */
+.mz-toggle-group--joined .mz-toggle {
+  border-radius: 0;
+  margin-left: -1px;
+  background: var(--mz-face);
+  border-color: var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-face-top);
+}
+.mz-toggle-group--joined .mz-toggle:hover {
+  background: var(--mz-face-hover);
+  color: var(--mz-text);
+}
+/* Keeps the label legible on the tone fill: the hover rules above are more
+   specific than the [data-state='on'] colour, so it has to be restated. */
+.mz-toggle[data-state='on']:hover,
+.mz-toggle-group--segmented .mz-toggle[data-state='on']:hover,
+.mz-toggle-group--joined .mz-toggle[data-state='on']:hover {
+  color: #fff;
+  text-shadow: var(--mz-convex-text-shadow);
+}
+.mz-toggle-group--joined .mz-toggle:first-child {
+  margin-left: 0;
+  border-top-left-radius: var(--mz-radius);
+  border-bottom-left-radius: var(--mz-radius);
+}
+.mz-toggle-group--joined .mz-toggle:last-child {
+  border-top-right-radius: var(--mz-radius);
+  border-bottom-right-radius: var(--mz-radius);
+}
+/* Higher specificity than the .mz-toggle-group--joined .mz-toggle face above,
+   which would otherwise flatten the pressed state. */
+.mz-toggle-group--joined .mz-toggle[data-state='on'] {
+  z-index: 1;
+  color: #fff;
+  border-color: var(--mz-convex-hairline);
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  box-shadow:
+    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    inset 0 1px 0 var(--mz-convex-top),
+    inset 0 -1px 0 var(--mz-convex-bottom);
+  text-shadow: var(--mz-convex-text-shadow);
+}
+
+/* -------------------------------- Slider -------------------------------- */
+.mz-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+}
+.mz-slider[data-orientation='vertical'] {
+  flex-direction: column;
+  width: auto;
+  height: 100%;
+  min-height: 160px;
+}
+.mz-slider[data-disabled] { opacity: 0.5; }
+
+.mz-slider__track {
+  position: relative;
+  flex-grow: 1;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--mz-well);
+  border: 1px solid var(--mz-border);
+  box-shadow: var(--mz-well-inset);
+}
+.mz-slider[data-orientation='horizontal'] .mz-slider__track { height: 8px; width: 100%; }
+.mz-slider[data-orientation='vertical'] .mz-slider__track { width: 8px; height: 100%; }
+
+.mz-slider__range {
+  position: absolute;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--mz-tone-rgb), 0.85) 0%,
+    rgb(var(--mz-tone-rgb)) 100%
+  );
+  box-shadow:
+    0 0 14px rgba(var(--mz-tone-rgb), 0.55),
+    inset 0 1px 0 var(--mz-convex-top);
+}
+.mz-slider[data-orientation='horizontal'] .mz-slider__range { height: 100%; }
+.mz-slider[data-orientation='vertical'] .mz-slider__range { width: 100%; }
+
+.mz-slider__thumb {
+  display: block;
+  width: 16px;
+  height: 20px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #ffffff 0%, #dcdae8 100%);
+  border: 1px solid var(--mz-convex-hairline);
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(var(--mz-tone-rgb), 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  cursor: grab;
+  transition: box-shadow var(--mz-duration) ease, transform 0.15s var(--mz-ease);
+}
+.mz-slider__thumb:hover {
+  box-shadow:
+    0 6px 18px -2px rgba(0, 0, 0, 0.55),
+    0 0 0 7px rgba(var(--mz-tone-rgb), 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+.mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); }
+
+/* Hover darkens the toned fill, matching the buttons. */
+.mz-checkbox[data-state='checked']:hover,
+.mz-checkbox[data-state='indeterminate']:hover,
+.mz-radio[data-state='checked']:hover,
+.mz-switch[data-state='checked']:hover,
+.mz-toggle[data-state='on']:hover,
+.mz-toggle-group--segmented .mz-toggle[data-state='on']:hover,
+.mz-toggle-group--joined .mz-toggle[data-state='on']:hover {
+  background-color: var(--mz-fill-hover);
+}

@@ -1,0 +1,81 @@
+{
+  "name": "@morze/ui",
+  "version": "0.1.0",
+  "description": "Morze UI — React component kit built on shadcn/ui + Radix primitives with the Morze convex look.",
+  "keywords": [
+    "react",
+    "ui",
+    "components",
+    "shadcn",
+    "radix",
+    "design-system",
+    "morze"
+  ],
+  "license": "MIT",
+  "author": "Morze Technologies",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/morze-ui.css",
+    "./tokens.css": "./dist/morze-ui-tokens.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build:js": "tsup && node scripts/add-client-directive.mjs",
+    "build:css": "node scripts/build-css.mjs",
+    "build": "npm run clean && npm run build:js && npm run build:css",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "vite --config playground/vite.config.ts",
+    "preview": "vite preview --config playground/vite.config.ts",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "radix-ui": "^1.6.7"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.0",
+    "happy-dom": "^20.11.6",
+    "lightningcss": "^1.33.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

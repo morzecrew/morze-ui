@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Morze UI — design tokens
+   Palette and the "convex" recipe are lifted from morze-landing (.btn-primary):
+   135° gradient + hairline border + inset top highlight + tone glow.
+   Dark is the default theme; light is opt-in via [data-mz-theme="light"].
+   ========================================================================== */
+
+:root,
+[data-mz-theme='dark'],
+.mz-theme-dark {
+  color-scheme: dark;
+
+  /* ---- Surfaces: warm dark indigo, not pure black ---- */
+  --mz-bg: #0a0a14;
+  --mz-bg-rgb: 10, 10, 20;
+  --mz-bg-2: #12121e;
+  --mz-surface: #14141f;
+  --mz-surface-rgb: 22, 22, 34;
+  --mz-surface-2: #1a1a26;
+  --mz-elevated: #1c1c2b;
+  --mz-elevated-rgb: 28, 28, 43;
+
+  /* ---- Lines ---- */
+  --mz-border: rgba(255, 255, 255, 0.08);
+  --mz-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* ---- Text ---- */
+  --mz-text: #ececf5;
+  --mz-text-rgb: 236, 236, 245;
+  --mz-text-dim: #a3a0b8;
+  --mz-text-muted: #6a6680;
+
+  /* ---- Tones ---- */
+  --mz-primary-rgb: 168, 124, 248;
+  --mz-accent-rgb: 52, 211, 153;
+  --mz-danger-rgb: 255, 100, 130;
+  --mz-warning-rgb: 251, 191, 36;
+  --mz-info-rgb: 56, 189, 248;
+  --mz-success-rgb: 52, 211, 153;
+
+  --mz-primary: rgb(var(--mz-primary-rgb));
+  --mz-primary-fg: #ffffff;
+  --mz-primary-soft: rgba(var(--mz-primary-rgb), 0.14);
+  --mz-primary-glow: rgba(var(--mz-primary-rgb), 0.45);
+
+  /* ---- The convex recipe ----
+     Every active element (button, toggle, checkbox, radio, switch, slider,
+     tab, select trigger) is built from these four layers. */
+  --mz-convex-hairline: rgba(255, 255, 255, 0.18);
+  --mz-convex-top: rgba(255, 255, 255, 0.35);
+  --mz-convex-bottom: rgba(0, 0, 0, 0.2);
+  --mz-convex-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+  /* Idle (unfilled) control face: a faint upward gradient over the surface. */
+  --mz-face: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
+  --mz-face-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.04) 100%);
+  --mz-face-top: rgba(255, 255, 255, 0.1);
+  --mz-face-bottom: rgba(0, 0, 0, 0.35);
+
+  /* Sunken face — inputs, tracks, wells. Convex inverted. */
+  --mz-well: linear-gradient(180deg, #0c0c15 0%, #161621 100%);
+  --mz-well-inset: inset 0 1px 2px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+
+  --mz-overlay: rgba(6, 6, 14, 0.72);
+  --mz-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --mz-shadow-2: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  --mz-shadow-3: 0 24px 64px -24px rgba(0, 0, 0, 0.85);
+}
+
+[data-mz-theme='light'],
+.mz-theme-light {
+  color-scheme: light;
+
+  --mz-bg: #f6f6fa;
+  --mz-bg-rgb: 246, 246, 250;
+  --mz-bg-2: #ffffff;
+  --mz-surface: #ffffff;
+  --mz-surface-rgb: 255, 255, 255;
+  --mz-surface-2: #f2f2f7;
+  --mz-elevated: #ffffff;
+  --mz-elevated-rgb: 255, 255, 255;
+
+  --mz-border: rgba(16, 12, 40, 0.12);
+  /* Strong enough for control outlines to clear 3:1 against a white page. */
+  --mz-border-strong: rgba(16, 12, 40, 0.26);
+
+  --mz-text: #17162a;
+  --mz-text-rgb: 23, 22, 42;
+  --mz-text-dim: #5b5872;
+  --mz-text-muted: #8b88a3;
+
+  --mz-primary-rgb: 124, 74, 232;
+  --mz-accent-rgb: 16, 175, 122;
+  --mz-danger-rgb: 226, 60, 92;
+  --mz-warning-rgb: 202, 138, 4;
+  --mz-info-rgb: 14, 145, 214;
+  --mz-success-rgb: 16, 175, 122;
+
+  --mz-convex-hairline: rgba(255, 255, 255, 0.4);
+  --mz-convex-top: rgba(255, 255, 255, 0.45);
+  --mz-convex-bottom: rgba(0, 0, 0, 0.18);
+  --mz-convex-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
+
+  --mz-face: linear-gradient(180deg, #ffffff 0%, #f0eff6 100%);
+  --mz-face-hover: linear-gradient(180deg, #ffffff 0%, #e9e8f2 100%);
+  --mz-face-top: rgba(255, 255, 255, 0.9);
+  --mz-face-bottom: rgba(16, 12, 40, 0.12);
+
+  --mz-well: linear-gradient(180deg, #e5e4ef 0%, #f3f3f9 100%);
+  --mz-well-inset: inset 0 1px 2px rgba(16, 12, 40, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+
+  --mz-overlay: rgba(24, 22, 45, 0.35);
+  --mz-shadow-1: 0 1px 2px rgba(16, 12, 40, 0.08);
+  --mz-shadow-2: 0 8px 24px -12px rgba(16, 12, 40, 0.22);
+  --mz-shadow-3: 0 24px 64px -24px rgba(16, 12, 40, 0.35);
+}
+
+:root {
+  /* ---- Typography ----
+     System stacks: nothing to download, and the kit inherits the host app's
+     look. Point --mz-font-sans at a webfont to brand it. */
+  --mz-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --mz-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+  --mz-font-display: var(--mz-font-sans);
+
+  /* Control labels: plain sentence case in the UI font. */
+  --mz-label-font: var(--mz-font-sans);
+  --mz-label-transform: none;
+  --mz-label-tracking: 0;
+  --mz-label-weight: 600;
+
+  /* ---- Geometry ----
+     Rectangular by default: controls share one small radius, surfaces a
+     slightly larger one. --mz-radius-pill is kept for the round bits that
+     stay round (radio, dots, thumbs). */
+  --mz-radius: 8px;
+  --mz-radius-sm: 6px;
+  --mz-radius-lg: 12px;
+  --mz-radius-xl: 14px;
+  --mz-radius-pill: 999px;
+  --mz-radius-control: var(--mz-radius);
+
+  /* ---- Motion ----
+     Active elements grow in place on hover; nothing shifts position, so a
+     button never moves out from under the pointer. */
+  --mz-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --mz-duration: 0.28s;
+  --mz-hover-scale: 1.02;
+  --mz-press-scale: 0.98;
+
+  /* How much black is mixed into a *filled* surface on hover / press.
+     Neutral variants (secondary, outline, ghost) lighten instead — darkening
+     them would sink the button into the page. */
+  --mz-hover-mix: 88%;
+  --mz-press-mix: 80%;
+
+  /* Fixed convex sheen laid over the flat fill colour, so the colour itself
+     stays a plain animatable value. */
+  --mz-fill-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(0, 0, 0, 0.14) 100%);
+
+  /* ---- Focus ---- */
+  --mz-ring-width: 2px;
+  --mz-ring-offset: 2px;
+}

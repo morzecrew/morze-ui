@@ -1,0 +1,13 @@
+/* Morze UI — full stylesheet.
+   Import once at the app root:  import '@morze/ui/styles.css' */
+@import './tokens.css';
+@import './base.css';
+@import './components/button.css';
+@import './components/controls.css';
+@import './components/fields.css';
+@import './components/overlays.css';
+@import './components/display.css';
+@import './components/data-table.css';
+@import './components/sheet.css';
+@import './components/sidebar.css';
+@import './tones.css';

@@ -1,0 +1,645 @@
+'use client'
+
+import * as React from 'react'
+
+import { cn } from '../../lib/utils'
+import {
+  AlertIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ChevronRightIcon,
+  InboxIcon,
+  SortIcon,
+} from '../../lib/icons'
+import { Button } from '../button'
+import { Checkbox } from '../checkbox'
+import { Skeleton } from '../skeleton'
+import { CellEditor } from './cell-editor'
+import { ColumnFilter, FilterChip } from './column-filter'
+import { ColumnManager } from './column-manager'
+import { DataTablePagination } from './data-table-pagination'
+import type {
+  ColumnLayout,
+  DataTableColumn,
+  DataTableQuery,
+  RowSelectionState,
+} from './types'
+import { resolveLabels, type DataTableLabels } from './labels'
+import { activeFilters, setFilter, sortStateOf, toggleSort } from './utils'
+import { cssSafe, useColumnResize } from './use-column-resize'
+import { useColumnLayout } from './use-column-layout'
+import { useRowSelection } from './use-row-selection'
+
+export type DataTableProps<T> = {
+  columns: DataTableColumn<T>[]
+  data: T[]
+  rowKey: (row: T) => string
+  /** Total matching rows on the server; drives the pager. */
+  total?: number
+  loading?: boolean
+  error?: React.ReactNode
+  onRetry?: () => void
+
+  query: DataTableQuery
+  onQueryChange: (query: DataTableQuery) => void
+
+  /** Shift-click extends the range; `allMatching` covers unfetched rows. */
+  selection?: RowSelectionState
+  onSelectionChange?: (selection: RowSelectionState) => void
+  bulkActions?: (selection: RowSelectionState) => React.ReactNode
+
+  renderExpanded?: (row: T) => React.ReactNode
+  onRowClick?: (row: T) => void
+
+  layout?: Partial<ColumnLayout>
+  onLayoutChange?: (layout: ColumnLayout) => void
+  /** localStorage key for widths, order, visibility and pinning. */
+  persistKey?: string | null
+
+  toolbar?: React.ReactNode
+  /**
+   * Stretches the columns to fill the container on mount and on container
+   * resize, so there is no dead space at the right edge. Columns the user
+   * resized by hand keep their width. `false` uses the declared widths as-is.
+   */
+  autoFit?: boolean
+  density?: 'compact' | 'normal' | 'relaxed'
+  stickyHeader?: boolean
+  emptyState?: React.ReactNode
+  pageSizeOptions?: number[]
+  /** Overrides for any of the table's own strings. Defaults are English. */
+  labels?: Partial<DataTableLabels>
+  /** Locale for number formatting; defaults to the browser's. */
+  locale?: string
+  caption?: string
+  className?: string
+}
+
+const SELECT_WIDTH = 44
+const EXPAND_WIDTH = 40
+
+export function DataTable<T>({
+  columns,
+  data,
+  rowKey,
+  total,
+  loading = false,
+  error,
+  onRetry,
+  query,
+  onQueryChange,
+  selection,
+  onSelectionChange,
+  bulkActions,
+  renderExpanded,
+  onRowClick,
+  layout: controlledLayout,
+  onLayoutChange,
+  persistKey = null,
+  toolbar,
+  autoFit = true,
+  density = 'normal',
+  stickyHeader = true,
+  emptyState,
+  pageSizeOptions,
+  labels: labelsProp,
+  locale,
+  caption,
+  className,
+}: DataTableProps<T>) {
+  const labels = resolveLabels(labelsProp)
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  const scrollerRef = React.useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = React.useState({ left: false, right: false })
+  const [expanded, setExpanded] = React.useState<Set<string>>(new Set())
+  const [editing, setEditing] = React.useState<{ key: string; col: string } | null>(null)
+
+  const {
+    layout,
+    visible,
+    widthOf,
+    minWidthOf,
+    setWidth,
+    toggleHidden,
+    setPinned,
+    move,
+    moveTo,
+    reset,
+    fitTo,
+  } = useColumnLayout({ columns, persistKey, layout: controlledLayout, onLayoutChange })
+
+  const resize = useColumnResize({ rootRef, widthOf, minWidthOf, onCommit: setWidth })
+
+  const selectable = Boolean(selection && onSelectionChange)
+  const pageKeys = React.useMemo(() => data.map(rowKey), [data, rowKey])
+  const rows = useRowSelection({
+    value: selection ?? { keys: [], allMatching: false },
+    onChange: onSelectionChange ?? (() => {}),
+    pageKeys,
+  })
+
+  // Fill the row on mount and on container resize. Guarded by the last width
+  // it ran for, so the observer cannot ping-pong with an appearing scrollbar.
+  const lastFitWidth = React.useRef(0)
+  React.useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller || !autoFit) return
+    const controls = (selectable ? SELECT_WIDTH : 0) + (renderExpanded ? EXPAND_WIDTH : 0)
+    const run = () => {
+      const available = scroller.clientWidth - controls - 2
+      if (Math.abs(available - lastFitWidth.current) < 1) return
+      lastFitWidth.current = available
+      fitTo(available)
+    }
+    run()
+    const observer = new ResizeObserver(run)
+    observer.observe(scroller)
+    return () => observer.disconnect()
+  }, [autoFit, fitTo, selectable, renderExpanded, layout.hidden, layout.order])
+
+  // Edge shadows tell the reader there is more table beyond the viewport.
+  React.useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    const update = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth
+      setScrolled({ left: scroller.scrollLeft > 1, right: scroller.scrollLeft < max - 1 })
+    }
+    update()
+    scroller.addEventListener('scroll', update, { passive: true })
+    const observer = new ResizeObserver(update)
+    observer.observe(scroller)
+    return () => {
+      scroller.removeEventListener('scroll', update)
+      observer.disconnect()
+    }
+  }, [visible.length, data.length])
+
+  // Sticky offsets are expressed as a calc() over the width variables, so they
+  // stay correct while a column is being resized.
+  const offsets = React.useMemo(() => {
+    const result = new Map<string, string>()
+    let leftParts: string[] = selectable ? [`${SELECT_WIDTH}px`] : []
+    if (renderExpanded) leftParts = [...leftParts, `${EXPAND_WIDTH}px`]
+    for (const column of visible) {
+      if (layout.pinned[column.id] !== 'left') continue
+      result.set(column.id, leftParts.length ? `calc(${leftParts.join(' + ')})` : '0px')
+      leftParts.push(`var(--mz-dt-w-${cssSafe(column.id)}, ${widthOf(column.id)}px)`)
+    }
+    const rightParts: string[] = []
+    for (const column of [...visible].reverse()) {
+      if (layout.pinned[column.id] !== 'right') continue
+      result.set(column.id, rightParts.length ? `calc(${rightParts.join(' + ')})` : '0px')
+      rightParts.push(`var(--mz-dt-w-${cssSafe(column.id)}, ${widthOf(column.id)}px)`)
+    }
+    return result
+  }, [visible, layout.pinned, widthOf, selectable, renderExpanded])
+
+  const widthVars = React.useMemo(() => {
+    const style: Record<string, string> = {}
+    for (const column of visible) {
+      style[`--mz-dt-w-${cssSafe(column.id)}`] = `${widthOf(column.id)}px`
+    }
+    return style as React.CSSProperties
+  }, [visible, widthOf])
+
+  // Only the cell on the seam gets the edge shadow, so the cue reads as one
+  // boundary rather than a shadow under every pinned column.
+  const leftPinned = visible.filter((c) => layout.pinned[c.id] === 'left')
+  const rightPinned = visible.filter((c) => layout.pinned[c.id] === 'right')
+  const lastLeftPinned = leftPinned[leftPinned.length - 1]?.id
+  const firstRightPinned = rightPinned[0]?.id
+  const pinEdgeOf = (id: string) =>
+    id === lastLeftPinned ? 'left' : id === firstRightPinned ? 'right' : undefined
+  // With no pinned data column the control column carries the seam instead.
+  const controlPinEdge = leftPinned.length === 0 ? 'left' : undefined
+
+  const chips = activeFilters(query.filters)
+  const columnById = React.useMemo(() => new Map(columns.map((c) => [c.id, c])), [columns])
+  const labelOf = (id: string) => {
+    const column = columnById.get(id)
+    return column?.label ?? (typeof column?.header === 'string' ? column.header : id)
+  }
+
+  const toggleExpanded = (key: string) =>
+    setExpanded((current) => {
+      const next = new Set(current)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+
+  const fillerIndex = visible.length - rightPinned.length
+  // +1 for the filler column, so full-width rows really span the table.
+  const colSpan = visible.length + 1 + (selectable ? 1 : 0) + (renderExpanded ? 1 : 0)
+  const selectionCount = rows.allMatching ? total : rows.count
+
+  /* Cells are rendered through helpers so the filler column can be spliced in
+     between the scrolling columns and the right-pinned group. */
+  const renderHeaderCells = (list: DataTableColumn<T>[]) =>
+    list.map((column) => {
+                const { dir, index } = sortStateOf(query, column.id)
+                const pinned = layout.pinned[column.id]
+                const label = labelOf(column.id)
+                return (
+                  <th
+                    key={column.id}
+                    data-col={column.id}
+                    data-pinned={pinned}
+                    data-pin-edge={pinEdgeOf(column.id)}
+                    data-align={column.align}
+                    aria-sort={dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : 'none'}
+                    className="mz-dt__th"
+                    style={
+                      pinned
+                        ? ({ [pinned]: offsets.get(column.id) } as React.CSSProperties)
+                        : undefined
+                    }
+                  >
+                    <div className="mz-dt__th-inner">
+                      {column.sortable ? (
+                        <button
+                          type="button"
+                          className="mz-dt__sort mz-focusable"
+                          title={labels.sortBy(label)}
+                          onClick={(event) =>
+                            onQueryChange(toggleSort(query, column.id, event.shiftKey))
+                          }
+                        >
+                          <span className="mz-dt__th-label">{column.header}</span>
+                          <span className="mz-dt__sort-icon" data-active={dir ? true : undefined}>
+                            {dir === 'asc' ? (
+                              <ArrowUpIcon />
+                            ) : dir === 'desc' ? (
+                              <ArrowDownIcon />
+                            ) : (
+                              <SortIcon />
+                            )}
+                            {index ? <b>{index}</b> : null}
+                          </span>
+                        </button>
+                      ) : (
+                        <span className="mz-dt__th-label" title={column.headerTitle}>
+                          {column.header}
+                        </span>
+                      )}
+
+                      {column.filter ? (
+                        <ColumnFilter
+                          columnLabel={label}
+                          def={column.filter}
+                          value={query.filters[column.id]}
+                          onApply={(value) => onQueryChange(setFilter(query, column.id, value))}
+                        />
+                      ) : null}
+                    </div>
+
+                    {column.resizable === false ? null : (
+                      <span
+                        role="separator"
+                        aria-orientation="vertical"
+                        aria-label={labels.columnWidth(label)}
+                        tabIndex={0}
+                        className="mz-dt__resizer mz-focusable"
+                        data-resizing={resize.resizing === column.id || undefined}
+                        onPointerDown={(event) => resize.start(event, column.id)}
+                        onDoubleClick={() => resize.autoFit(column.id)}
+                        onKeyDown={(event) => resize.onKeyDown(event, column.id)}
+                      />
+                    )}
+                  </th>
+                )
+              })
+
+  const renderBodyCells = (row: T, rowIndex: number, list: DataTableColumn<T>[]) => {
+    const key = rowKey(row)
+    return list.map((column) => {
+                          const pinned = layout.pinned[column.id]
+                          const isEditing = editing?.key === key && editing.col === column.id
+                          return (
+                            <td
+                              key={column.id}
+                              data-col={column.id}
+                              data-pinned={pinned}
+                              data-pin-edge={pinEdgeOf(column.id)}
+                              data-align={column.align}
+                              data-editable={column.editable ? true : undefined}
+                              className="mz-dt__td"
+                              style={
+                                pinned
+                                  ? ({ [pinned]: offsets.get(column.id) } as React.CSSProperties)
+                                  : undefined
+                              }
+                              onDoubleClick={
+                                column.editable
+                                  ? (event) => {
+                                      event.stopPropagation()
+                                      setEditing({ key, col: column.id })
+                                    }
+                                  : undefined
+                              }
+                            >
+                              {isEditing && column.editable ? (
+                                <CellEditor
+                                  row={row}
+                                  def={column.editable}
+                                  onDone={() => setEditing(null)}
+                                />
+                              ) : (
+                                <div className="mz-dt__cell">
+                                  {column.cell
+                                    ? column.cell(row, { rowIndex })
+                                    : column.accessor?.(row)}
+                                </div>
+                              )}
+                            </td>
+                          )
+                        })
+  }
+
+  return (
+    <div
+      ref={rootRef}
+      data-slot="data-table"
+      data-density={density}
+      className={cn('mz-dt', className)}
+      style={widthVars}
+    >
+      {(toolbar || chips.length > 0 || columns.some((c) => c.hideable !== false)) && (
+        <div className="mz-dt__toolbar">
+          <div className="mz-dt__toolbar-main">{toolbar}</div>
+          <div className="mz-dt__toolbar-side">
+            <ColumnManager
+              columns={columns}
+              layout={layout}
+              labels={labelsProp}
+              onToggleHidden={toggleHidden}
+              onSetPinned={setPinned}
+              onMove={move}
+              onMoveTo={moveTo}
+              onReset={reset}
+            />
+          </div>
+        </div>
+      )}
+
+      {chips.length > 0 && (
+        <div className="mz-dt__chips">
+          {chips.map(([id, value]) => (
+            <FilterChip
+              key={id}
+              label={
+                <>
+                  <b>{labelOf(id)}</b>
+                  {describeFilter(value, columnById.get(id)?.filter, labels)}
+                </>
+              }
+              clearLabel={labels.clearFilter}
+              onClear={() => onQueryChange(setFilter(query, id, undefined))}
+            />
+          ))}
+          <Button
+            variant="link"
+            size="xs"
+            onClick={() => onQueryChange({ ...query, filters: {}, page: 1 })}
+          >
+            {labels.resetAll}
+          </Button>
+        </div>
+      )}
+
+      <div
+        ref={scrollerRef}
+        className="mz-dt__scroller"
+        data-scrolled-left={scrolled.left || undefined}
+        data-scrolled-right={scrolled.right || undefined}
+      >
+        <table className="mz-dt__table" data-sticky={stickyHeader || undefined}>
+          {caption ? <caption className="mz-sr-only">{caption}</caption> : null}
+          {/* A trailing auto-width column absorbs whatever space is left over.
+              Without it `table-layout: fixed` spreads the slack across every
+              column, so dragging one would visibly squeeze its neighbours. */}
+          <colgroup>
+            {selectable ? <col style={{ width: SELECT_WIDTH }} /> : null}
+            {renderExpanded ? <col style={{ width: EXPAND_WIDTH }} /> : null}
+            {visible.slice(0, fillerIndex).map((column) => (
+              <col
+                key={column.id}
+                style={{ width: `var(--mz-dt-w-${cssSafe(column.id)}, ${widthOf(column.id)}px)` }}
+              />
+            ))}
+            <col className="mz-dt__col-filler" />
+            {visible.slice(fillerIndex).map((column) => (
+              <col
+                key={column.id}
+                style={{ width: `var(--mz-dt-w-${cssSafe(column.id)}, ${widthOf(column.id)}px)` }}
+              />
+            ))}
+          </colgroup>
+
+          <thead>
+            <tr>
+              {selectable ? (
+                <th
+                  className="mz-dt__th mz-dt__th--control"
+                  data-pinned="left"
+                  data-pin-edge={renderExpanded ? undefined : controlPinEdge}
+                  style={{ left: 0 }}
+                >
+                  <Checkbox
+                    size="sm"
+                    aria-label={labels.selectPage}
+                    checked={rows.pageSelected ? true : rows.pagePartial ? 'indeterminate' : false}
+                    onCheckedChange={rows.togglePage}
+                  />
+                </th>
+              ) : null}
+              {renderExpanded ? (
+                <th
+                  className="mz-dt__th mz-dt__th--control"
+                  data-pinned="left"
+                  data-pin-edge={controlPinEdge}
+                  style={{ left: selectable ? SELECT_WIDTH : 0 }}
+                >
+                  <span className="mz-sr-only">{labels.details}</span>
+                </th>
+              ) : null}
+
+              {renderHeaderCells(visible.slice(0, fillerIndex))}
+              <th className="mz-dt__th mz-dt__th--filler" aria-hidden="true" />
+              {renderHeaderCells(visible.slice(fillerIndex))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading && data.length === 0
+              ? Array.from({ length: Math.min(query.pageSize, 8) }, (_, index) => (
+                  <tr key={`skeleton-${index}`} className="mz-dt__row">
+                    <td className="mz-dt__td" colSpan={colSpan}>
+                      <Skeleton style={{ height: 14, width: `${60 + ((index * 13) % 35)}%` }} />
+                    </td>
+                  </tr>
+                ))
+              : data.map((row, rowIndex) => {
+                  const key = rowKey(row)
+                  const isOpen = expanded.has(key)
+                  return (
+                    <React.Fragment key={key}>
+                      <tr
+                        className="mz-dt__row"
+                        data-selected={rows.selected.has(key) || rows.allMatching || undefined}
+                        data-clickable={onRowClick ? true : undefined}
+                        onClick={onRowClick ? () => onRowClick(row) : undefined}
+                      >
+                        {selectable ? (
+                          <td
+                            className="mz-dt__td mz-dt__td--control"
+                            data-pinned="left"
+                            data-pin-edge={renderExpanded ? undefined : controlPinEdge}
+                            style={{ left: 0 }}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <Checkbox
+                              size="sm"
+                              aria-label={labels.selectRow}
+                              checked={rows.selected.has(key) || rows.allMatching}
+                              onClick={(event) =>
+                                rows.toggle(key, { shiftKey: (event as React.MouseEvent).shiftKey })
+                              }
+                            />
+                          </td>
+                        ) : null}
+
+                        {renderExpanded ? (
+                          <td
+                            className="mz-dt__td mz-dt__td--control"
+                            data-pinned="left"
+                            data-pin-edge={controlPinEdge}
+                            style={{ left: selectable ? SELECT_WIDTH : 0 }}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              className="mz-dt__expand mz-focusable"
+                              data-open={isOpen || undefined}
+                              aria-expanded={isOpen}
+                              aria-label={isOpen ? labels.collapseRow : labels.expandRow}
+                              onClick={() => toggleExpanded(key)}
+                            >
+                              <ChevronRightIcon />
+                            </button>
+                          </td>
+                        ) : null}
+
+                        {renderBodyCells(row, rowIndex, visible.slice(0, fillerIndex))}
+                        <td className="mz-dt__td mz-dt__td--filler" aria-hidden="true" />
+                        {renderBodyCells(row, rowIndex, visible.slice(fillerIndex))}
+                      </tr>
+
+                      {isOpen && renderExpanded ? (
+                        <tr className="mz-dt__row mz-dt__row--expanded">
+                          <td className="mz-dt__td mz-dt__td--expanded" colSpan={colSpan}>
+                            {renderExpanded(row)}
+                          </td>
+                        </tr>
+                      ) : null}
+                    </React.Fragment>
+                  )
+                })}
+          </tbody>
+        </table>
+
+        {!loading && !error && data.length === 0 ? (
+          <div className="mz-dt__state">
+            {emptyState ?? (
+              <>
+                <InboxIcon />
+                <p>{labels.empty}</p>
+                {chips.length > 0 ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => onQueryChange({ ...query, filters: {}, page: 1 })}
+                  >
+                    {labels.resetFilters}
+                  </Button>
+                ) : null}
+              </>
+            )}
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="mz-dt__state" data-tone="danger">
+            <AlertIcon />
+            <p>{error}</p>
+            {onRetry ? (
+              <Button size="sm" variant="secondary" onClick={onRetry}>
+                {labels.retry}
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {loading && data.length > 0 ? <div className="mz-dt__loading-bar" aria-hidden="true" /> : null}
+      </div>
+
+      <DataTablePagination
+        query={query}
+        total={total}
+        rowsOnPage={data.length}
+        pageSizeOptions={pageSizeOptions}
+        labels={labelsProp}
+        locale={locale}
+        onQueryChange={onQueryChange}
+      />
+
+      {selectable && (rows.count ?? 0) > 0 ? (
+        <div className="mz-dt__bulkbar" role="region" aria-label={labels.bulkActions}>
+          <span className="mz-dt__bulkbar-count">
+            {labels.selectedCount(
+              selectionCount?.toLocaleString(locale) ?? String(rows.count ?? 0)
+            )}
+            {rows.allMatching ? labels.allMatchingSuffix : null}
+          </span>
+          {!rows.allMatching && total !== undefined && rows.pageSelected && total > data.length ? (
+            <Button variant="link" size="xs" onClick={rows.selectAllMatching}>
+              {labels.selectAllMatching(total.toLocaleString(locale))}
+            </Button>
+          ) : null}
+          <div className="mz-dt__bulkbar-actions">
+            {bulkActions?.(selection ?? { keys: [], allMatching: false })}
+            <Button variant="ghost" size="sm" onClick={rows.clear}>
+              {labels.clearSelection}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function describeFilter(
+  value: import('./types').FilterValue,
+  def: import('./types').ColumnFilterDef | undefined,
+  labels: DataTableLabels
+): string {
+  switch (value.type) {
+    case 'text':
+      return `: “${value.value}”`
+    case 'select': {
+      // Show what the user picked in the menu, not the raw wire value.
+      const options = def?.type === 'select' ? def.options : []
+      const labels = value.value.map(
+        (v) => options.find((option) => option.value === v)?.label ?? v
+      )
+      return `: ${labels.join(', ')}`
+    }
+    case 'number-range':
+      return `: ${value.min ?? '…'}–${value.max ?? '…'}`
+    case 'date-range':
+      return `: ${value.from ?? '…'} – ${value.to ?? '…'}`
+    case 'boolean':
+      return `: ${value.value ? labels.yes.toLowerCase() : labels.no.toLowerCase()}`
+  }
+}
