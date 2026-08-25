@@ -4,6 +4,8 @@ Morze UI — a React component kit shaped like **shadcn/ui (latest)** on **Radix
 primitives, wearing the convex look from the Morze landing: a 135° gradient, a
 hairline rim, an inset highlight on top and a tone glow underneath.
 
+![Morze UI components](docs/screenshot.png)
+
 ```
 background-color: rgb(tone);
 background-image: linear-gradient(135deg, rgba(255,255,255,.07), rgba(0,0,0,.14));
