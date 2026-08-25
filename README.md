@@ -47,6 +47,23 @@ export default function App() {
 
 Tokens only, without components: `import '@morze/ui/tokens.css'`.
 
+**In a Tailwind v4 host, import the kit into a layer.** The kit ships plain,
+unlayered CSS, and unlayered CSS beats layered CSS regardless of source order —
+imported naively, `.mz-btn--primary` outranks every utility passed through
+`className`:
+
+```css
+/* Layer order first — @layer statements may precede @import. */
+@layer theme, base, components, morze-ui, utilities;
+
+@import 'tailwindcss';
+@import '@morze/ui/styles.css' layer(morze-ui);
+```
+
+The kit then wins over the host's preflight, and a `className` on a component
+still wins over the kit. Note that `cn` is plain `clsx`, not `tailwind-merge`:
+conflicting classes are not de-duplicated, they are resolved by that cascade.
+
 ## Themes
 
 Dark is the default, light is opt-in through an attribute (or the
@@ -342,7 +359,23 @@ What it does:
 - **Header filters** — `text`, `select`, `number-range`, `date-range`,
   `boolean`. A value is staged in the popover and committed on Apply: otherwise
   every keystroke would be a request. Active filters are echoed as chips above
-  the table.
+  the table. `type: 'custom'` renders a widget of your own in the same popover —
+  an async multiselect, a range slider — and it takes part in `query.filters`
+  like the built-in ones:
+
+  ```tsx
+  filter: {
+    type: 'custom',
+    render: ({ value, commit }) => (
+      <ClientPicker selected={value as string[]} onPick={(ids, names) => commit(ids, names)} />
+    ),
+    describe: (value) => `${(value as string[]).length} selected`,
+  }
+  ```
+
+  The value reaches the backend untouched; `commit(value, label)` applies and
+  closes, `onChange` only stages. `actions: false` drops the Apply/Reset footer
+  for a widget that commits itself.
 - **Default widths** — columns stretch to fill the container, so there is no
   dead space at the right edge. The maths runs off the declared `width` values
   (they act as proportions), re-runs when the container resizes and always
@@ -371,10 +404,28 @@ What it does:
 - **States** — skeletons on the first load, a thin progress line when refetching
   over data already on screen, an empty result and an error with a retry.
 - **Density** `compact | normal | relaxed`.
+- **Row styling** — `rowClassName` tints a row by record state (a soft-deleted
+  row painted red); `rowProps` adds `data-*`, `title` or a handler of your own.
+  The table's own attributes win, so neither can break selection or expansion.
+- **Load more instead of paging** — pass `onLoadMore` and the pager is replaced
+  by a footer inside the table's own scroller, so an endless scroll works from
+  the inside (a host cannot bolt a sentinel onto a scroller it does not own).
+  `hasMore` defaults to `data.length < total`, `autoLoadMore={false}` waits for
+  a click, and `pagination` brings the pager back if you want both. The table
+  asks once per batch of rows: a host that answers with nothing new is not
+  asked again.
+- **The pager adapts** — `pageSizeOptions={false}`, or a single option, hides
+  the rows-per-page select for a backend that fixes the page size.
 
 Helpers for your own UI: `useTableQuery`, `useSavedViews`, `useColumnLayout`,
 `useRowSelection`, plus the pure functions `toggleSort`, `setFilter`,
 `serializeSort` / `parseSort`.
+
+Cells already truncate: `.mz-dt__cell` is `overflow: hidden; text-overflow:
+ellipsis; white-space: nowrap`. Carrying a `className="block truncate"` from a
+shadcn table onto cell content is redundant — and a block-level child that
+reflows during a render is exactly what used to feed the scroll observer into a
+render loop (see `FIXES.md`).
 
 A table stays a table: on narrow screens it scrolls horizontally with the first
 column pinned, it does not reflow into cards.
@@ -407,6 +458,23 @@ const de: Partial<DataTableLabels> = {
 `locale` controls number formatting; without it the browser's locale is used.
 The complete set of keys is `DataTableLabels`, with defaults in
 `defaultDataTableLabels`.
+
+Ready-made bundles ship behind their own entry points, so a non-English host
+does not hand-carry ~50 strings — and does not silently drift as the kit adds
+them:
+
+```tsx
+import { dataTable as ru, common } from '@morze/ui/locales/ru'
+
+<DataTable labels={ru} locale="ru-RU" … />
+<Dialog><DialogContent closeLabel={common.close}>…</DialogContent></Dialog>
+```
+
+`common` carries the strings the rest of the kit takes as individual props
+(`close`, `loading`, `sidebarNavigation`, `sidebarSections`, `toggleSidebar`).
+A bundle is plain data — no React, no styles — so it is safe to import from a
+server component. `@morze/ui/locales/en` is the same shape for English, and
+`MorzeLocale` types a language of your own.
 
 ## Accessibility and behaviour
 

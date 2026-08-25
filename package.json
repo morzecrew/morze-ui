@@ -13,6 +13,14 @@
   ],
   "license": "MIT",
   "author": "Morze Technologies",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morzecrew/morze-ui.git"
+  },
+  "homepage": "https://github.com/morzecrew/morze-ui#readme",
+  "bugs": {
+    "url": "https://github.com/morzecrew/morze-ui/issues"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -25,6 +33,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./locales/en": {
+      "types": "./dist/locales/en.d.ts",
+      "import": "./dist/locales/en.js",
+      "require": "./dist/locales/en.cjs"
+    },
+    "./locales/ru": {
+      "types": "./dist/locales/ru.d.ts",
+      "import": "./dist/locales/ru.js",
+      "require": "./dist/locales/ru.cjs"
     },
     "./styles.css": "./dist/morze-ui.css",
     "./tokens.css": "./dist/morze-ui-tokens.css",

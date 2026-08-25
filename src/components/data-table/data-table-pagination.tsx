@@ -32,13 +32,18 @@ export function DataTablePagination({
   query: DataTableQuery
   total?: number
   rowsOnPage: number
-  pageSizeOptions?: number[]
+  /**
+   * `false` — or a single option — hides the control: a host whose backend
+   * fixes the page size would otherwise show a select that changes nothing.
+   */
+  pageSizeOptions?: number[] | false
   labels?: Partial<DataTableLabels>
   /** Number formatting locale; defaults to the browser's. */
   locale?: string
   onQueryChange: (query: DataTableQuery) => void
 }) {
   const labels = resolveLabels(labelsProp)
+  const sizes = pageSizeOptions === false ? [] : pageSizeOptions
   const pages = pageCount(total, query.pageSize)
   const from = total === 0 ? 0 : (query.page - 1) * query.pageSize + 1
   const to = total === undefined ? from + rowsOnPage - 1 : Math.min(query.page * query.pageSize, total)
@@ -62,26 +67,28 @@ export function DataTablePagination({
         )}
       </div>
 
-      <div className="mz-dt__pagination-size">
-        <span>{labels.rowsPerPage}</span>
-        <Select
-          value={String(query.pageSize)}
-          onValueChange={(value) =>
-            onQueryChange({ ...query, pageSize: Number(value), page: 1 })
-          }
-        >
-          <SelectTrigger size="sm" className="mz-dt__pagination-select">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={String(size)}>
-                {size}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {sizes.length > 1 ? (
+        <div className="mz-dt__pagination-size">
+          <span>{labels.rowsPerPage}</span>
+          <Select
+            value={String(query.pageSize)}
+            onValueChange={(value) =>
+              onQueryChange({ ...query, pageSize: Number(value), page: 1 })
+            }
+          >
+            <SelectTrigger size="sm" className="mz-dt__pagination-select">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {sizes.map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
       <div className="mz-dt__pagination-nav">
         <span className="mz-dt__pagination-page">

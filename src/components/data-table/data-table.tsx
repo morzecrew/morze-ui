@@ -22,6 +22,7 @@ import type {
   ColumnLayout,
   DataTableColumn,
   DataTableQuery,
+  RowAttributes,
   RowSelectionState,
 } from './types'
 import { resolveLabels, type DataTableLabels } from './labels'
@@ -50,6 +51,15 @@ export type DataTableProps<T> = {
 
   renderExpanded?: (row: T) => React.ReactNode
   onRowClick?: (row: T) => void
+  /** Per-row class name — tinting a row by record state, marking it stale. */
+  rowClassName?: (row: T, context: { rowIndex: number }) => string | undefined
+  /**
+   * Extra attributes for the row element: `data-*`, `title`, `aria-*`, a
+   * handler of your own. The table's own attributes win, so this cannot break
+   * selection, expansion or the pinned-column seam; a `className` here is
+   * merged, and an `onClick` runs before `onRowClick`.
+   */
+  rowProps?: (row: T, context: { rowIndex: number }) => RowAttributes
 
   layout?: Partial<ColumnLayout>
   onLayoutChange?: (layout: ColumnLayout) => void
@@ -66,7 +76,20 @@ export type DataTableProps<T> = {
   density?: 'compact' | 'normal' | 'relaxed'
   stickyHeader?: boolean
   emptyState?: React.ReactNode
-  pageSizeOptions?: number[]
+  /** `false` — or a single option — hides the rows-per-page select. */
+  pageSizeOptions?: number[] | false
+  /** Renders the pager. Defaults to `false` once `onLoadMore` is given. */
+  pagination?: boolean
+  /**
+   * Appends the next page instead of replacing the current one. Passing it
+   * puts a footer inside the table's own scroller — the element an infinite
+   * scroll needs to watch, which a host cannot add from the outside.
+   */
+  onLoadMore?: () => void
+  /** Whether anything is left to load. Defaults to `data.length < total`. */
+  hasMore?: boolean
+  /** `false` waits for a click instead of loading as the footer scrolls in. */
+  autoLoadMore?: boolean
   /** Overrides for any of the table's own strings. Defaults are English. */
   labels?: Partial<DataTableLabels>
   /** Locale for number formatting; defaults to the browser's. */
@@ -93,6 +116,8 @@ export function DataTable<T>({
   bulkActions,
   renderExpanded,
   onRowClick,
+  rowClassName,
+  rowProps,
   layout: controlledLayout,
   onLayoutChange,
   persistKey = null,
@@ -102,6 +127,10 @@ export function DataTable<T>({
   stickyHeader = true,
   emptyState,
   pageSizeOptions,
+  pagination,
+  onLoadMore,
+  hasMore,
+  autoLoadMore = true,
   labels: labelsProp,
   locale,
   caption,
@@ -163,7 +192,14 @@ export function DataTable<T>({
     if (!scroller) return
     const update = () => {
       const max = scroller.scrollWidth - scroller.clientWidth
-      setScrolled({ left: scroller.scrollLeft > 1, right: scroller.scrollLeft < max - 1 })
+      const left = scroller.scrollLeft > 1
+      const right = scroller.scrollLeft < max - 1
+      // A fresh object here would be a new state on every observer tick, and any
+      // cell whose content reflows during that render feeds the observer again —
+      // the two then re-render each other until the tab locks up.
+      setScrolled((current) =>
+        current.left === left && current.right === right ? current : { left, right }
+      )
     }
     update()
     scroller.addEventListener('scroll', update, { passive: true })
@@ -174,6 +210,50 @@ export function DataTable<T>({
       observer.disconnect()
     }
   }, [visible.length, data.length])
+
+  /* ------------------------------ Load more ------------------------------
+     The footer lives inside the scroller, because that is the element an
+     observer has to be rooted at; a host cannot reach in from the outside. */
+  const moreRef = React.useRef<HTMLDivElement>(null)
+  const onLoadMoreRef = React.useRef(onLoadMore)
+  // Kept current after every commit, so the observer below never has to be
+  // re-subscribed just because the host passed a fresh closure.
+  React.useEffect(() => {
+    onLoadMoreRef.current = onLoadMore
+  })
+  // The row count the last request was made at. One request per batch of rows:
+  // a host that answers with nothing new would otherwise be asked forever.
+  const askedAt = React.useRef(-1)
+
+  const canLoadMore =
+    Boolean(onLoadMore) && (hasMore ?? (total === undefined || data.length < total))
+  const showLoadMore = canLoadMore && !error && data.length > 0
+  const showPager = pagination ?? !onLoadMore
+
+  const askForMore = () => {
+    if (askedAt.current === data.length) return
+    askedAt.current = data.length
+    onLoadMoreRef.current?.()
+  }
+
+  React.useEffect(() => {
+    const sentinel = moreRef.current
+    const scroller = scrollerRef.current
+    if (!sentinel || !scroller || !showLoadMore || !autoLoadMore || loading) return
+    if (typeof IntersectionObserver === 'undefined') return
+    // Nothing here may touch state: a re-render that reflows a cell feeds the
+    // scroller's own observer, and the two can then drive each other (FIXES.md).
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) askForMore()
+      },
+      { root: scroller, rootMargin: '120px' }
+    )
+    observer.observe(sentinel)
+    // Re-observing on every batch is what keeps an endless scroll going: the
+    // fresh observer reports the footer again if it is still in view.
+    return () => observer.disconnect()
+  }, [showLoadMore, autoLoadMore, loading, data.length])
 
   // Sticky offsets are expressed as a calc() over the width variables, so they
   // stay correct while a column is being resized.
@@ -483,13 +563,24 @@ export function DataTable<T>({
               : data.map((row, rowIndex) => {
                   const key = rowKey(row)
                   const isOpen = expanded.has(key)
+                  const context = { rowIndex }
+                  const hostClass = rowClassName?.(row, context)
+                  const hostProps = rowProps?.(row, context)
                   return (
                     <React.Fragment key={key}>
                       <tr
-                        className="mz-dt__row"
+                        {...hostProps}
+                        className={cn('mz-dt__row', hostClass, hostProps?.className)}
                         data-selected={rows.selected.has(key) || rows.allMatching || undefined}
                         data-clickable={onRowClick ? true : undefined}
-                        onClick={onRowClick ? () => onRowClick(row) : undefined}
+                        onClick={
+                          onRowClick || hostProps?.onClick
+                            ? (event) => {
+                                hostProps?.onClick?.(event)
+                                onRowClick?.(row)
+                              }
+                            : undefined
+                        }
                       >
                         {selectable ? (
                           <td
@@ -537,7 +628,9 @@ export function DataTable<T>({
                       </tr>
 
                       {isOpen && renderExpanded ? (
-                        <tr className="mz-dt__row mz-dt__row--expanded">
+                        // The detail panel belongs to the same record, so a row
+                        // tint carries onto it; the attributes do not.
+                        <tr className={cn('mz-dt__row mz-dt__row--expanded', hostClass)}>
                           <td className="mz-dt__td mz-dt__td--expanded" colSpan={colSpan}>
                             {renderExpanded(row)}
                           </td>
@@ -581,18 +674,28 @@ export function DataTable<T>({
           </div>
         ) : null}
 
+        {showLoadMore ? (
+          <div ref={moreRef} className="mz-dt__more" data-slot="data-table-load-more">
+            <Button variant="secondary" size="sm" disabled={loading} onClick={askForMore}>
+              {loading ? labels.loadingMore : labels.loadMore}
+            </Button>
+          </div>
+        ) : null}
+
         {loading && data.length > 0 ? <div className="mz-dt__loading-bar" aria-hidden="true" /> : null}
       </div>
 
-      <DataTablePagination
-        query={query}
-        total={total}
-        rowsOnPage={data.length}
-        pageSizeOptions={pageSizeOptions}
-        labels={labelsProp}
-        locale={locale}
-        onQueryChange={onQueryChange}
-      />
+      {showPager ? (
+        <DataTablePagination
+          query={query}
+          total={total}
+          rowsOnPage={data.length}
+          pageSizeOptions={pageSizeOptions}
+          labels={labelsProp}
+          locale={locale}
+          onQueryChange={onQueryChange}
+        />
+      ) : null}
 
       {selectable && (rows.count ?? 0) > 0 ? (
         <div className="mz-dt__bulkbar" role="region" aria-label={labels.bulkActions}>
@@ -641,5 +744,10 @@ function describeFilter(
       return `: ${value.from ?? '…'} – ${value.to ?? '…'}`
     case 'boolean':
       return `: ${value.value ? labels.yes.toLowerCase() : labels.no.toLowerCase()}`
+    case 'custom': {
+      // Only the host can put a custom value into words.
+      const text = (def?.type === 'custom' ? def.describe?.(value.value) : undefined) ?? value.label
+      return text ? `: ${text}` : ''
+    }
   }
 }

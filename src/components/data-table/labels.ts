@@ -47,6 +47,8 @@ export type DataTableLabels = {
   previousPage: string
   nextPage: string
   lastPage: string
+  loadMore: string
+  loadingMore: string
 
   selectedCount: (count: string) => string
   allMatchingSuffix: string
@@ -100,6 +102,8 @@ export const defaultDataTableLabels: DataTableLabels = {
   previousPage: 'Previous page',
   nextPage: 'Next page',
   lastPage: 'Last page',
+  loadMore: 'Load more',
+  loadingMore: 'Loading…',
 
   selectedCount: (count) => `Selected: ${count}`,
   allMatchingSuffix: ' (all matching)',

@@ -178,12 +178,14 @@ export type {
   DataTableProps,
   ColumnFilterDef,
   ColumnLayout,
+  CustomFilterContext,
   DataTableColumn,
   DataTableFilters,
   DataTableQuery,
   DataTableSort,
   EditableDef,
   FilterValue,
+  RowAttributes,
   RowSelectionState,
   SavedView,
   SelectOptionDef,
@@ -192,3 +194,6 @@ export type {
   UseSavedViewsOptions,
   DataTableLabels,
 } from './components/data-table'
+
+/** Locale bundles live behind their own entry points: `@morze/ui/locales/ru`. */
+export type { MorzeCommonLabels, MorzeLocale } from './locales/types'

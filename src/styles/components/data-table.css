@@ -298,6 +298,16 @@
 .mz-dt__state p { margin: 0; font-size: 14px; }
 .mz-dt__state[data-tone='danger'] { color: rgb(var(--mz-danger-rgb)); }
 
+/* Load-more footer. It sits inside the scroller — the element an infinite
+   scroll has to observe — so it trails the last row rather than the viewport. */
+.mz-dt__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px solid var(--mz-border);
+}
+
 /* Refetch on an already populated table: a hairline progress line, no jump. */
 .mz-dt__loading-bar {
   position: sticky;

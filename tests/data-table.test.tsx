@@ -208,11 +208,146 @@ describe('DataTable', () => {
     expect(Number(span)).toBe(cols)
   })
 
+  it('takes a row class and extra row attributes from the host', () => {
+    const { container } = table({
+      rowClassName: (row) => (row.id === '1' ? 'is-deleted' : undefined),
+      rowProps: (row) => ({ 'data-record': row.id, title: row.name }),
+    })
+    const rendered = container.querySelectorAll('tbody tr')
+    expect(rendered[0]).toHaveClass('mz-dt__row', 'is-deleted')
+    expect(rendered[0]).toHaveAttribute('data-record', '1')
+    expect(rendered[0]).toHaveAttribute('title', 'First')
+    expect(rendered[1]).not.toHaveClass('is-deleted')
+  })
+
+  it('runs the host row handler alongside onRowClick', async () => {
+    const hostClick = vi.fn()
+    const onRowClick = vi.fn()
+    table({ onRowClick, rowProps: () => ({ onClick: hostClick }) })
+    await userEvent.click(screen.getByText('First'))
+    expect(hostClick).toHaveBeenCalledTimes(1)
+    expect(onRowClick).toHaveBeenCalledWith(rows[0])
+  })
+
+  it('hides the rows-per-page control when the host fixes the page size', () => {
+    const fixed = table({ pageSizeOptions: false })
+    expect(fixed.container.querySelector('.mz-dt__pagination-size')).toBeNull()
+    // The pager itself stays: the page count and the arrows still mean something.
+    expect(fixed.container.querySelector('.mz-dt__pagination-nav')).not.toBeNull()
+    fixed.unmount()
+
+    // A single option is a control that cannot change anything either.
+    const one = table({ pageSizeOptions: [25] })
+    expect(one.container.querySelector('.mz-dt__pagination-size')).toBeNull()
+    one.unmount()
+
+    expect(table().container.querySelector('.mz-dt__pagination-size')).not.toBeNull()
+  })
+
   it('exposes a resize handle as a focusable separator', () => {
     table()
     const handle = screen.getByRole('separator', { name: /Width of column “Name”/ })
     expect(handle).toHaveAttribute('tabindex', '0')
     expect(handle).toHaveAttribute('aria-orientation', 'vertical')
+  })
+})
+
+describe('load more', () => {
+  it('replaces the pager with a footer inside the scroller', () => {
+    const { container } = table({ total: 100, onLoadMore: vi.fn() })
+    const footer = container.querySelector('[data-slot="data-table-load-more"]')
+    expect(footer).not.toBeNull()
+    // An infinite scroll has to observe the footer against the table's own
+    // scroller, which only works while it is a descendant of it.
+    expect(container.querySelector('.mz-dt__scroller')?.contains(footer!)).toBe(true)
+    expect(container.querySelector('.mz-dt__pagination')).toBeNull()
+  })
+
+  it('keeps the pager when the host asks for both', () => {
+    const { container } = table({ total: 100, onLoadMore: vi.fn(), pagination: true })
+    expect(container.querySelector('.mz-dt__pagination')).not.toBeNull()
+  })
+
+  it('stops offering more once everything is loaded', () => {
+    const loaded = table({ total: rows.length, onLoadMore: vi.fn() })
+    expect(loaded.container.querySelector('[data-slot="data-table-load-more"]')).toBeNull()
+    loaded.unmount()
+    const capped = table({ total: 100, hasMore: false, onLoadMore: vi.fn() })
+    expect(capped.container.querySelector('[data-slot="data-table-load-more"]')).toBeNull()
+  })
+
+  it('asks once per batch of rows, however often it is triggered', async () => {
+    const onLoadMore = vi.fn()
+    table({ total: 100, onLoadMore })
+    const button = screen.getByRole('button', { name: 'Load more' })
+    await userEvent.click(button)
+    await userEvent.click(button)
+    // The second click is for rows that are already on their way — a host that
+    // answers with nothing new would otherwise be asked forever.
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('custom filters', () => {
+  it('counts a custom value as active only when it carries a constraint', () => {
+    expect(isFilterActive({ type: 'custom', value: undefined })).toBe(false)
+    expect(isFilterActive({ type: 'custom', value: '' })).toBe(false)
+    expect(isFilterActive({ type: 'custom', value: [] })).toBe(false)
+    expect(isFilterActive({ type: 'custom', value: ['a'], label: 'A' })).toBe(true)
+    expect(isFilterActive({ type: 'custom', value: { id: 1 } })).toBe(true)
+  })
+
+  it('describes the chip with the label the widget supplied', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={{
+          ...emptyQuery,
+          filters: { name: { type: 'custom', value: ['a', 'b'], label: '2 selected' } },
+        }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    expect(document.querySelector('.mz-dt__chip')).toHaveTextContent('Name: 2 selected')
+  })
+
+  it('renders the host widget in the header popover and applies what it commits', async () => {
+    const custom: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        accessor: (r) => r.name,
+        filter: {
+          type: 'custom',
+          render: ({ commit }) => (
+            <button type="button" onClick={() => commit(['x'], 'X only')}>
+              Pick X
+            </button>
+          ),
+        },
+      },
+    ]
+    const onQueryChange = vi.fn()
+    render(
+      <DataTable
+        columns={custom}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={onQueryChange}
+      />
+    )
+    await userEvent.click(screen.getByRole('button', { name: /Filter: Name/ }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Pick X' }))
+    expect(onQueryChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        filters: { name: { type: 'custom', value: ['x'], label: 'X only' } },
+      })
+    )
   })
 })
 

@@ -63,15 +63,18 @@ export function ColumnFilter({ columnLabel, def, value, onApply, labels: labelsP
           setDraft={setDraft}
           labels={labels}
           onSubmit={() => commit(draft)}
+          onCommit={commit}
         />
-        <div className="mz-dt__filter-actions">
-          <Button size="sm" variant="ghost" onClick={() => commit(undefined)}>
-            {labels.reset}
-          </Button>
-          <Button size="sm" onClick={() => commit(draft)}>
-            {labels.apply}
-          </Button>
-        </div>
+        {def.type === 'custom' && def.actions === false ? null : (
+          <div className="mz-dt__filter-actions">
+            <Button size="sm" variant="ghost" onClick={() => commit(undefined)}>
+              {labels.reset}
+            </Button>
+            <Button size="sm" onClick={() => commit(draft)}>
+              {labels.apply}
+            </Button>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   )
@@ -83,12 +86,14 @@ function FilterBody({
   setDraft,
   labels,
   onSubmit,
+  onCommit,
 }: {
   def: ColumnFilterDef
   draft: FilterValue | undefined
   setDraft: (value: FilterValue | undefined) => void
   labels: DataTableLabels
   onSubmit: () => void
+  onCommit: (value: FilterValue | undefined) => void
 }) {
   const submitOnEnter = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
@@ -196,6 +201,25 @@ function FilterBody({
           onChange={(e) => patch({ to: e.target.value || undefined })}
         />
       </div>
+    )
+  }
+
+  if (def.type === 'custom') {
+    const staged = draft?.type === 'custom' ? draft : undefined
+    // An undefined value is how a widget says "no constraint", so it maps to a
+    // cleared filter rather than to an empty custom value.
+    const wrap = (value: unknown, label?: string): FilterValue | undefined =>
+      value === undefined ? undefined : { type: 'custom', value, label }
+    return (
+      <>
+        {def.render({
+          value: staged?.value,
+          label: staged?.label,
+          onChange: (value, label) => setDraft(wrap(value, label)),
+          commit: (value, label) => onCommit(wrap(value, label)),
+          labels,
+        })}
+      </>
     )
   }
 

@@ -133,7 +133,17 @@ export default function TableDemo() {
       accessor: (row) => new Date(row.date).toLocaleDateString('en-GB'),
       filter: { type: 'date-range' },
     },
-    { id: 'comment', header: 'Comment', width: 320, accessor: (row) => row.comment },
+    {
+      id: 'comment', header: 'Comment', width: 320,
+      // Deliberately a block-level child: a cell that reflows during a render
+      // is what used to feed the scroll observer into a render loop, and the
+      // playground never reproduced it while every cell held inline content.
+      cell: (row) => (
+        <a href="#orders" style={{ display: 'block', color: 'inherit' }}>
+          {row.comment}
+        </a>
+      ),
+    },
   ]
 
   return (
@@ -147,6 +157,8 @@ export default function TableDemo() {
       persistKey="playground.orders"
       selection={selection}
       onSelectionChange={setSelection}
+      rowClassName={(row) => (row.status === 'done' ? 'demo-row--done' : undefined)}
+      rowProps={(row) => ({ 'data-status': row.status })}
       bulkActions={() => (
         <>
           <Button size="sm" variant="secondary">Export</Button>

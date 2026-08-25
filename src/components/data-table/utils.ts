@@ -14,6 +14,15 @@ export function isFilterActive(value: FilterValue | undefined): value is FilterV
       return Boolean(value.from || value.to)
     case 'boolean':
       return true
+    case 'custom':
+      // The shape belongs to the host widget, so activeness is structural:
+      // anything that is not empty counts as a constraint.
+      return !(
+        value.value === undefined ||
+        value.value === null ||
+        value.value === '' ||
+        (Array.isArray(value.value) && value.value.length === 0)
+      )
   }
 }
 

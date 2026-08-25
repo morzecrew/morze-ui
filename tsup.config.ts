@@ -1,7 +1,9 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
+  // Locales are separate entries so a host pays for the language it imports —
+  // they are plain data and pull in nothing from the component bundle.
+  entry: ['src/index.ts', 'src/locales/en.ts', 'src/locales/ru.ts'],
   format: ['esm', 'cjs'],
   dts: true,
   sourcemap: true,
