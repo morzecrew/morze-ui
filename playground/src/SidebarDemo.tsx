@@ -159,7 +159,7 @@ export default function SidebarDemo() {
         </SidebarContent>
 
         <SidebarFooter>
-          <Badge className="mz-sidebar-hide-collapsed" variant="soft" tone="accent" dot>
+          <Badge className="mz-sidebar-hide-collapsed" variant="soft" tone="accent">
             online
           </Badge>
           <span

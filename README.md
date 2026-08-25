@@ -17,7 +17,9 @@ box-shadow: 0 3px 10px -4px rgba(tone,.4),
 
 That recipe is applied to **every active element**: buttons, toggles,
 checkboxes, radios, switches, sliders, tabs, the select trigger, badges and the
-active navigation item.
+active navigation item. The label itself stays flat — the embossed
+`text-shadow` is off (`--mz-convex-text-shadow: none`), as on the landing,
+because on a 34px control it only made the text shout.
 
 ## Install
 
@@ -38,7 +40,7 @@ import { Button, Switch, MorzeThemeProvider } from '@morze/ui'
 export default function App() {
   return (
     <MorzeThemeProvider defaultTheme="dark">
-      <Button dot>Submit request</Button>
+      <Button>Submit request</Button>
       <Switch defaultChecked />
     </MorzeThemeProvider>
   )
@@ -99,7 +101,7 @@ and the focus ring:
 ```tsx
 <Button tone="accent">Save</Button>
 <Switch tone="success" defaultChecked />
-<Badge tone="danger" dot>Live</Badge>
+<Badge tone="danger">Live</Badge>
 <Progress value={40} tone="warning" />
 ```
 
@@ -118,17 +120,43 @@ larger one for surfaces.
 | `--mz-radius-sm` | `6px` | items inside containers: menu items, tabs, checkbox |
 | `--mz-radius` | `8px` | buttons, inputs, select, toggles, badges, alerts |
 | `--mz-radius-lg` | `12px` | cards, dialogs, popovers, menus |
-| `--mz-radius-pill` | `999px` | only what is round by meaning: radio, indicator dots |
+| `--mz-radius-pill` | `999px` | only what is round by meaning: the radio and its mark |
 
 Fully square corners: `--mz-radius: 0; --mz-radius-sm: 0; --mz-radius-lg: 0`.
 
-Fonts are **system stacks** — nothing is downloaded and the kit inherits the
-host application's look. Control labels are plain sentence case.
+**The kit inherits your application's font.** Every `mz-` element is
+`font-family: inherit`, so a button, a table cell and a menu item read in the
+same face as the text around them — the kit never renders a label in a font the
+page does not use. Control labels are plain sentence case.
+
+`--mz-font-sans` is the fallback, applied to `.mz-root`: `'Golos Text'` (the
+face morze.tech uses) with a system stack behind it. Nothing is downloaded —
+load the webfont in the host if you want it:
+
+```html
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..700&display=swap"
+      rel="stylesheet" />
+```
+
+Set the font on `body`, not only inside the app shell: dialogs, menus and
+tooltips are portalled to `<body>` and inherit from there.
+
+The **leading** is the kit's own, though: `--mz-line` (1.45) is applied at zero
+specificity to every `mz-` element, so a landing-style `line-height: 1.7` on
+your body does not inflate a dialog description or a field hint. For the same
+reason the kit zeroes the UA margins on the headings, paragraphs and lists it
+renders itself — a host with no CSS reset used to get a dialog title pushed
+14px away from its description. Your own markup inside a `Card` or `Dialog` is
+untouched.
 
 ```css
+body { font-family: var(--mz-font-sans); }
+
 :root {
   --mz-primary-rgb: 120, 90, 250;   /* brand colour */
-  --mz-font-sans: 'Inter', sans-serif;
+  --mz-font-sans: 'Inter', sans-serif;   /* or your own face */
+  --mz-font-display: 'Unbounded', sans-serif;  /* headings only */
   --mz-radius: 4px;                 /* tighter */
 }
 ```
@@ -200,7 +228,7 @@ What this kit adds on top:
 - `Button` — `variant`: `primary` (default) `secondary` `outline` `ghost`
   `destructive` `link`; `size`: `xs` (28px) `sm` (34) `md` (40, default)
   `lg` (48) plus square `icon-xs` `icon-sm` `icon` `icon-lg`; `loading`,
-  `dot` (a pulsing morse dot), `tone`. The `sm/md/lg` heights (34/40/48px) are
+  `tone`. The `sm/md/lg` heights (34/40/48px) are
   shared by buttons, inputs and toggles, so controls line up in a row. With
   `asChild` the loading indicator is grafted inside the child element and the
   blocked state is expressed through `aria-disabled`, since a link has no
@@ -216,7 +244,7 @@ What this kit adds on top:
   also gets `role="button"`, `tabIndex` and Enter/Space activation.
 - `Spinner` — `label` (default `Loading`) is announced by screen readers;
   `label={null}` makes it purely decorative.
-- `Badge` — `variant`: `solid` `soft` `outline`, plus `dot`.
+- `Badge` — `variant`: `solid` `soft` `outline`.
 - `Field` / `FieldHint` / `FieldError` — form scaffolding.
 
 ```tsx
@@ -500,7 +528,13 @@ npm run dev        # playground with every component (http://localhost:5250)
 npm run typecheck
 npm run test       # vitest: component behaviour plus CSS contracts
 npm run build      # dist: ESM + CJS + .d.ts + morze-ui.css
+npm run shot       # redraws docs/screenshot.png from playground/shot.html
 ```
+
+The still at the top of this file is generated, not composed by hand: `npm run
+shot` renders `playground/shot.html` in headless Chrome at 2x and trims the
+frame to its content, so the picture can follow the kit whenever the look
+changes.
 
 `tests/smoke.test.tsx` covers component behaviour and accessibility,
 `tests/css-contract.test.ts` covers the visual layer's contracts (cascade order

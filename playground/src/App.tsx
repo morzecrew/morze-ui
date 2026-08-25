@@ -73,7 +73,7 @@ function ThemeSwitch() {
   const { resolvedTheme, setTheme } = useMorzeTheme()
   return (
     <div className="pg-row">
-      <Badge variant="soft" tone="accent" dot>
+      <Badge variant="soft" tone="accent">
         {resolvedTheme}
       </Badge>
       <ToggleGroup
@@ -136,7 +136,7 @@ function Demo() {
       <div className="pg__grid">
         <Section title="Buttons">
           <div className="pg-row">
-            <Button dot>Submit request</Button>
+            <Button>Submit request</Button>
             <Button variant="secondary">Secondary</Button>
             <Button variant="outline">Outline</Button>
           </div>
@@ -307,7 +307,7 @@ function Demo() {
                   <DialogClose asChild>
                     <Button variant="ghost">Cancel</Button>
                   </DialogClose>
-                  <Button dot>Send</Button>
+                  <Button>Send</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -352,7 +352,7 @@ function Demo() {
               Soft
             </Badge>
             <Badge variant="outline">Outline</Badge>
-            <Badge tone="danger" dot>
+            <Badge tone="danger">
               Live
             </Badge>
           </div>

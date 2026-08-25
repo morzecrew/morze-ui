@@ -369,18 +369,26 @@
   border-radius: 5px;
   background: linear-gradient(180deg, #ffffff 0%, #dcdae8 100%);
   border: 1px solid var(--mz-convex-hairline);
+  /* No tone halo around the cap: a ring standing off the thumb read as a
+     second control drawn around it. The drop shadow alone lifts it. */
   box-shadow:
     0 4px 12px -2px rgba(0, 0, 0, 0.5),
-    0 0 0 4px rgba(var(--mz-tone-rgb), 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
   cursor: grab;
-  transition: box-shadow var(--mz-duration) ease, transform 0.15s var(--mz-ease);
+  transition:
+    background-image var(--mz-duration) ease,
+    box-shadow var(--mz-duration) ease,
+    transform 0.15s var(--mz-ease);
 }
+/* Hover darkens the cap, the way every other filled surface darkens. The halo
+   keeps its size: a ring that grows under the cursor reads as a second control
+   appearing around the thumb. */
 .mz-slider__thumb:hover {
-  box-shadow:
-    0 6px 18px -2px rgba(0, 0, 0, 0.55),
-    0 0 0 7px rgba(var(--mz-tone-rgb), 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, #ffffff 94%, #000) 0%,
+    color-mix(in srgb, #dcdae8 94%, #000) 100%
+  );
 }
 .mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); }
 

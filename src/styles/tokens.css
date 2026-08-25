@@ -49,11 +49,19 @@
   --mz-convex-hairline: rgba(255, 255, 255, 0.18);
   --mz-convex-top: rgba(255, 255, 255, 0.35);
   --mz-convex-bottom: rgba(0, 0, 0, 0.2);
-  --mz-convex-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  /* Off: the landing dropped the embossed label, and on a small control it
+     only made the text shout. Kept as a hook for a host that wants it back. */
+  --mz-convex-text-shadow: none;
 
   /* Idle (unfilled) control face: a faint upward gradient over the surface. */
   --mz-face: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
   --mz-face-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.04) 100%);
+  /* The same neutral face, split the way the tone fill is: a flat colour under
+     a fixed sheen, so hover can animate — browsers do not interpolate
+     gradients, and --mz-face → --mz-face-hover jumps. */
+  --mz-face-fill: rgba(255, 255, 255, 0.02);
+  --mz-face-fill-hover: rgba(255, 255, 255, 0.06);
+  --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
   --mz-face-top: rgba(255, 255, 255, 0.1);
   --mz-face-bottom: rgba(0, 0, 0, 0.35);
 
@@ -99,10 +107,13 @@
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);
   --mz-convex-bottom: rgba(0, 0, 0, 0.18);
-  --mz-convex-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
+  --mz-convex-text-shadow: none;
 
   --mz-face: linear-gradient(180deg, #ffffff 0%, #f0eff6 100%);
   --mz-face-hover: linear-gradient(180deg, #ffffff 0%, #e9e8f2 100%);
+  --mz-face-fill: #f0eff6;
+  --mz-face-fill-hover: #e9e8f2;
+  --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
   --mz-face-top: rgba(255, 255, 255, 0.9);
   --mz-face-bottom: rgba(16, 12, 40, 0.12);
 
@@ -117,24 +128,36 @@
 
 :root {
   /* ---- Typography ----
-     System stacks: nothing to download, and the kit inherits the host app's
-     look. Point --mz-font-sans at a webfont to brand it. */
-  --mz-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+     The kit follows the application's own typography: every mz- element
+     inherits its font, so the host's face (Golos Text on morze.tech) reaches
+     the buttons and the table without a single override. This stack is the
+     fallback, applied at .mz-root and by whoever sets a font on <body> —
+     Golos Text first, so a standalone install already reads as Morze. Nothing
+     is downloaded: load the webfont in the host, or leave the system fallback.
+     */
+  --mz-font-sans: 'Golos Text', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --mz-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
     'Liberation Mono', monospace;
-  --mz-font-display: var(--mz-font-sans);
+  /* Headings inherit too; point this at a display face (the landing uses
+     Unbounded) to brand titles without touching body copy. */
+  --mz-font-display: inherit;
 
-  /* Control labels: plain sentence case in the UI font. */
-  --mz-label-font: var(--mz-font-sans);
+  /* The kit's own rhythm. The face comes from the host, the leading does not:
+     a landing's airy line-height (morze.tech runs 1.7) inflates a dialog
+     description and a field hint inside a dense UI. */
+  --mz-line: 1.45;
+
+  /* Control labels: plain sentence case in the application's font. */
+  --mz-label-font: inherit;
   --mz-label-transform: none;
   --mz-label-tracking: 0;
   --mz-label-weight: 600;
 
   /* ---- Geometry ----
      Rectangular by default: controls share one small radius, surfaces a
-     slightly larger one. --mz-radius-pill is kept for the round bits that
-     stay round (radio, dots, thumbs). */
+     slightly larger one. --mz-radius-pill is kept for what is round by
+     meaning: the radio and its mark. */
   --mz-radius: 8px;
   --mz-radius-sm: 6px;
   --mz-radius-lg: 12px;

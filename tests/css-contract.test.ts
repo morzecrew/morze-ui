@@ -71,7 +71,26 @@ describe('hover states', () => {
   it('darkens only filled surfaces', () => {
     expect(css).toContain('--mz-fill-hover')
     // Neutral variants lighten through the face token instead.
-    expect(css).toMatch(/\.mz-btn--secondary:hover\{[^}]*--mz-face-hover/)
+    expect(css).toMatch(/\.mz-btn--secondary:hover\{[^}]*--mz-face-fill-hover/)
+  })
+
+  it('animates the neutral face instead of snapping to a new gradient', () => {
+    // A gradient cannot be interpolated, so the face is split the way the tone
+    // fill is: flat colour under a fixed sheen.
+    expect(css).toMatch(/\.mz-btn--secondary\{[^}]*background-color:var\(--mz-face-fill\)/)
+    expect(css).toMatch(/\.mz-btn--secondary\{[^}]*background-image:var\(--mz-face-sheen\)/)
+    expect(css).not.toMatch(/\.mz-btn--secondary:hover\{[^}]*background-image/)
+  })
+
+  it('drops the tone glow from the neutral and outline buttons', () => {
+    const secondary = css.match(/\.mz-btn--secondary:hover\{[^}]*\}/)?.[0] ?? ''
+    const outline = css.match(/\.mz-btn--outline:hover\{[^}]*\}/)?.[0] ?? ''
+    expect(secondary).not.toContain('box-shadow')
+    // The neutral button keeps its neutral rim: only the face lifts.
+    expect(secondary).not.toContain('border-color')
+    expect(outline).not.toContain('box-shadow')
+    // The outline picks up the tone in its own border, at full strength.
+    expect(outline).toContain('border-color:rgb(var(--mz-tone-rgb))')
   })
 })
 
@@ -134,6 +153,12 @@ describe('motion', () => {
     expect(css).not.toContain('skewX(-20deg)')
   })
 
+  it('carries no pulsing dot', () => {
+    // Dropped from the kit: nothing in a UI blinks on its own.
+    expect(css).not.toContain('mz-pulse')
+    expect(css).not.toContain('__dot')
+  })
+
   it('respects prefers-reduced-motion', () => {
     expect(css).toContain('prefers-reduced-motion')
   })
@@ -150,3 +175,40 @@ describe('accessibility contracts', () => {
     expect(css).toMatch(/\.mz-focusable:focus-visible\{outline:/)
   })
 })
+
+describe('typography contracts', () => {
+  it('inherits the application font instead of dictating a stack', () => {
+    // A hardcoded stack here is what made a button label read in a different
+    // face from the page around it.
+    expect(css).toMatch(/\[class\^=mz-\][^{]*\{[^}]*font-family:inherit/)
+    expect(css).toMatch(/--mz-label-font:\s*inherit/)
+  })
+
+  it('owns its rhythm instead of inheriting the page one', () => {
+    // A landing-style body (morze.tech runs line-height 1.7) otherwise
+    // inflates a dialog description and a field hint inside a dense UI.
+    expect(css).toMatch(/--mz-line:\s*1\.45/)
+    expect(css).toContain(':where([class^=mz-],[class*=\\ mz-]){line-height:var(--mz-line)}')
+  })
+
+  it('zeroes the UA margins on the text it renders itself', () => {
+    // Without a host reset a dialog title carried h2's 14.94px margin and drifted
+    // away from its description; a consumer's own <p> in a Card keeps its own.
+    expect(css).toMatch(
+      /:where\(\[class\^=mz-\],\[class\*=\\ mz-\]\):is\(h1,h2,h3,h4,h5,h6,p,[^)]*\)\{margin:0\}/
+    )
+  })
+
+  it('keeps the label flat on a convex face', () => {
+    // The landing dropped the embossed label; the token stays as the hook.
+    expect(css).toMatch(/--mz-convex-text-shadow:\s*none/)
+    expect(css).not.toMatch(/--mz-convex-text-shadow:\s*0 /)
+  })
+
+  it('keeps the button compact while the label still has air', () => {
+    expect(css).toContain('.mz-btn--md{height:40px;padding:0 20px')
+    // The height scale stays shared with the fields, or controls stop lining up.
+    expect(css).toContain('.mz-input--sm{height:34px')
+  })
+})
+

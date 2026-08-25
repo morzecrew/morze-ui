@@ -15,7 +15,7 @@
   cursor: pointer;
   text-align: left;
   color: var(--mz-text);
-  font-family: var(--mz-font-sans);
+  font-family: inherit;
   font-size: 14px;
   white-space: nowrap;
   border-radius: var(--mz-radius);

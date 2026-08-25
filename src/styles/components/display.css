@@ -171,15 +171,6 @@
   color: var(--mz-text-dim);
   border-color: var(--mz-border-strong);
 }
-.mz-badge__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: var(--mz-radius-pill);
-  background: currentColor;
-  box-shadow: 0 0 8px currentColor;
-  animation: mz-pulse 1.6s ease-in-out infinite;
-}
-
 /* --------------------------------- Alert -------------------------------- */
 .mz-alert {
   position: relative;
@@ -219,7 +210,7 @@
   border: none;
   cursor: pointer;
   color: var(--mz-text);
-  font-family: var(--mz-font-sans);
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
   text-align: left;

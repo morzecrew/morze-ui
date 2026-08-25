@@ -40,7 +40,7 @@
   padding: 0 12px;
   height: 40px;
   color: var(--mz-text);
-  font-family: var(--mz-font-sans);
+  font-family: inherit;
   font-size: 14px;
   border-radius: var(--mz-radius);
   background: var(--mz-well);

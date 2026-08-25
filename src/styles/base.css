@@ -5,10 +5,33 @@
    consumer's own nodes inside a Card or Dialog keep their box model.
    ========================================================================== */
 
+/* Typography is inherited, never dictated: a button, a cell or a menu item
+   reads in the application's own font. A kit that hardcoded its stack here
+   would render every label in a face the surrounding page does not use. */
 [class^='mz-'],
 [class*=' mz-'] {
   box-sizing: border-box;
-  font-family: var(--mz-font-sans);
+  font-family: inherit;
+}
+
+/* The kit stacks its own text with flex gaps, so a heading, a paragraph or a
+   list it renders needs no UA margin. A host with a reset (Tailwind's
+   preflight, normalize) never saw these; without one, a dialog title drifted
+   away from its description and a field hint sat 12px below where it belongs.
+   Specificity stays at zero, so any rule — the kit's own or the host's — that
+   sets a margin on these elements still wins. Only elements the kit renders
+   are touched: a consumer's own <p> inside a Card keeps its margins. */
+:where([class^='mz-'], [class*=' mz-']):is(
+  h1, h2, h3, h4, h5, h6, p, ul, ol, dl, dd, figure, blockquote, pre
+) {
+  margin: 0;
+}
+
+/* Leading is the kit's, not the page's — see --mz-line. Zero specificity, so
+   the components that set their own (titles, labels) and anything the host
+   writes both still win. */
+:where([class^='mz-'], [class*=' mz-']) {
+  line-height: var(--mz-line);
 }
 
 /* Pseudo-elements are the kit's own, so they follow the same box model. */
@@ -86,10 +109,6 @@
 @keyframes mz-pop-out {
   from { opacity: 1; transform: none }
   to { opacity: 0; transform: translateY(-4px) scale(0.96) }
-}
-@keyframes mz-pulse {
-  0%, 100% { opacity: 1; transform: scale(1) }
-  50% { opacity: 0.55; transform: scale(0.82) }
 }
 @keyframes mz-spin { to { transform: rotate(360deg) } }
 @keyframes mz-shimmer { to { background-position: -200% 0 } }

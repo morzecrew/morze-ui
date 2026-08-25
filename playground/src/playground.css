@@ -1,4 +1,6 @@
-body { background: var(--mz-bg); }
+/* The app owns the font; the kit inherits it — including the portalled
+   dialogs, menus and tooltips, which live on <body> rather than in .mz-root. */
+body { background: var(--mz-bg); font-family: var(--mz-font-sans); }
 :root {
   --mz-primary-rgb: 78, 117, 255
 }

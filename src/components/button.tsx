@@ -43,8 +43,6 @@ type ButtonProps = React.ComponentProps<'button'> &
     tone?: Tone
     /** Swaps the label for a spinner and blocks interaction. */
     loading?: boolean
-    /** Pulsing morse dot before the label — the landing's signature accent. */
-    dot?: boolean
   }
 
 function Button({
@@ -54,7 +52,6 @@ function Button({
   asChild = false,
   tone,
   loading = false,
-  dot = false,
   disabled,
   children,
   ...props
@@ -64,7 +61,6 @@ function Button({
 
   const decorate = (label: React.ReactNode) => (
     <>
-      {dot ? <span className="mz-btn__dot" aria-hidden="true" /> : null}
       {label}
       {loading ? (
         <span className="mz-btn__spinner" aria-hidden="true">

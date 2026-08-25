@@ -23,7 +23,6 @@ function Badge({
   className,
   variant = 'solid',
   tone,
-  dot = false,
   asChild = false,
   children,
   ...props
@@ -31,7 +30,6 @@ function Badge({
   VariantProps<typeof badgeVariants> & {
     asChild?: boolean
     tone?: Tone
-    dot?: boolean
   }) {
   const Comp = asChild ? Slot.Root : 'span'
 
@@ -43,14 +41,7 @@ function Badge({
       className={cn(badgeVariants({ variant }), className)}
       {...props}
     >
-      {asChild ? (
-        children
-      ) : (
-        <>
-          {dot ? <span className="mz-badge__dot" aria-hidden="true" /> : null}
-          {children}
-        </>
-      )}
+      {children}
     </Comp>
   )
 }
