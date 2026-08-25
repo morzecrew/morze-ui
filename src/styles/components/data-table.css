@@ -368,7 +368,24 @@
 .mz-dt__bulkbar-actions { display: flex; align-items: center; gap: 8px; }
 
 /* --------------------------- Header popovers ---------------------------- */
-.mz-dt__filter-panel { width: 15rem; padding: 12px; }
+/* The popover is bounded by the room Radix measured for it, and only the body
+   scrolls — the column name and the Apply/Reset row stay put. A `custom` filter
+   renders whatever the host hands over, so without this a tall widget grows the
+   panel past the edge of the window with no way to reach the buttons. */
+.mz-dt__filter-panel {
+  width: 15rem;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: var(--radix-popper-available-height, 60vh);
+}
+
+.mz-dt__filter-body {
+  /* `min-height: 0` or the body refuses to shrink below its content and the
+     overflow lands on the panel instead. */
+  min-height: 0;
+  overflow: auto;
+}
 .mz-dt__filter-head {
   margin-bottom: 10px;
   font-size: 12px;

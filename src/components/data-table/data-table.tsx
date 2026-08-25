@@ -100,6 +100,8 @@ export type DataTableProps<T> = {
 
 const SELECT_WIDTH = 44
 const EXPAND_WIDTH = 40
+/** How long a fitted width keeps blocking a re-fit to that same width. */
+const FIT_CYCLE_MS = 250
 
 export function DataTable<T>({
   columns,
@@ -167,24 +169,41 @@ export function DataTable<T>({
     pageKeys,
   })
 
-  // Fill the row on mount and on container resize. Guarded by the last width
-  // it ran for, so the observer cannot ping-pong with an appearing scrollbar.
-  const lastFitWidth = React.useRef(0)
+  // Fill the row on mount and on container resize.
+  //
+  // The widths this effect has recently fitted to. A single "last width" is not
+  // enough: fitting to A can make a scrollbar appear, which makes the next
+  // measurement B, and fitting to B makes it disappear again. Both steps differ
+  // from the one immediately before, so a last-width guard waves the whole cycle
+  // through and the observer keeps re-fitting for as long as the table is shown.
+  // Entries expire, so a genuine resize back to an earlier width still fits.
+  const recentFits = React.useRef<{ width: number; at: number }[]>([])
+  // Hidden and order are compared by value: `merge` hands back fresh arrays on
+  // every layout change, and re-subscribing on a width change would clear the
+  // cycle history that width change is supposed to be caught by.
+  const hiddenKey = layout.hidden.join('\u0000')
+  const orderKey = layout.order.join('\u0000')
   React.useEffect(() => {
     const scroller = scrollerRef.current
     if (!scroller || !autoFit) return
     const controls = (selectable ? SELECT_WIDTH : 0) + (renderExpanded ? EXPAND_WIDTH : 0)
+    // A column hidden, shown or moved has to redistribute into the same width,
+    // so the history cannot outlive the layout it was collected for.
+    recentFits.current = []
     const run = () => {
       const available = scroller.clientWidth - controls - 2
-      if (Math.abs(available - lastFitWidth.current) < 1) return
-      lastFitWidth.current = available
+      const now = Date.now()
+      const recent = recentFits.current.filter((entry) => now - entry.at < FIT_CYCLE_MS)
+      recentFits.current = recent
+      if (recent.some((entry) => Math.abs(available - entry.width) < 1)) return
+      recent.push({ width: available, at: now })
       fitTo(available)
     }
     run()
     const observer = new ResizeObserver(run)
     observer.observe(scroller)
     return () => observer.disconnect()
-  }, [autoFit, fitTo, selectable, renderExpanded, layout.hidden, layout.order])
+  }, [autoFit, fitTo, selectable, renderExpanded, hiddenKey, orderKey])
 
   // Edge shadows tell the reader there is more table beyond the viewport.
   React.useEffect(() => {
@@ -369,6 +388,7 @@ export function DataTable<T>({
                           columnLabel={label}
                           def={column.filter}
                           value={query.filters[column.id]}
+                          labels={labelsProp}
                           onApply={(value) => onQueryChange(setFilter(query, column.id, value))}
                         />
                       ) : null}

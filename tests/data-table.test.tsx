@@ -1,4 +1,4 @@
-import { act } from 'react'
+import { StrictMode, act } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -99,6 +99,25 @@ describe('query utils', () => {
 })
 
 describe('DataTable', () => {
+  it('translates the column filter along with the rest of the table', async () => {
+    // The header filter is the only child that used to be rendered without
+    // `labels`, so its popover stayed English while the pager and the column
+    // manager followed the host's locale.
+    table({
+      labels: {
+        filterFor: (column) => `Фильтр: ${column}`,
+        apply: 'Применить',
+        reset: 'Сбросить',
+        contains: 'Содержит…',
+      },
+    })
+    const trigger = screen.getByTitle('Фильтр: Name')
+    await userEvent.click(trigger)
+    expect(screen.getByPlaceholderText('Содержит…')).toBeInTheDocument()
+    expect(screen.getByText('Применить')).toBeInTheDocument()
+    expect(screen.getByText('Сбросить')).toBeInTheDocument()
+  })
+
   it('renders a row per record and marks sortable headers for assistive tech', () => {
     table()
     expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute('aria-sort', 'none')
@@ -395,6 +414,51 @@ describe('column auto-fit', () => {
     act(() => result.current.setWidth('b', 400))
     act(() => result.current.fitTo(900))
     expect(result.current.widthOf('b')).toBe(400)
+  })
+
+  it('reports one user action to the host once, not once per updater run', () => {
+    // React may run a state updater more than once for a single commit, and
+    // under StrictMode it always does. Persisting from inside it wrote the
+    // layout twice and told the host about one resize twice.
+    const onLayoutChange = vi.fn()
+    const { result } = renderHook(
+      () => useColumnLayout({ columns: fitColumns, onLayoutChange }),
+      { wrapper: StrictMode }
+    )
+    act(() => result.current.setWidth('b', 300))
+    expect(onLayoutChange).toHaveBeenCalledTimes(1)
+    expect(onLayoutChange.mock.calls[0]![0].widths.b).toBe(300)
+  })
+
+  it('writes the layout to storage once per change', () => {
+    const key = 'test.layout.once'
+    window.localStorage.removeItem(key)
+    const setItem = vi.spyOn(Storage.prototype, 'setItem')
+    const { result } = renderHook(
+      () => useColumnLayout({ columns: fitColumns, persistKey: key }),
+      { wrapper: StrictMode }
+    )
+    act(() => result.current.setWidth('b', 300))
+    expect(setItem.mock.calls.filter(([k]) => k === key)).toHaveLength(1)
+    setItem.mockRestore()
+    window.localStorage.removeItem(key)
+  })
+
+  it('builds two updates in the same tick on each other', () => {
+    const { result } = renderHook(() => useColumnLayout({ columns: fitColumns }))
+    act(() => {
+      result.current.setWidth('a', 111)
+      result.current.setWidth('b', 222)
+    })
+    expect(result.current.widthOf('a')).toBe(111)
+    expect(result.current.widthOf('b')).toBe(222)
+  })
+
+  it('keeps auto-fit out of storage and out of the host callback', () => {
+    const onLayoutChange = vi.fn()
+    const { result } = renderHook(() => useColumnLayout({ columns: fitColumns, onLayoutChange }))
+    act(() => result.current.fitTo(800))
+    expect(onLayoutChange).not.toHaveBeenCalled()
   })
 
   it('leaves a column with flex: false at its declared width', () => {

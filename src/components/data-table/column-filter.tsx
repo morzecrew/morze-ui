@@ -57,14 +57,16 @@ export function ColumnFilter({ columnLabel, def, value, onApply, labels: labelsP
       </PopoverTrigger>
       <PopoverContent align="start" className="mz-dt__filter-panel">
         <div className="mz-dt__filter-head">{columnLabel}</div>
-        <FilterBody
-          def={def}
-          draft={draft}
-          setDraft={setDraft}
-          labels={labels}
-          onSubmit={() => commit(draft)}
-          onCommit={commit}
-        />
+        <div className="mz-dt__filter-body">
+          <FilterBody
+            def={def}
+            draft={draft}
+            setDraft={setDraft}
+            labels={labels}
+            onSubmit={() => commit(draft)}
+            onCommit={commit}
+          />
+        </div>
         {def.type === 'custom' && def.actions === false ? null : (
           <div className="mz-dt__filter-actions">
             <Button size="sm" variant="ghost" onClick={() => commit(undefined)}>

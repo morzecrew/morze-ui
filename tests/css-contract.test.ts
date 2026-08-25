@@ -176,6 +176,54 @@ describe('accessibility contracts', () => {
   })
 })
 
+describe('neutral greys', () => {
+  /** Every hex the token is declared as, expanded to r/g/b. */
+  const channelsOf = (token: string) =>
+    [...css.matchAll(new RegExp(`\\${token}:([^;}]+)`, 'g'))]
+      .flatMap((m) => [...m[1]!.matchAll(/#([0-9a-f]{3}|[0-9a-f]{6})\b/g)])
+      .map((m) => {
+        const hex = m[1]!
+        const full = hex.length === 3 ? [...hex].map((c) => c + c).join('') : hex
+        return [full.slice(0, 2), full.slice(2, 4), full.slice(4, 6)]
+      })
+
+  it('keeps the text on a grey ramp', () => {
+    // Text carries no hue: its contrast is calibrated, and a saturated brand
+    // dragged through it costs more than it buys.
+    for (const token of ['--mz-text', '--mz-text-dim', '--mz-text-muted']) {
+      const values = channelsOf(token)
+      expect(values.length, token).toBeGreaterThan(0)
+      for (const [r, g, b] of values) expect([token, r, g, b].join(' ')).toBe([token, r, r, r].join(' '))
+    }
+  })
+
+  it('builds the surfaces from a grey plus a whisper of the brand', () => {
+    expect(css).toContain('--mz-tint:rgb(var(--mz-primary-rgb))')
+    for (const token of ['--mz-bg', '--mz-surface', '--mz-elevated', '--mz-well', '--mz-cap']) {
+      expect(css, token).toMatch(new RegExp(`\\${token}:[^;}]*var\\(--mz-tint\\)`))
+      // The base under the tint stays neutral: the hue comes from one place.
+      for (const [r, g, b] of channelsOf(token)) {
+        expect([token, r, g, b].join(' ')).toBe([token, r, r, r].join(' '))
+      }
+    }
+  })
+
+  it('keeps that whisper a whisper', () => {
+    // Five channel steps out of 255. Past ~6% it stops reading as a neutral
+    // and starts reading as a colour — which is what the violet cast did.
+    const strength = css.match(/--mz-tint-strength:(\d+)%/)
+    expect(strength).not.toBeNull()
+    expect(Number(strength![1])).toBeLessThanOrEqual(6)
+  })
+
+  it('leaves none of the old tinted literals behind', () => {
+    for (const literal of ['#0a0a14', '#14141f', '#1c1c2b', '#f0eff6', '#e5e4ef', '#dcdae8', '#17162a']) {
+      expect(css, literal).not.toContain(literal)
+    }
+    expect(css).not.toContain('16,12,40')
+  })
+})
+
 describe('typography contracts', () => {
   it('inherits the application font instead of dictating a stack', () => {
     // A hardcoded stack here is what made a button label read in a different

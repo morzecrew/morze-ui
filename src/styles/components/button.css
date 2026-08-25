@@ -114,7 +114,7 @@
 
 /* ---- Outline / ghost: from .btn-ghost on the landing ---- */
 .mz-btn--outline {
-  background: rgba(var(--mz-surface-rgb), 0.65);
+  background: color-mix(in srgb, var(--mz-surface) 65%, transparent);
   color: var(--mz-text);
   border-color: rgba(var(--mz-text-rgb), 0.16);
   backdrop-filter: blur(8px);

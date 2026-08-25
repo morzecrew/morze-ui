@@ -200,6 +200,29 @@ sink them into the page.
 
 ## Customisation
 
+**The neutrals carry a whisper of the brand.** Panels, inputs, table headers
+and the sunken wells are a grey ramp with a few percent of `--mz-tint` mixed in
+— three channel steps out of 255, enough that a surface is not flat cardboard,
+not enough to name a colour. Dark runs the tint weaker than light (2.5% against
+4%): there the brand is far lighter than the surfaces it sits in, so the same
+percentage pulls a lot more hue. The tint follows `--mz-primary-rgb`, so the greys
+move with the brand instead of keeping a violet cast that belongs to no one:
+
+```css
+:root {
+  --mz-primary-rgb: 16, 175, 122;   /* panels and wells go faintly green */
+  --mz-tint-strength: 0%;           /* …or take the hue out altogether */
+  --mz-tint: #808080;               /* same thing, keeping the lightness */
+}
+```
+
+The grey under each mix is pre-compensated, so at the default strength the ramp
+lands on the same lightness it would have with no tint at all; raising the
+strength lifts the surfaces slightly. Text is deliberately left out: its
+contrast is calibrated, and a saturated brand dragged through it costs more than
+it buys. The tinted surfaces need `color-mix()` — Chrome 111+, Firefox 113+,
+Safari 16.2+, the same baseline as the rest of the kit.
+
 Everything is driven by custom properties; override them after importing the
 styles. The main groups: surfaces (`--mz-bg`, `--mz-surface`, `--mz-elevated`),
 borders, text, tones, the convex recipe (`--mz-convex-*`, `--mz-face*`,

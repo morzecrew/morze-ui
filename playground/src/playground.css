@@ -2,7 +2,7 @@
    dialogs, menus and tooltips, which live on <body> rather than in .mz-root. */
 body { background: var(--mz-bg); font-family: var(--mz-font-sans); }
 :root {
-  --mz-primary-rgb: 78, 117, 255
+  --mz-primary-rgb: 23, 158, 105
 }
 .pg {
   min-height: 100vh;

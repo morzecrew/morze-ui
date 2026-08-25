@@ -72,22 +72,41 @@ export function useColumnLayout<T>({
     [controlled, internal, baseline]
   )
 
+  // Kept current after every commit, so `update` — and the `fitTo` the table
+  // hands to a ResizeObserver as an effect dependency — keep a stable identity
+  // even when the host passes a fresh callback on every render.
+  const onLayoutChangeRef = React.useRef(onLayoutChange)
+  React.useEffect(() => {
+    onLayoutChangeRef.current = onLayoutChange
+  })
+
+  // Mirrors the committed layout so the next one can be derived outside the
+  // state updater. Assigned eagerly in `update` too, so two calls in the same
+  // tick still build on each other rather than on a stale snapshot.
+  const internalRef = React.useRef(internal)
+  React.useEffect(() => {
+    internalRef.current = internal
+  }, [internal])
+
   const update = React.useCallback(
     (patch: (current: ColumnLayout) => ColumnLayout, options?: { persist?: boolean }) => {
-      setInternal((current) => {
-        const base = controlled ? merge(baseline, controlled, baseline) : current
-        const next = patch(base)
-        if (next === base) return current
-        // Auto-fit is derived from the container, so it is never stored:
-        // otherwise the saved widths would depend on the last viewport used.
-        if (options?.persist !== false) {
-          writeStored(persistKey, next)
-          onLayoutChange?.(next)
-        }
-        return next
-      })
+      const base = controlled ? merge(baseline, controlled, baseline) : internalRef.current
+      const next = patch(base)
+      if (next === base) return
+      internalRef.current = next
+      setInternal(next)
+      // Storage and the host callback are effects of the change, not part of
+      // computing it. React may run a state updater more than once for a single
+      // commit — under StrictMode it always does — which wrote the layout twice
+      // and reported one user action to the host twice.
+      // Auto-fit is derived from the container, so it is never stored:
+      // otherwise the saved widths would depend on the last viewport used.
+      if (options?.persist !== false) {
+        writeStored(persistKey, next)
+        onLayoutChangeRef.current?.(next)
+      }
     },
-    [controlled, baseline, persistKey, onLayoutChange]
+    [controlled, baseline, persistKey]
   )
 
   const byId = React.useMemo(

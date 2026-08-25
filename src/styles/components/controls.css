@@ -159,7 +159,7 @@
   width: calc(var(--mz-switch-h) - 8px);
   height: calc(var(--mz-switch-h) - 8px);
   border-radius: 4px;
-  background: linear-gradient(180deg, #ffffff 0%, #dcdae8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--mz-cap) 100%);
   box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
@@ -367,7 +367,7 @@
   width: 16px;
   height: 20px;
   border-radius: 5px;
-  background: linear-gradient(180deg, #ffffff 0%, #dcdae8 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--mz-cap) 100%);
   border: 1px solid var(--mz-convex-hairline);
   /* No tone halo around the cap: a ring standing off the thumb read as a
      second control drawn around it. The drop shadow alone lifts it. */
@@ -387,7 +387,7 @@
   background-image: linear-gradient(
     180deg,
     color-mix(in srgb, #ffffff 94%, #000) 0%,
-    color-mix(in srgb, #dcdae8 94%, #000) 100%
+    color-mix(in srgb, var(--mz-cap) 94%, #000) 100%
   );
 }
 .mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); }

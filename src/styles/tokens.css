@@ -10,25 +10,51 @@
 .mz-theme-dark {
   color-scheme: dark;
 
-  /* ---- Surfaces: warm dark indigo, not pure black ---- */
-  --mz-bg: #0a0a14;
-  --mz-bg-rgb: 10, 10, 20;
-  --mz-bg-2: #12121e;
-  --mz-surface: #14141f;
-  --mz-surface-rgb: 22, 22, 34;
-  --mz-surface-2: #1a1a26;
-  --mz-elevated: #1c1c2b;
-  --mz-elevated-rgb: 28, 28, 43;
+  /* ---- Surfaces: a graphite ramp under a whisper of the brand ----
+     Graphite rather than near-black: at #0b0b0b the page read as a hole and
+     the elevation steps had nowhere to go. The tint is deliberately tiny —
+     three channel steps out of 255 — enough that a panel is not flat
+     cardboard, not enough to name a colour, and it follows --mz-primary-rgb
+     rather than the fixed violet the kit used to carry. Dark runs it weaker
+     than light (2.5% against 4%): the brand is far lighter than the surfaces
+     it sits in here, so the same percentage pulls a lot more hue.
 
-  /* ---- Lines ---- */
-  --mz-border: rgba(255, 255, 255, 0.08);
-  --mz-border-strong: rgba(255, 255, 255, 0.16);
+     The steps are taken from the EIS application (app-eis.morze.tech): its
+     card and table header sit at #111116, its input fill at #19191f, its hover
+     at #222227. The kit keeps its own elevation language on top of that — the
+     page is a little below the card, and a well stays sunken rather than
+     lifted, which is where it parts ways with EIS.
+
+     The literals are pre-compensated: at the default strength each surface
+     lands on the lightness above, so raising the strength lifts the ramp a
+     little and 0% drops it back to the bare literal. For a neutral kit point the tint at
+     a grey instead: --mz-tint: #808080. */
+  --mz-tint: rgb(var(--mz-primary-rgb));
+  --mz-tint-strength: 0.6%;
+
+  --mz-bg: color-mix(in srgb, #0c0c0c, var(--mz-tint) var(--mz-tint-strength));
+  --mz-bg-rgb: 16, 16, 16;
+  --mz-bg-2: color-mix(in srgb, #0f0f0f, var(--mz-tint) var(--mz-tint-strength));
+  --mz-surface: color-mix(in srgb, #111111, var(--mz-tint) var(--mz-tint-strength));
+  --mz-surface-rgb: 21, 21, 21;
+  --mz-surface-2: color-mix(in srgb, #161616, var(--mz-tint) var(--mz-tint-strength));
+  --mz-elevated: color-mix(in srgb, #1b1b1b, var(--mz-tint) var(--mz-tint-strength));
+  --mz-elevated-rgb: 31, 31, 31;
+
+  /* ---- Lines ----
+     Strong enough to carry a panel edge on their own: on this ramp the step
+     between a card and the page is small, so the hairline does the separating
+     rather than the fill. */
+  --mz-border: rgba(255, 255, 255, 0.11);
+  --mz-border-strong: rgba(255, 255, 255, 0.2);
 
   /* ---- Text ---- */
-  --mz-text: #ececf5;
-  --mz-text-rgb: 236, 236, 245;
-  --mz-text-dim: #a3a0b8;
-  --mz-text-muted: #6a6680;
+  --mz-text: #fafafa;
+  --mz-text-rgb: 250, 250, 250;
+  --mz-text-dim: #a3a3a3;
+  /* Lifted with the ramp: on graphite the old #696969 fell under 3:1 on a
+     raised panel. */
+  --mz-text-muted: #767676;
 
   /* ---- Tones ---- */
   --mz-primary-rgb: 168, 124, 248;
@@ -64,12 +90,23 @@
   --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
   --mz-face-top: rgba(255, 255, 255, 0.1);
   --mz-face-bottom: rgba(0, 0, 0, 0.35);
+  /* The physical cap on a slider thumb: white on top, grey underneath. */
+  --mz-cap: color-mix(in srgb, #dddddd, var(--mz-tint) var(--mz-tint-strength));
 
-  /* Sunken face — inputs, tracks, wells. Convex inverted. */
-  --mz-well: linear-gradient(180deg, #0c0c15 0%, #161621 100%);
-  --mz-well-inset: inset 0 1px 2px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  /* Field face — inputs, table headers, tracks, wells. It sits *above* the
+     surface it lies in, the way EIS paints an input (its fill is the border
+     colour at 30%, a step lighter than the card). On a ramp this dark a carved
+     well turns into a hole; the field reads better as a lighter patch with a
+     hairline. The inner shadow stays, softened, so it is still a field and not
+     a button. */
+  --mz-well: linear-gradient(
+    180deg,
+    color-mix(in srgb, #151515, var(--mz-tint) var(--mz-tint-strength)) 0%,
+    color-mix(in srgb, #1c1c1c, var(--mz-tint) var(--mz-tint-strength)) 100%
+  );
+  --mz-well-inset: inset 0 1px 2px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
 
-  --mz-overlay: rgba(6, 6, 14, 0.72);
+  --mz-overlay: rgba(10, 10, 10, 0.72);
   --mz-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --mz-shadow-2: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
   --mz-shadow-3: 0 24px 64px -24px rgba(0, 0, 0, 0.85);
@@ -79,23 +116,26 @@
 .mz-theme-light {
   color-scheme: light;
 
-  --mz-bg: #f6f6fa;
-  --mz-bg-rgb: 246, 246, 250;
+  --mz-tint: rgb(var(--mz-primary-rgb));
+  --mz-tint-strength: 4%;
+
+  --mz-bg: color-mix(in srgb, #fcfcfc, var(--mz-tint) var(--mz-tint-strength));
+  --mz-bg-rgb: 246, 246, 246;
   --mz-bg-2: #ffffff;
   --mz-surface: #ffffff;
   --mz-surface-rgb: 255, 255, 255;
-  --mz-surface-2: #f2f2f7;
+  --mz-surface-2: color-mix(in srgb, #f8f8f8, var(--mz-tint) var(--mz-tint-strength));
   --mz-elevated: #ffffff;
   --mz-elevated-rgb: 255, 255, 255;
 
-  --mz-border: rgba(16, 12, 40, 0.12);
+  --mz-border: rgba(16, 16, 16, 0.12);
   /* Strong enough for control outlines to clear 3:1 against a white page. */
-  --mz-border-strong: rgba(16, 12, 40, 0.26);
+  --mz-border-strong: rgba(16, 16, 16, 0.26);
 
-  --mz-text: #17162a;
-  --mz-text-rgb: 23, 22, 42;
-  --mz-text-dim: #5b5872;
-  --mz-text-muted: #8b88a3;
+  --mz-text: #181818;
+  --mz-text-rgb: 24, 24, 24;
+  --mz-text-dim: #5b5b5b;
+  --mz-text-muted: #8b8b8b;
 
   --mz-primary-rgb: 124, 74, 232;
   --mz-accent-rgb: 16, 175, 122;
@@ -109,21 +149,33 @@
   --mz-convex-bottom: rgba(0, 0, 0, 0.18);
   --mz-convex-text-shadow: none;
 
-  --mz-face: linear-gradient(180deg, #ffffff 0%, #f0eff6 100%);
-  --mz-face-hover: linear-gradient(180deg, #ffffff 0%, #e9e8f2 100%);
-  --mz-face-fill: #f0eff6;
-  --mz-face-fill-hover: #e9e8f2;
+  --mz-face: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    color-mix(in srgb, #f6f6f6, var(--mz-tint) var(--mz-tint-strength)) 100%
+  );
+  --mz-face-hover: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    color-mix(in srgb, #efefef, var(--mz-tint) var(--mz-tint-strength)) 100%
+  );
+  --mz-face-fill: color-mix(in srgb, #f6f6f6, var(--mz-tint) var(--mz-tint-strength));
+  --mz-face-fill-hover: color-mix(in srgb, #efefef, var(--mz-tint) var(--mz-tint-strength));
   --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
   --mz-face-top: rgba(255, 255, 255, 0.9);
-  --mz-face-bottom: rgba(16, 12, 40, 0.12);
+  --mz-face-bottom: rgba(16, 16, 16, 0.12);
 
-  --mz-well: linear-gradient(180deg, #e5e4ef 0%, #f3f3f9 100%);
-  --mz-well-inset: inset 0 1px 2px rgba(16, 12, 40, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+  --mz-well: linear-gradient(
+    180deg,
+    color-mix(in srgb, #ebebeb, var(--mz-tint) var(--mz-tint-strength)) 0%,
+    color-mix(in srgb, #f9f9f9, var(--mz-tint) var(--mz-tint-strength)) 100%
+  );
+  --mz-well-inset: inset 0 1px 2px rgba(16, 16, 16, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
 
-  --mz-overlay: rgba(24, 22, 45, 0.35);
-  --mz-shadow-1: 0 1px 2px rgba(16, 12, 40, 0.08);
-  --mz-shadow-2: 0 8px 24px -12px rgba(16, 12, 40, 0.22);
-  --mz-shadow-3: 0 24px 64px -24px rgba(16, 12, 40, 0.35);
+  --mz-overlay: rgba(25, 25, 25, 0.35);
+  --mz-shadow-1: 0 1px 2px rgba(16, 16, 16, 0.08);
+  --mz-shadow-2: 0 8px 24px -12px rgba(16, 16, 16, 0.22);
+  --mz-shadow-3: 0 24px 64px -24px rgba(16, 16, 16, 0.35);
 }
 
 :root {
