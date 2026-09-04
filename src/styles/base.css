@@ -46,7 +46,14 @@
    Font size and line height are left to the host: this element wraps the
    whole application. */
 .mz-root {
-  background: var(--mz-bg);
+  background-color: var(--mz-bg);
+  /* One brand glow spilling in from above the viewport — see --mz-halo.
+     Fixed so scrolling does not drag the light source along; engines that
+     ignore fixed attachment (iOS) just let it scroll off, which degrades to
+     the flat page. */
+  background-image: radial-gradient(1100px 520px at 50% -140px, var(--mz-halo), transparent 62%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--mz-text);
   font-family: var(--mz-font-sans);
   -webkit-font-smoothing: antialiased;
@@ -63,7 +70,7 @@
   .mz-btn, .mz-badge, .mz-toggle, .mz-toggle-group, .mz-checkbox, .mz-radio,
   .mz-switch, .mz-slider, .mz-tabs-list, .mz-progress, .mz-alert, .mz-input,
   .mz-textarea, .mz-select-trigger, .mz-item, .mz-tooltip-content,
-  .mz-accordion-trigger__icon, .mz-sidebar__menu-button
+  .mz-accordion-trigger__icon, .mz-sidebar__menu-button, .mz-avatar
 ) {
   --mz-tone-rgb: var(--mz-primary-rgb);
 
@@ -89,14 +96,22 @@
   opacity: 0.5;
 }
 
-/* Popper surfaces (dialog, menu, popover, select, tooltip). */
+/* Popper surfaces (dialog, menu, popover, select). Frosted, not opaque: the
+   page passes behind a floating panel, which is exactly where the glass layer
+   earns its keep — see the --mz-glass tokens for the fallbacks. The fill and
+   the sheen are kept apart the way the convex faces are, so a host can put a
+   sweep back through --mz-glass-sheen without touching the flat fill. */
 .mz-panel {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%),
-    var(--mz-elevated);
+  background-color: var(--mz-glass);
+  background-image: var(--mz-glass-sheen);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
   border: 1px solid var(--mz-border-strong);
   border-radius: var(--mz-radius-lg);
-  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-face-top);
+  /* --mz-glass-edge, not --mz-face-top: the 11% line belongs to raised
+     controls and doubled into a bright rim on a frosted panel. Every glass
+     surface in the kit catches the same quieter light on its top edge. */
+  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-glass-edge);
   color: var(--mz-text);
 }
 

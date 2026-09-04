@@ -1,0 +1,5930 @@
+{
+  "version": "1.0.0",
+  "schema_version": 1,
+  "project": {
+    "name": "morze-ui",
+    "is_monorepo": false,
+    "total_files": 95,
+    "entry_points": [
+      "playground/src/main.tsx",
+      "playground/src/App.tsx"
+    ],
+    "tech_stack": [
+      {
+        "name": "React",
+        "version": "19.2.8",
+        "category": "framework"
+      },
+      {
+        "name": "Vite",
+        "version": "8.2.2",
+        "category": "infra"
+      },
+      {
+        "name": "Node.js",
+        "version": ">=18",
+        "category": "language"
+      },
+      {
+        "name": "TypeScript",
+        "version": "5.9.3",
+        "category": "language"
+      }
+    ],
+    "entry_candidates": [
+      "playground/src/main.tsx",
+      "playground/src/App.tsx"
+    ],
+    "graph_mode": "flow"
+  },
+  "nodes": [
+    {
+      "id": "class:.agents/skills/ui-ux-pro-max/scripts/core.py:BM25",
+      "type": "class",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "BM25",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "class:.agents/skills/ui-ux-pro-max/scripts/design_system.py:DesignSystemGenerator",
+      "type": "class",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "DesignSystemGenerator",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/SKILL.md",
+      "type": "document",
+      "filePath": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 399,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 11,
+      "tags": [],
+      "summary": "Documentation: SKILL.md."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/data/catalog-summary.json",
+      "type": "config",
+      "filePath": ".agents/skills/ui-ux-pro-max/data/catalog-summary.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 59,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 12,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: catalog-summary.json."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/data/data-provenance.json",
+      "type": "config",
+      "filePath": ".agents/skills/ui-ux-pro-max/data/data-provenance.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 917,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 13,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: data-provenance.json."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/data/google-font-licenses.json",
+      "type": "config",
+      "filePath": ".agents/skills/ui-ux-pro-max/data/google-font-licenses.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 10828,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 14,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: google-font-licenses.json."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/references/pro-rules.md",
+      "type": "document",
+      "filePath": ".agents/skills/ui-ux-pro-max/references/pro-rules.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 272,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 15,
+      "tags": [],
+      "summary": "Documentation: pro-rules.md."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/references/quick-reference.md",
+      "type": "document",
+      "filePath": ".agents/skills/ui-ux-pro-max/references/quick-reference.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 613,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 16,
+      "tags": [],
+      "summary": "Documentation: quick-reference.md."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "language": "python",
+      "symbolCount": 67,
+      "lineCount": 1030,
+      "complexity": "complex",
+      "pagerank": 0.031875,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Config module core defining _normalize, BM25, __init__."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "language": "python",
+      "symbolCount": 45,
+      "lineCount": 1773,
+      "complexity": "complex",
+      "pagerank": 0.015009,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Config module design_system defining _resolve_dial, _relative_luminance, _palette_is_dark."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "language": "python",
+      "symbolCount": 10,
+      "lineCount": 145,
+      "complexity": "moderate",
+      "pagerank": 0.016584,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Config module reasoning_contract defining _object_without_duplicates, parse_decision_rules, _validate_action."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/search.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/search.py",
+      "language": "python",
+      "symbolCount": 2,
+      "lineCount": 228,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Config module search defining format_output."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+      "language": "python",
+      "symbolCount": 19,
+      "lineCount": 486,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 24,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for catalog_refresh."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+      "language": "python",
+      "symbolCount": 47,
+      "lineCount": 417,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for core."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+      "language": "python",
+      "symbolCount": 18,
+      "lineCount": 223,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for core_data_quality."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "language": "python",
+      "symbolCount": 35,
+      "lineCount": 487,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for data_contracts."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+      "language": "python",
+      "symbolCount": 32,
+      "lineCount": 192,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for design_system_mode."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+      "language": "python",
+      "symbolCount": 13,
+      "lineCount": 204,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for native_desktop_stack_freshness."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+      "language": "python",
+      "symbolCount": 20,
+      "lineCount": 210,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 24,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for relevance_evaluator."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+      "language": "python",
+      "symbolCount": 13,
+      "lineCount": 185,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for style_taxonomy."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+      "language": "python",
+      "symbolCount": 13,
+      "lineCount": 146,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for text_layout_resilience."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+      "language": "python",
+      "symbolCount": 16,
+      "lineCount": 192,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 7,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for web_stack_freshness."
+    },
+    {
+      "id": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "type": "file",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "language": "python",
+      "symbolCount": 70,
+      "lineCount": 1301,
+      "complexity": "complex",
+      "pagerank": 0.011187,
+      "communityId": 7,
+      "tags": [],
+      "summary": "Config module validate_data defining _relative_luminance, contrast_ratio, _read_rows."
+    },
+    {
+      "id": "file:FIXES.md",
+      "type": "document",
+      "filePath": "FIXES.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 505,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 17,
+      "tags": [],
+      "summary": "Documentation: FIXES.md."
+    },
+    {
+      "id": "file:README.md",
+      "type": "document",
+      "filePath": "README.md",
+      "language": "markdown",
+      "symbolCount": 0,
+      "lineCount": 646,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 18,
+      "tags": [],
+      "summary": "Project overview and entry point for new readers."
+    },
+    {
+      "id": "file:package.json",
+      "type": "config",
+      "filePath": "package.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 67,
+      "complexity": "simple",
+      "pagerank": 0.005986,
+      "communityId": 3,
+      "tags": [
+        "config"
+      ],
+      "summary": "Node package manifest: dependencies, scripts, and metadata."
+    },
+    {
+      "id": "file:playground/index.html",
+      "type": "file",
+      "filePath": "playground/index.html",
+      "language": "html",
+      "symbolCount": 0,
+      "lineCount": 20,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module index."
+    },
+    {
+      "id": "file:playground/shot.html",
+      "type": "file",
+      "filePath": "playground/shot.html",
+      "language": "html",
+      "symbolCount": 0,
+      "lineCount": 14,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module shot."
+    },
+    {
+      "id": "file:playground/src/App.tsx",
+      "type": "file",
+      "filePath": "playground/src/App.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 332,
+      "complexity": "moderate",
+      "pagerank": 0.006265,
+      "communityId": 5,
+      "tags": [
+        "entry_point"
+      ],
+      "summary": "Application module App defining ThemeSwitch, Section, Demo.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/src/Shot.tsx",
+      "type": "file",
+      "filePath": "playground/src/Shot.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 266,
+      "complexity": "moderate",
+      "pagerank": 0.006265,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module Shot defining PlusIcon, Shot.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/src/SidebarDemo.tsx",
+      "type": "file",
+      "filePath": "playground/src/SidebarDemo.tsx",
+      "language": "typescript",
+      "symbolCount": 5,
+      "lineCount": 162,
+      "complexity": "moderate",
+      "pagerank": 0.005562,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module SidebarDemo defining Icon, MobileTrigger, SidebarDemo.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/src/TableDemo.tsx",
+      "type": "file",
+      "filePath": "playground/src/TableDemo.tsx",
+      "language": "typescript",
+      "symbolCount": 7,
+      "lineCount": 160,
+      "complexity": "moderate",
+      "pagerank": 0.005562,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module TableDemo defining useOrders, TableDemo.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/src/main.tsx",
+      "type": "file",
+      "filePath": "playground/src/main.tsx",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 6,
+      "complexity": "simple",
+      "pagerank": 0.00832,
+      "communityId": 5,
+      "tags": [
+        "entry_point"
+      ],
+      "summary": "Application module main.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/src/shot-entry.tsx",
+      "type": "file",
+      "filePath": "playground/src/shot-entry.tsx",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 11,
+      "complexity": "simple",
+      "pagerank": 0.00832,
+      "communityId": 5,
+      "tags": [],
+      "summary": "Application module shot-entry.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:playground/vite.config.ts",
+      "type": "file",
+      "filePath": "playground/vite.config.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 12,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [],
+      "summary": "Application module vite.config.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:scripts/add-client-directive.mjs",
+      "type": "file",
+      "filePath": "scripts/add-client-directive.mjs",
+      "language": "javascript",
+      "symbolCount": 2,
+      "lineCount": 18,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [],
+      "summary": "Docs & Tooling module add-client-directive (2 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:scripts/build-css.mjs",
+      "type": "file",
+      "filePath": "scripts/build-css.mjs",
+      "language": "javascript",
+      "symbolCount": 3,
+      "lineCount": 23,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [],
+      "summary": "Docs & Tooling module build-css defining build.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:scripts/shot.mjs",
+      "type": "file",
+      "filePath": "scripts/shot.mjs",
+      "language": "javascript",
+      "symbolCount": 10,
+      "lineCount": 74,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [],
+      "summary": "Docs & Tooling module shot (10 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:skills-lock.json",
+      "type": "config",
+      "filePath": "skills-lock.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 7,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 23,
+      "tags": [
+        "config"
+      ],
+      "summary": "Configuration file: skills-lock.json."
+    },
+    {
+      "id": "file:src/components/accordion.tsx",
+      "type": "file",
+      "filePath": "src/components/accordion.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 43,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module accordion defining Accordion, AccordionItem, AccordionTrigger.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/alert.tsx",
+      "type": "file",
+      "filePath": "src/components/alert.tsx",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 20,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module alert defining Alert, AlertTitle, AlertDescription.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/avatar.tsx",
+      "type": "file",
+      "filePath": "src/components/avatar.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 38,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 6,
+      "tags": [],
+      "summary": "UI module avatar defining Avatar, AvatarGroup, AvatarImage.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/badge.tsx",
+      "type": "file",
+      "filePath": "src/components/badge.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 23,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 8,
+      "tags": [],
+      "summary": "UI module badge defining Badge.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/button.tsx",
+      "type": "file",
+      "filePath": "src/components/button.tsx",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 73,
+      "complexity": "simple",
+      "pagerank": 0.006617,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module button defining Button.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/card.tsx",
+      "type": "file",
+      "filePath": "src/components/card.tsx",
+      "language": "typescript",
+      "symbolCount": 7,
+      "lineCount": 58,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module card defining Card, CardHeader, CardTitle.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/checkbox.tsx",
+      "type": "file",
+      "filePath": "src/components/checkbox.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 29,
+      "complexity": "simple",
+      "pagerank": 0.005365,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module checkbox defining Checkbox.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/cell-editor.tsx",
+      "type": "file",
+      "filePath": "src/components/data-table/cell-editor.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 60,
+      "complexity": "simple",
+      "pagerank": 0.004757,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module cell-editor defining CellEditor.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/column-filter.tsx",
+      "type": "file",
+      "filePath": "src/components/data-table/column-filter.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 207,
+      "complexity": "moderate",
+      "pagerank": 0.005157,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module column-filter defining ColumnFilter, FilterBody, FilterChip.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/column-manager.tsx",
+      "type": "file",
+      "filePath": "src/components/data-table/column-manager.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 227,
+      "complexity": "moderate",
+      "pagerank": 0.005157,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module column-manager defining nameOf, ColumnManager.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/data-table-pagination.tsx",
+      "type": "file",
+      "filePath": "src/components/data-table/data-table-pagination.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 95,
+      "complexity": "simple",
+      "pagerank": 0.005157,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module data-table-pagination defining DataTablePagination.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/data-table.tsx",
+      "type": "file",
+      "filePath": "src/components/data-table/data-table.tsx",
+      "language": "typescript",
+      "symbolCount": 6,
+      "lineCount": 788,
+      "complexity": "complex",
+      "pagerank": 0.004897,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module data-table defining DataTable, describeFilter.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/index.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/index.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 27,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module index.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/labels.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/labels.ts",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 76,
+      "complexity": "simple",
+      "pagerank": 0.027892,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module labels defining resolveLabels.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/types.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/types.ts",
+      "language": "typescript",
+      "symbolCount": 15,
+      "lineCount": 131,
+      "complexity": "moderate",
+      "pagerank": 0.020024,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module types (15 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/use-column-layout.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/use-column-layout.ts",
+      "language": "typescript",
+      "symbolCount": 7,
+      "lineCount": 272,
+      "complexity": "moderate",
+      "pagerank": 0.005157,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module use-column-layout defining readStored, writeStored, useColumnLayout.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/use-column-resize.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/use-column-resize.ts",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 90,
+      "complexity": "simple",
+      "pagerank": 0.004757,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module use-column-resize defining useColumnResize, cssSafe.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/use-row-selection.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/use-row-selection.ts",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 55,
+      "complexity": "simple",
+      "pagerank": 0.005157,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module use-row-selection defining useRowSelection.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/use-table-query.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/use-table-query.ts",
+      "language": "typescript",
+      "symbolCount": 6,
+      "lineCount": 123,
+      "complexity": "moderate",
+      "pagerank": 0.004897,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module use-table-query defining encode, decode, useTableQuery.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/data-table/utils.ts",
+      "type": "file",
+      "filePath": "src/components/data-table/utils.ts",
+      "language": "typescript",
+      "symbolCount": 8,
+      "lineCount": 78,
+      "complexity": "moderate",
+      "pagerank": 0.007569,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module utils defining isFilterActive, activeFilters, setFilter.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/dialog.tsx",
+      "type": "file",
+      "filePath": "src/components/dialog.tsx",
+      "language": "typescript",
+      "symbolCount": 10,
+      "lineCount": 73,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module dialog defining Dialog, DialogTrigger, DialogPortal.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/dropdown-menu.tsx",
+      "type": "file",
+      "filePath": "src/components/dropdown-menu.tsx",
+      "language": "typescript",
+      "symbolCount": 15,
+      "lineCount": 139,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module dropdown-menu defining DropdownMenu, DropdownMenuPortal, DropdownMenuTrigger.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/field.tsx",
+      "type": "file",
+      "filePath": "src/components/field.tsx",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 18,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module field defining Field, FieldHint, FieldError.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/input.tsx",
+      "type": "file",
+      "filePath": "src/components/input.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 14,
+      "complexity": "simple",
+      "pagerank": 0.006516,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module input defining Input.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/label.tsx",
+      "type": "file",
+      "filePath": "src/components/label.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 8,
+      "complexity": "simple",
+      "pagerank": 0.005105,
+      "communityId": 6,
+      "tags": [],
+      "summary": "UI module label defining Label.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/popover.tsx",
+      "type": "file",
+      "filePath": "src/components/popover.tsx",
+      "language": "typescript",
+      "symbolCount": 7,
+      "lineCount": 45,
+      "complexity": "moderate",
+      "pagerank": 0.005731,
+      "communityId": 0,
+      "tags": [],
+      "summary": "UI module popover defining Popover, PopoverTrigger, PopoverAnchor.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/progress.tsx",
+      "type": "file",
+      "filePath": "src/components/progress.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 25,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 6,
+      "tags": [],
+      "summary": "UI module progress defining Progress.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/radio-group.tsx",
+      "type": "file",
+      "filePath": "src/components/radio-group.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 23,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 6,
+      "tags": [],
+      "summary": "UI module radio-group defining RadioGroup, RadioGroupItem.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/select.tsx",
+      "type": "file",
+      "filePath": "src/components/select.tsx",
+      "language": "typescript",
+      "symbolCount": 10,
+      "lineCount": 104,
+      "complexity": "moderate",
+      "pagerank": 0.006343,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module select defining Select, SelectGroup, SelectValue.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/separator.tsx",
+      "type": "file",
+      "filePath": "src/components/separator.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 13,
+      "complexity": "simple",
+      "pagerank": 0.005733,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module separator defining Separator.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/sheet.tsx",
+      "type": "file",
+      "filePath": "src/components/sheet.tsx",
+      "language": "typescript",
+      "symbolCount": 10,
+      "lineCount": 73,
+      "complexity": "moderate",
+      "pagerank": 0.005106,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module sheet defining Sheet, SheetTrigger, SheetClose.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/sidebar.tsx",
+      "type": "file",
+      "filePath": "src/components/sidebar.tsx",
+      "language": "typescript",
+      "symbolCount": 33,
+      "lineCount": 347,
+      "complexity": "complex",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module sidebar defining useSidebar, readStored, SidebarProvider.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/skeleton.tsx",
+      "type": "file",
+      "filePath": "src/components/skeleton.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 6,
+      "complexity": "simple",
+      "pagerank": 0.005366,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module skeleton defining Skeleton.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/slider.tsx",
+      "type": "file",
+      "filePath": "src/components/slider.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 34,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 6,
+      "tags": [],
+      "summary": "UI module slider defining Slider.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/spinner.tsx",
+      "type": "file",
+      "filePath": "src/components/spinner.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 19,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 4,
+      "tags": [],
+      "summary": "UI module spinner defining Spinner.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/switch.tsx",
+      "type": "file",
+      "filePath": "src/components/switch.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 20,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module switch defining Switch.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/tabs.tsx",
+      "type": "file",
+      "filePath": "src/components/tabs.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 32,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module tabs defining Tabs, TabsList, TabsTrigger.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/textarea.tsx",
+      "type": "file",
+      "filePath": "src/components/textarea.tsx",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 6,
+      "complexity": "simple",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module textarea defining Textarea.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/theme-provider.tsx",
+      "type": "file",
+      "filePath": "src/components/theme-provider.tsx",
+      "language": "typescript",
+      "symbolCount": 9,
+      "lineCount": 98,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module theme-provider defining readStored, writeStored, systemTheme.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/toggle-group.tsx",
+      "type": "file",
+      "filePath": "src/components/toggle-group.tsx",
+      "language": "typescript",
+      "symbolCount": 5,
+      "lineCount": 72,
+      "complexity": "moderate",
+      "pagerank": 0.004706,
+      "communityId": 8,
+      "tags": [],
+      "summary": "UI module toggle-group defining ToggleGroup, ToggleGroupItem.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/toggle.tsx",
+      "type": "file",
+      "filePath": "src/components/toggle.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 25,
+      "complexity": "simple",
+      "pagerank": 0.005506,
+      "communityId": 8,
+      "tags": [],
+      "summary": "UI module toggle defining Toggle.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/components/tooltip.tsx",
+      "type": "file",
+      "filePath": "src/components/tooltip.tsx",
+      "language": "typescript",
+      "symbolCount": 5,
+      "lineCount": 48,
+      "complexity": "moderate",
+      "pagerank": 0.005106,
+      "communityId": 1,
+      "tags": [],
+      "summary": "UI module tooltip defining TooltipProvider, Tooltip, TooltipTrigger.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/index.ts",
+      "type": "file",
+      "filePath": "src/index.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 119,
+      "complexity": "moderate",
+      "pagerank": 0.008128,
+      "communityId": 1,
+      "tags": [
+        "barrel"
+      ],
+      "summary": "Re-export barrel for src/.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/lib/icons.tsx",
+      "type": "file",
+      "filePath": "src/lib/icons.tsx",
+      "language": "typescript",
+      "symbolCount": 29,
+      "lineCount": 107,
+      "complexity": "complex",
+      "pagerank": 0.01584,
+      "communityId": 4,
+      "tags": [],
+      "summary": "Service module icons defining icon.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/lib/use-is-mobile.ts",
+      "type": "file",
+      "filePath": "src/lib/use-is-mobile.ts",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 17,
+      "complexity": "simple",
+      "pagerank": 0.005106,
+      "communityId": 1,
+      "tags": [],
+      "summary": "Service module use-is-mobile defining useIsMobile.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/lib/utils.ts",
+      "type": "file",
+      "filePath": "src/lib/utils.ts",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 8,
+      "complexity": "simple",
+      "pagerank": 0.044962,
+      "communityId": 1,
+      "tags": [],
+      "summary": "Service module utils defining cn.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/locales/en.ts",
+      "type": "file",
+      "filePath": "src/locales/en.ts",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 19,
+      "complexity": "simple",
+      "pagerank": 0.005453,
+      "communityId": 0,
+      "tags": [],
+      "summary": "Application module en (2 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/locales/ru.ts",
+      "type": "file",
+      "filePath": "src/locales/ru.ts",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 71,
+      "complexity": "simple",
+      "pagerank": 0.005453,
+      "communityId": 0,
+      "tags": [],
+      "summary": "Application module ru (3 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:src/locales/types.ts",
+      "type": "file",
+      "filePath": "src/locales/types.ts",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 14,
+      "complexity": "simple",
+      "pagerank": 0.009341,
+      "communityId": 0,
+      "tags": [],
+      "summary": "Application module types (2 symbols).",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/css-contract.test.ts",
+      "type": "file",
+      "filePath": "tests/css-contract.test.ts",
+      "language": "typescript",
+      "symbolCount": 3,
+      "lineCount": 437,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for css-contract.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/data-table.test.tsx",
+      "type": "file",
+      "filePath": "tests/data-table.test.tsx",
+      "language": "typescript",
+      "symbolCount": 4,
+      "lineCount": 586,
+      "complexity": "complex",
+      "pagerank": 0.004497,
+      "communityId": 20,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for data-table.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/locales.test.ts",
+      "type": "file",
+      "filePath": "tests/locales.test.ts",
+      "language": "typescript",
+      "symbolCount": 1,
+      "lineCount": 29,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 22,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for locales.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/setup.ts",
+      "type": "file",
+      "filePath": "tests/setup.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 1,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 19,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for setup.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/sidebar.test.tsx",
+      "type": "file",
+      "filePath": "tests/sidebar.test.tsx",
+      "language": "typescript",
+      "symbolCount": 2,
+      "lineCount": 125,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 20,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for sidebar.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tests/smoke.test.tsx",
+      "type": "file",
+      "filePath": "tests/smoke.test.tsx",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 175,
+      "complexity": "moderate",
+      "pagerank": 0.004497,
+      "communityId": 20,
+      "tags": [
+        "test"
+      ],
+      "summary": "Tests for smoke.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:tsconfig.json",
+      "type": "config",
+      "filePath": "tsconfig.json",
+      "language": "json",
+      "symbolCount": 0,
+      "lineCount": 17,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 10,
+      "tags": [
+        "config"
+      ],
+      "summary": "TypeScript compiler configuration."
+    },
+    {
+      "id": "file:tsup.config.ts",
+      "type": "file",
+      "filePath": "tsup.config.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 15,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 9,
+      "tags": [],
+      "summary": "Application module tsup.config.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "file:vitest.config.ts",
+      "type": "file",
+      "filePath": "vitest.config.ts",
+      "language": "typescript",
+      "symbolCount": 0,
+      "lineCount": 7,
+      "complexity": "simple",
+      "pagerank": 0.004497,
+      "communityId": 2,
+      "tags": [],
+      "summary": "Application module vitest.config.",
+      "primaryOwner": "alexander"
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:__init__",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "__init__",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_contains_phrase",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_contains_phrase",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_domain_keywords",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_domain_keywords",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_match_diagnostic",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_exact_match_diagnostic",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_row_identity",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_exact_row_identity",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_stack_identifier",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_exact_stack_identifier",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_file_signature",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_file_signature",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_get_bm25",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_get_bm25",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_legacy_successor_guidance",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_legacy_successor_guidance",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_csv",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_load_csv",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_csv_snapshot",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_load_csv_snapshot",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_product_keywords",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_load_product_keywords",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_rows_or_empty",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_load_rows_or_empty",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_normalize",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_normalize",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_passes_threshold",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_passes_threshold",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_project_row",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_project_row",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_query_coverage",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_query_coverage",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_rewrite_query_for_domain",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_rewrite_query_for_domain",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_row_identities",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_row_identities",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_search_csv",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_search_csv",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_search_csv_detailed",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_search_csv_detailed",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_stack_query_requests_legacy",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_stack_query_requests_legacy",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_stack_row_filter",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_stack_row_filter",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_style_identity",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_style_identity",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_style_search_destination",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_style_search_destination",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_suggest_identities",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_suggest_identities",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_suggest_terms",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_suggest_terms",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_valid_max_results",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "_valid_max_results",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:detect_domain",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "detect_domain",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:fit",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "fit",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:score",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "score",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:search",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "search",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:search_stack",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "search_stack",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:tokenize",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "tokenize",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:vocabulary",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "name": "vocabulary",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:__init__",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "__init__",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_apply_reasoning",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_apply_reasoning",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_build_style_lookup",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_build_style_lookup",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_contrast_ratio",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_contrast_ratio",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_derive_dark_palette",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_derive_dark_palette",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_detect_page_type",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_detect_page_type",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_extract_results",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_extract_results",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_filter_anti_patterns_for_mode",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_filter_anti_patterns_for_mode",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_find_reasoning_rule",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_find_reasoning_rule",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_generate_intelligent_overrides",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_generate_intelligent_overrides",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_landing_patterns",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_load_landing_patterns",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_reasoning",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_load_reasoning",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_styles",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_load_styles",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_multi_domain_search",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_multi_domain_search",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_palette_is_dark",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_palette_is_dark",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_query_wants_dark",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_query_wants_dark",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_relative_luminance",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_relative_luminance",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_color_mode",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_resolve_color_mode",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_dial",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_resolve_dial",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_style",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_resolve_style",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_select_best_match",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_select_best_match",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_select_palette_for_mode",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_select_palette_for_mode",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_style_is_dark_primary",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_style_is_dark_primary",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_write_persisted_file",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "_write_persisted_file",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:ansi_ljust",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "ansi_ljust",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_ascii_box",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "format_ascii_box",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_markdown",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "format_markdown",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_master_md",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "format_master_md",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_page_override_md",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "format_page_override_md",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:generate",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "generate",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:generate_design_system",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "generate_design_system",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:hex_to_ansi",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "hex_to_ansi",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:persist_design_system",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "persist_design_system",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:safe_slug",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "safe_slug",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:section_header",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "name": "section_header",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:_object_without_duplicates",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "name": "_object_without_duplicates",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:_validate_action",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "name": "_validate_action",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:apply_decision_rules",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "name": "apply_decision_rules",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:parse_decision_rules",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "name": "parse_decision_rules",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_catalog_date",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_catalog_date",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_app_interface_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_app_interface_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_catalog_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_catalog_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_catalog_summary",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_catalog_summary",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_chart_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_chart_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_color_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_color_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_core_data_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_core_data_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_file",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_file",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_font_catalog",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_font_catalog",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_icon_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_icon_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_landing_claims",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_landing_claims",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_motion_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_motion_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_phosphor_catalog",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_phosphor_catalog",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_provenance",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_provenance",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_react_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_react_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_reasoning_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_reasoning_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_stack_freshness_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_stack_freshness_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_style_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_style_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_typography_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_typography_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_ux_contract",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_check_ux_contract",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_configured_font_names",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_configured_font_names",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_declared_weights",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_declared_weights",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_font_families",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_font_families",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_font_names",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_font_names",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_imported_weights",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_imported_weights",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_load_catalog_json",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_load_catalog_json",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_read_rows",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_read_rows",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_relative_luminance",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_relative_luminance",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_split",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_split",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_catalog_source_key",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_catalog_source_key",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_confidence",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_confidence",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_dataset_source_key",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_dataset_source_key",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_date",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_date",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_google_fonts_exclusion_source",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_google_fonts_exclusion_source",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_provenance_source",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "_valid_provenance_source",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:contrast_ratio",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "contrast_ratio",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:main",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "main",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:validate",
+      "type": "function",
+      "filePath": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "name": "validate",
+      "language": "python",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:src/components/data-table/labels.ts:resolveLabels",
+      "type": "function",
+      "filePath": "src/components/data-table/labels.ts",
+      "name": "resolveLabels",
+      "language": "typescript",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:src/lib/icons.tsx:icon",
+      "type": "function",
+      "filePath": "src/lib/icons.tsx",
+      "name": "icon",
+      "language": "typescript",
+      "tags": [],
+      "summary": ""
+    },
+    {
+      "id": "function:src/lib/utils.ts:cn",
+      "type": "function",
+      "filePath": "src/lib/utils.ts",
+      "name": "cn",
+      "language": "typescript",
+      "tags": [],
+      "summary": ""
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "class:.agents/skills/ui-ux-pro-max/scripts/core.py:BM25",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_contains_phrase",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_domain_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_match_diagnostic",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_row_identity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_exact_stack_identifier",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_file_signature",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_get_bm25",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_legacy_successor_guidance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_csv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_csv_snapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_product_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_load_rows_or_empty",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_normalize",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_passes_threshold",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_project_row",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_query_coverage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_rewrite_query_for_domain",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_row_identities",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_search_csv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_search_csv_detailed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_stack_query_requests_legacy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_stack_row_filter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_style_identity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_style_search_destination",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_suggest_identities",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_suggest_terms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:_valid_max_results",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:detect_domain",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:fit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:score",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:search_stack",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:tokenize",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:vocabulary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py::BM25",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py::BM25",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:fit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py::BM25",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:score",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py::BM25",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:tokenize",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/core.py::BM25",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/core.py:vocabulary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "class:.agents/skills/ui-ux-pro-max/scripts/design_system.py:DesignSystemGenerator",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_apply_reasoning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_build_style_lookup",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_contrast_ratio",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_derive_dark_palette",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_detect_page_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_extract_results",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_filter_anti_patterns_for_mode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_find_reasoning_rule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_generate_intelligent_overrides",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_landing_patterns",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_reasoning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_styles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_multi_domain_search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_palette_is_dark",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_query_wants_dark",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_relative_luminance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_color_mode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_dial",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_style",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_select_best_match",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_select_palette_for_mode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_style_is_dark_primary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_write_persisted_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:ansi_ljust",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_ascii_box",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_master_md",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:format_page_override_md",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:generate_design_system",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:hex_to_ansi",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:persist_design_system",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:safe_slug",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:section_header",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:__init__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_apply_reasoning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_build_style_lookup",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_extract_results",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_find_reasoning_rule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_landing_patterns",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_reasoning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_load_styles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_multi_domain_search",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_resolve_style",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:_select_best_match",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py::DesignSystemGenerator",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/design_system.py:generate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:_object_without_duplicates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:_validate_action",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:apply_decision_rules",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py:parse_decision_rules",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/search.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/search.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_catalog_date",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_app_interface_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_catalog_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_catalog_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_chart_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_color_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_core_data_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_font_catalog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_icon_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_landing_claims",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_motion_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_phosphor_catalog",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_provenance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_react_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_reasoning_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_stack_freshness_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_style_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_typography_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_check_ux_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_configured_font_names",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_declared_weights",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_font_families",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_font_names",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_imported_weights",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_load_catalog_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_read_rows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_relative_luminance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_split",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_catalog_source_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_confidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_dataset_source_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_date",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_google_fonts_exclusion_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:_valid_provenance_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:contrast_ratio",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+      "target": "function:.agents/skills/ui-ux-pro-max/scripts/validate_data.py:validate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/index.cjs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/index.d.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/index.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/en.cjs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/en.d.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/en.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/ru.cjs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/ru.d.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/locales/ru.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/morze-ui-tokens.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:dist/morze-ui.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:package.json",
+      "target": "file:package.json",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:playground/index.html",
+      "target": "file:playground/src/main.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/shot.html",
+      "target": "file:playground/src/shot-entry.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/App.tsx",
+      "target": "file:external:@morze/ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/App.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/App.tsx",
+      "target": "file:package.json",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/App.tsx",
+      "target": "file:playground/src/SidebarDemo.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/App.tsx",
+      "target": "file:playground/src/TableDemo.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/Shot.tsx",
+      "target": "file:external:@morze/ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/SidebarDemo.tsx",
+      "target": "file:external:@morze/ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/SidebarDemo.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/TableDemo.tsx",
+      "target": "file:external:@morze/ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/TableDemo.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/main.tsx",
+      "target": "file:external:@morze/ui/styles.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/main.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/main.tsx",
+      "target": "file:external:react-dom/client",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/main.tsx",
+      "target": "file:playground/src/App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/shot-entry.tsx",
+      "target": "file:external:@morze/ui/styles.css",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/shot-entry.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/shot-entry.tsx",
+      "target": "file:external:react-dom/client",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/src/shot-entry.tsx",
+      "target": "file:playground/src/Shot.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/vite.config.ts",
+      "target": "file:external:@vitejs/plugin-react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/vite.config.ts",
+      "target": "file:external:node:url",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:playground/vite.config.ts",
+      "target": "file:external:vite",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/add-client-directive.mjs",
+      "target": "file:external:node:fs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/add-client-directive.mjs",
+      "target": "file:external:node:path",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/add-client-directive.mjs",
+      "target": "file:external:node:url",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build-css.mjs",
+      "target": "file:external:lightningcss",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build-css.mjs",
+      "target": "file:external:node:fs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build-css.mjs",
+      "target": "file:external:node:path",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build-css.mjs",
+      "target": "file:external:node:url",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/shot.mjs",
+      "target": "file:external:node:child_process",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/shot.mjs",
+      "target": "file:external:node:fs",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/shot.mjs",
+      "target": "file:external:node:os",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/shot.mjs",
+      "target": "file:external:node:path",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/shot.mjs",
+      "target": "file:external:node:url",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/accordion.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/accordion.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/accordion.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/accordion.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/alert.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/alert.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/avatar.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/avatar.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/avatar.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/badge.tsx",
+      "target": "file:external:class-variance-authority",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/badge.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/badge.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/badge.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/button.tsx",
+      "target": "file:external:class-variance-authority",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/button.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/button.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/button.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/button.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/card.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/card.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/checkbox.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/checkbox.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/checkbox.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/checkbox.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/cell-editor.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/cell-editor.tsx",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/cell-editor.tsx",
+      "target": "file:src/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/cell-editor.tsx",
+      "target": "file:src/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/data-table/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/components/popover.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-filter.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/components/popover.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/components/separator.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/column-manager.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/components/data-table/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table-pagination.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/cell-editor.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/column-filter.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/column-manager.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/data-table-pagination.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/use-column-layout.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/use-column-resize.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/use-row-selection.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/data-table/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/components/skeleton.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/data-table.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/column-filter.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/column-manager.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/data-table-pagination.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/data-table.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/use-column-layout.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/use-row-selection.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/use-table-query.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/index.ts",
+      "target": "file:src/components/data-table/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/labels.ts",
+      "target": "function:src/components/data-table/labels.ts:resolveLabels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/types.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/types.ts",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-column-layout.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-column-layout.ts",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-column-resize.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-row-selection.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-row-selection.ts",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-table-query.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-table-query.ts",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/use-table-query.ts",
+      "target": "file:src/components/data-table/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/data-table/utils.ts",
+      "target": "file:src/components/data-table/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dialog.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dialog.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dialog.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dialog.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dropdown-menu.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dropdown-menu.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dropdown-menu.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/dropdown-menu.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/field.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/field.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/input.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/input.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/label.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/label.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/label.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/popover.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/popover.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/popover.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/progress.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/progress.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/progress.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/radio-group.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/radio-group.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/radio-group.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/select.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/select.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/select.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/select.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/separator.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/separator.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/separator.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sheet.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sheet.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sheet.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sheet.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/components/separator.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/components/sheet.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/components/skeleton.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/components/tooltip.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/lib/use-is-mobile.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/sidebar.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/skeleton.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/skeleton.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/slider.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/slider.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/slider.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/spinner.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/spinner.tsx",
+      "target": "file:src/lib/icons.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/spinner.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/switch.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/switch.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/switch.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tabs.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tabs.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tabs.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/textarea.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/textarea.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/theme-provider.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle-group.tsx",
+      "target": "file:external:class-variance-authority",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle-group.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle-group.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle-group.tsx",
+      "target": "file:src/components/toggle.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle-group.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle.tsx",
+      "target": "file:external:class-variance-authority",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/toggle.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tooltip.tsx",
+      "target": "file:external:radix-ui",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tooltip.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/components/tooltip.tsx",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/accordion.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/alert.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/avatar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/badge.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/button.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/card.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/checkbox.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/data-table/index.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/dialog.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/dropdown-menu.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/field.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/input.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/label.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/popover.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/progress.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/radio-group.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/select.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/separator.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/sheet.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/sidebar.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/skeleton.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/slider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/spinner.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/switch.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/tabs.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/textarea.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/theme-provider.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/toggle-group.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/toggle.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/components/tooltip.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/lib/use-is-mobile.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/lib/utils.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/index.ts",
+      "target": "file:src/locales/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/lib/icons.tsx",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/lib/icons.tsx",
+      "target": "function:src/lib/icons.tsx:icon",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/lib/use-is-mobile.ts",
+      "target": "file:external:react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/lib/utils.ts",
+      "target": "file:external:clsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/lib/utils.ts",
+      "target": "function:src/lib/utils.ts:cn",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/locales/en.ts",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/locales/en.ts",
+      "target": "file:src/locales/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/locales/ru.ts",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/locales/ru.ts",
+      "target": "file:src/locales/types.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/locales/types.ts",
+      "target": "file:src/components/data-table/labels.ts",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/css-contract.test.ts",
+      "target": "file:external:node:child_process",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/css-contract.test.ts",
+      "target": "file:external:node:fs",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/css-contract.test.ts",
+      "target": "file:external:node:path",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/css-contract.test.ts",
+      "target": "file:external:vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/data-table.test.tsx",
+      "target": "file:external:@testing-library/react",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/data-table.test.tsx",
+      "target": "file:external:@testing-library/user-event",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/data-table.test.tsx",
+      "target": "file:external:react",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/data-table.test.tsx",
+      "target": "file:external:vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/data-table.test.tsx",
+      "target": "file:src/index.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/locales.test.ts",
+      "target": "file:external:vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/locales.test.ts",
+      "target": "file:src/index.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/locales.test.ts",
+      "target": "file:src/locales/en.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/locales.test.ts",
+      "target": "file:src/locales/ru.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/setup.ts",
+      "target": "file:external:@testing-library/jest-dom/vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/sidebar.test.tsx",
+      "target": "file:external:@testing-library/react",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/sidebar.test.tsx",
+      "target": "file:external:@testing-library/user-event",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/sidebar.test.tsx",
+      "target": "file:external:vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/sidebar.test.tsx",
+      "target": "file:src/index.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/smoke.test.tsx",
+      "target": "file:external:@testing-library/react",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/smoke.test.tsx",
+      "target": "file:external:@testing-library/user-event",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/smoke.test.tsx",
+      "target": "file:external:vitest",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/smoke.test.tsx",
+      "target": "file:src/index.ts",
+      "type": "tested_by",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tsconfig.json",
+      "target": "file:src",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0,
+      "hint": "node_package"
+    },
+    {
+      "source": "file:tsup.config.ts",
+      "target": "file:external:tsup",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:vitest.config.ts",
+      "target": "file:external:@vitejs/plugin-react",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:vitest.config.ts",
+      "target": "file:external:vitest/config",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:application",
+      "name": "Application",
+      "description": "",
+      "nodeIds": [
+        "file:FIXES.md",
+        "file:README.md",
+        "file:package.json",
+        "file:playground/index.html",
+        "file:playground/shot.html",
+        "file:playground/src/App.tsx",
+        "file:playground/src/Shot.tsx",
+        "file:playground/src/SidebarDemo.tsx",
+        "file:playground/src/TableDemo.tsx",
+        "file:playground/src/main.tsx",
+        "file:playground/src/shot-entry.tsx",
+        "file:playground/vite.config.ts",
+        "file:skills-lock.json",
+        "file:src/index.ts",
+        "file:src/locales/en.ts",
+        "file:src/locales/ru.ts",
+        "file:src/locales/types.ts",
+        "file:tsconfig.json",
+        "file:tsup.config.ts",
+        "file:vitest.config.ts"
+      ],
+      "display_order": 0,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:ui",
+      "name": "UI",
+      "description": "",
+      "nodeIds": [
+        "file:src/components/accordion.tsx",
+        "file:src/components/alert.tsx",
+        "file:src/components/avatar.tsx",
+        "file:src/components/badge.tsx",
+        "file:src/components/button.tsx",
+        "file:src/components/card.tsx",
+        "file:src/components/checkbox.tsx",
+        "file:src/components/data-table/cell-editor.tsx",
+        "file:src/components/data-table/column-filter.tsx",
+        "file:src/components/data-table/column-manager.tsx",
+        "file:src/components/data-table/data-table-pagination.tsx",
+        "file:src/components/data-table/data-table.tsx",
+        "file:src/components/data-table/index.ts",
+        "file:src/components/data-table/labels.ts",
+        "file:src/components/data-table/types.ts",
+        "file:src/components/data-table/use-column-layout.ts",
+        "file:src/components/data-table/use-column-resize.ts",
+        "file:src/components/data-table/use-row-selection.ts",
+        "file:src/components/data-table/use-table-query.ts",
+        "file:src/components/data-table/utils.ts",
+        "file:src/components/dialog.tsx",
+        "file:src/components/dropdown-menu.tsx",
+        "file:src/components/field.tsx",
+        "file:src/components/input.tsx",
+        "file:src/components/label.tsx",
+        "file:src/components/popover.tsx",
+        "file:src/components/progress.tsx",
+        "file:src/components/radio-group.tsx",
+        "file:src/components/select.tsx",
+        "file:src/components/separator.tsx",
+        "file:src/components/sheet.tsx",
+        "file:src/components/sidebar.tsx",
+        "file:src/components/skeleton.tsx",
+        "file:src/components/slider.tsx",
+        "file:src/components/spinner.tsx",
+        "file:src/components/switch.tsx",
+        "file:src/components/tabs.tsx",
+        "file:src/components/textarea.tsx",
+        "file:src/components/theme-provider.tsx",
+        "file:src/components/toggle-group.tsx",
+        "file:src/components/toggle.tsx",
+        "file:src/components/tooltip.tsx"
+      ],
+      "display_order": 1,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:config",
+      "name": "Config",
+      "description": "",
+      "nodeIds": [
+        "file:.agents/skills/ui-ux-pro-max/SKILL.md",
+        "file:.agents/skills/ui-ux-pro-max/data/catalog-summary.json",
+        "file:.agents/skills/ui-ux-pro-max/data/data-provenance.json",
+        "file:.agents/skills/ui-ux-pro-max/data/google-font-licenses.json",
+        "file:.agents/skills/ui-ux-pro-max/references/pro-rules.md",
+        "file:.agents/skills/ui-ux-pro-max/references/quick-reference.md",
+        "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/search.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py"
+      ],
+      "display_order": 2,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:service",
+      "name": "Service",
+      "description": "",
+      "nodeIds": [
+        "file:src/lib/icons.tsx",
+        "file:src/lib/use-is-mobile.ts",
+        "file:src/lib/utils.ts"
+      ],
+      "display_order": 3,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:docs-tooling",
+      "name": "Docs & Tooling",
+      "description": "",
+      "nodeIds": [
+        "file:scripts/add-client-directive.mjs",
+        "file:scripts/build-css.mjs",
+        "file:scripts/shot.mjs"
+      ],
+      "display_order": 4,
+      "order_basis": "imports"
+    },
+    {
+      "id": "layer:test",
+      "name": "Test",
+      "description": "",
+      "nodeIds": [
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+        "file:tests/css-contract.test.ts",
+        "file:tests/data-table.test.tsx",
+        "file:tests/locales.test.ts",
+        "file:tests/setup.ts",
+        "file:tests/sidebar.test.tsx",
+        "file:tests/smoke.test.tsx"
+      ],
+      "display_order": 5,
+      "order_basis": "imports"
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "target_path": "README.md",
+      "page_type": "repo_overview",
+      "title": "README.md",
+      "depth": 0,
+      "kind": "overview",
+      "reason": "Start here for the end-to-end picture before diving into the code.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 2,
+      "target_path": "src/index.ts",
+      "page_type": "file_page",
+      "title": "index.ts",
+      "depth": 0,
+      "kind": "code",
+      "reason": "A re-export hub \u2014 the package's public surface fans out from here.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 3,
+      "target_path": "playground/src/main.tsx",
+      "page_type": "file_page",
+      "title": "main.tsx",
+      "depth": 0,
+      "kind": "code",
+      "reason": "An entry point \u2014 execution and imports fan out from here.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 4,
+      "target_path": "playground/src/App.tsx",
+      "page_type": "file_page",
+      "title": "App.tsx",
+      "depth": 0,
+      "kind": "code",
+      "reason": "An entry point \u2014 execution and imports fan out from here.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 5,
+      "target_path": "src/lib/utils.ts",
+      "page_type": "file_page",
+      "title": "utils.ts",
+      "depth": 1,
+      "kind": "code",
+      "reason": "Directly used by the entry points above; a core collaborator.",
+      "layer_id": "layer:service"
+    },
+    {
+      "order": 6,
+      "target_path": "src/locales/types.ts",
+      "page_type": "file_page",
+      "title": "types.ts",
+      "depth": 1,
+      "kind": "code",
+      "reason": "Directly used by the entry points above; a core collaborator.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 7,
+      "target_path": "package.json",
+      "page_type": "file_page",
+      "title": "package.json",
+      "depth": 1,
+      "kind": "code",
+      "reason": "Directly used by the entry points above; a core collaborator.",
+      "layer_id": "layer:application"
+    },
+    {
+      "order": 8,
+      "target_path": "src/components/button.tsx",
+      "page_type": "file_page",
+      "title": "button.tsx",
+      "depth": 1,
+      "kind": "code",
+      "reason": "Directly used by the entry points above; a core collaborator.",
+      "layer_id": "layer:ui"
+    },
+    {
+      "order": 9,
+      "target_path": "src/components/input.tsx",
+      "page_type": "file_page",
+      "title": "input.tsx",
+      "depth": 1,
+      "kind": "code",
+      "reason": "Directly used by the entry points above; a core collaborator.",
+      "layer_id": "layer:ui"
+    },
+    {
+      "order": 10,
+      "target_path": "scripts/add-client-directive.mjs",
+      "page_type": "file_page",
+      "title": "add-client-directive.mjs",
+      "depth": 1,
+      "kind": "code",
+      "reason": "The Docs & Tooling layer's anchor \u2014 its most depended-on file.",
+      "layer_id": "layer:docs-tooling"
+    },
+    {
+      "order": 11,
+      "target_path": "src/components/data-table/column-filter.tsx",
+      "page_type": "file_page",
+      "title": "column-filter.tsx",
+      "depth": 0,
+      "kind": "code",
+      "reason": "A top churn hotspot \u2014 one of the most frequently changed files in the repo; worth understanding early.",
+      "layer_id": "layer:ui"
+    },
+    {
+      "order": 12,
+      "target_path": "tests/css-contract.test.ts",
+      "page_type": "file_page",
+      "title": "css-contract.test.ts",
+      "depth": 2,
+      "kind": "code",
+      "reason": "The test suite \u2014 how the system's behavior is verified.",
+      "layer_id": "layer:test"
+    }
+  ],
+  "modules": [
+    {
+      "id": "module:application",
+      "name": "Application",
+      "path": "",
+      "layerId": "layer:application",
+      "nodeIds": [
+        "file:FIXES.md",
+        "file:README.md",
+        "file:package.json",
+        "file:playground/index.html",
+        "file:playground/shot.html",
+        "file:playground/src/App.tsx",
+        "file:playground/src/Shot.tsx",
+        "file:playground/src/SidebarDemo.tsx",
+        "file:playground/src/TableDemo.tsx",
+        "file:playground/src/main.tsx",
+        "file:playground/src/shot-entry.tsx",
+        "file:playground/vite.config.ts",
+        "file:skills-lock.json",
+        "file:src/index.ts",
+        "file:src/locales/en.ts",
+        "file:src/locales/ru.ts",
+        "file:src/locales/types.ts",
+        "file:tsconfig.json",
+        "file:tsup.config.ts",
+        "file:vitest.config.ts"
+      ],
+      "wholeLayer": true,
+      "language": "typescript"
+    },
+    {
+      "id": "module:src-components",
+      "name": "UI",
+      "path": "src/components",
+      "layerId": "layer:ui",
+      "nodeIds": [
+        "file:src/components/accordion.tsx",
+        "file:src/components/alert.tsx",
+        "file:src/components/avatar.tsx",
+        "file:src/components/badge.tsx",
+        "file:src/components/button.tsx",
+        "file:src/components/card.tsx",
+        "file:src/components/checkbox.tsx",
+        "file:src/components/data-table/cell-editor.tsx",
+        "file:src/components/data-table/column-filter.tsx",
+        "file:src/components/data-table/column-manager.tsx",
+        "file:src/components/data-table/data-table-pagination.tsx",
+        "file:src/components/data-table/data-table.tsx",
+        "file:src/components/data-table/index.ts",
+        "file:src/components/data-table/labels.ts",
+        "file:src/components/data-table/types.ts",
+        "file:src/components/data-table/use-column-layout.ts",
+        "file:src/components/data-table/use-column-resize.ts",
+        "file:src/components/data-table/use-row-selection.ts",
+        "file:src/components/data-table/use-table-query.ts",
+        "file:src/components/data-table/utils.ts",
+        "file:src/components/dialog.tsx",
+        "file:src/components/dropdown-menu.tsx",
+        "file:src/components/field.tsx",
+        "file:src/components/input.tsx",
+        "file:src/components/label.tsx",
+        "file:src/components/popover.tsx",
+        "file:src/components/progress.tsx",
+        "file:src/components/radio-group.tsx",
+        "file:src/components/select.tsx",
+        "file:src/components/separator.tsx",
+        "file:src/components/sheet.tsx",
+        "file:src/components/sidebar.tsx",
+        "file:src/components/skeleton.tsx",
+        "file:src/components/slider.tsx",
+        "file:src/components/spinner.tsx",
+        "file:src/components/switch.tsx",
+        "file:src/components/tabs.tsx",
+        "file:src/components/textarea.tsx",
+        "file:src/components/theme-provider.tsx",
+        "file:src/components/toggle-group.tsx",
+        "file:src/components/toggle.tsx",
+        "file:src/components/tooltip.tsx"
+      ],
+      "wholeLayer": true,
+      "language": "typescript"
+    },
+    {
+      "id": "module:agents-skills-ui-ux-pro-max",
+      "name": "Config",
+      "path": ".agents/skills/ui-ux-pro-max",
+      "layerId": "layer:config",
+      "nodeIds": [
+        "file:.agents/skills/ui-ux-pro-max/SKILL.md",
+        "file:.agents/skills/ui-ux-pro-max/data/catalog-summary.json",
+        "file:.agents/skills/ui-ux-pro-max/data/data-provenance.json",
+        "file:.agents/skills/ui-ux-pro-max/data/google-font-licenses.json",
+        "file:.agents/skills/ui-ux-pro-max/references/pro-rules.md",
+        "file:.agents/skills/ui-ux-pro-max/references/quick-reference.md",
+        "file:.agents/skills/ui-ux-pro-max/scripts/core.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/design_system.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/search.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/validate_data.py"
+      ],
+      "wholeLayer": true,
+      "language": "python"
+    },
+    {
+      "id": "module:src-lib",
+      "name": "Service",
+      "path": "src/lib",
+      "layerId": "layer:service",
+      "nodeIds": [
+        "file:src/lib/icons.tsx",
+        "file:src/lib/use-is-mobile.ts",
+        "file:src/lib/utils.ts"
+      ],
+      "wholeLayer": true,
+      "language": "typescript"
+    },
+    {
+      "id": "module:scripts",
+      "name": "Docs & Tooling",
+      "path": "scripts",
+      "layerId": "layer:docs-tooling",
+      "nodeIds": [
+        "file:scripts/add-client-directive.mjs",
+        "file:scripts/build-css.mjs",
+        "file:scripts/shot.mjs"
+      ],
+      "wholeLayer": true,
+      "language": "javascript"
+    },
+    {
+      "id": "module:test",
+      "name": "Test",
+      "path": "",
+      "layerId": "layer:test",
+      "nodeIds": [
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+        "file:.agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+        "file:tests/css-contract.test.ts",
+        "file:tests/data-table.test.tsx",
+        "file:tests/locales.test.ts",
+        "file:tests/setup.ts",
+        "file:tests/sidebar.test.tsx",
+        "file:tests/smoke.test.tsx"
+      ],
+      "wholeLayer": true,
+      "language": "python"
+    }
+  ]
+}

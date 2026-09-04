@@ -19,27 +19,31 @@
   font-size: 14px;
   white-space: nowrap;
   border-radius: var(--mz-radius);
-  background: var(--mz-face);
+  /* The same flat face every raised control wears, under the sheen hook. */
+  background-color: var(--mz-face);
+  background-image: var(--mz-face-sheen);
   border: 1px solid var(--mz-border-strong);
   box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
   outline: none;
   transition:
-    background var(--mz-duration) ease,
+    background-color var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease;
 }
 .mz-select-trigger--sm { height: 34px; font-size: 13px; }
 .mz-select-trigger:hover {
-  background: var(--mz-face-hover);
+  background-color: var(--mz-face-hover);
   border-color: rgba(var(--mz-tone-rgb), 0.45);
 }
+/* Glow matched to the input's: the trigger stands in the same form rows, and
+   at 0.7 it flashed brighter than the fields beside it. */
 .mz-select-trigger:focus-visible,
 .mz-select-trigger[data-state='open'] {
   border-color: rgba(var(--mz-tone-rgb), 0.65);
   box-shadow:
     inset 0 1px 0 var(--mz-face-top),
     0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
-    0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.7);
+    0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.45);
 }
 .mz-select-trigger[data-placeholder] { color: var(--mz-text-muted); }
 .mz-select-trigger[data-disabled] { opacity: 0.5; cursor: not-allowed; }
@@ -103,15 +107,12 @@
 
 /* Radix drives highlight state for both pointer and keyboard, so there is no
    separate :hover rule — that would double-highlight during keyboard nav. */
+/* One flat tint at the old sweep's mean, inside the tone ring. The gloss line
+   that used to sit on the top edge went with the sweep — on a 6px-tall menu
+   row it was reading as a seam between items rather than as light. */
 .mz-item[data-highlighted] {
-  background: linear-gradient(
-    135deg,
-    rgba(var(--mz-tone-rgb), 0.22) 0%,
-    rgba(var(--mz-tone-rgb), 0.1) 100%
-  );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.28);
+  background: rgba(var(--mz-tone-rgb), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.28);
   color: var(--mz-text);
 }
 .mz-item[data-state='checked'] { color: rgb(var(--mz-tone-rgb)); font-weight: 600; }
@@ -256,7 +257,7 @@
   background-image: var(--mz-fill-sheen);
   border: 1px solid var(--mz-convex-hairline);
   box-shadow:
-    0 10px 30px -10px rgba(var(--mz-primary-rgb), 0.6),
+    0 10px 30px -10px rgba(var(--mz-tone-rgb), 0.6),
     inset 0 1px 0 var(--mz-convex-top);
   color: #fff;
   font-size: 12px;
@@ -266,7 +267,9 @@
 .mz-tooltip-content[data-state='delayed-open'] { animation: mz-pop-in 0.14s var(--mz-ease); }
 .mz-tooltip-content[data-state='closed'] { animation: mz-pop-out 0.1s var(--mz-ease); }
 .mz-tooltip-arrow {
-  fill: rgb(var(--mz-primary-rgb));
+  /* The tone, not a fixed primary: the tooltip is a toned root, and a
+     retoned bubble kept sprouting a violet arrow otherwise. */
+  fill: rgb(var(--mz-tone-rgb));
   z-index: 1;
   translate: 0 -1px;
   border-radius: 2px;

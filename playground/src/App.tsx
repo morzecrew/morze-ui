@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { version } from '../../package.json'
 import SidebarDemo from './SidebarDemo'
 import TableDemo from './TableDemo'
 import {
@@ -10,6 +11,7 @@ import {
   AlertDescription,
   AlertTitle,
   Avatar,
+  AvatarGroup,
   AvatarFallback,
   Badge,
   Button,
@@ -110,7 +112,7 @@ function Demo() {
       <div className="pg__bar">
         <div className="pg__brand">
           <h1>Morze UI</h1>
-          <span>@morze/ui 0.1.0</span>
+          <span>@morze/ui {version}</span>
         </div>
         <ThemeSwitch />
       </div>
@@ -357,11 +359,19 @@ function Demo() {
             </Badge>
           </div>
           <div className="pg-row">
+            <AvatarGroup>
+              <Avatar>
+                <AvatarFallback>AS</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarFallback data-tone="accent">MT</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarFallback data-tone="info">KV</AvatarFallback>
+              </Avatar>
+            </AvatarGroup>
             <Avatar size="sm">
               <AvatarFallback>AS</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarFallback>MT</AvatarFallback>
             </Avatar>
             <Avatar size="lg">
               <AvatarFallback>UI</AvatarFallback>

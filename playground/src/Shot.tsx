@@ -7,6 +7,7 @@ import {
   AlertDescription,
   AlertTitle,
   Avatar,
+  AvatarGroup,
   AvatarFallback,
   Badge,
   Button,
@@ -230,7 +231,7 @@ export default function Shot() {
                 <Badge variant="soft">new</Badge>
               </CardAction>
             </CardHeader>
-            <CardContent>Gradient fill, hairline rim, inset highlight on top.</CardContent>
+            <CardContent>Flat fill, hairline rim, inset highlight on top.</CardContent>
             <CardFooter>
               <Button size="sm">Details</Button>
               <Button size="sm" variant="ghost">
@@ -240,12 +241,17 @@ export default function Shot() {
           </Card>
 
           <div className="shot__row">
-            <Avatar>
-              <AvatarFallback>AS</AvatarFallback>
-            </Avatar>
-            <Avatar>
-              <AvatarFallback data-tone="accent">MT</AvatarFallback>
-            </Avatar>
+            <AvatarGroup>
+              <Avatar>
+                <AvatarFallback>AS</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarFallback data-tone="accent">MT</AvatarFallback>
+              </Avatar>
+              <Avatar>
+                <AvatarFallback data-tone="info">UI</AvatarFallback>
+              </Avatar>
+            </AvatarGroup>
             <Avatar size="lg">
               <AvatarFallback>UI</AvatarFallback>
             </Avatar>

@@ -1,14 +1,13 @@
 # @morze/ui
 
 Morze UI — a React component kit shaped like **shadcn/ui (latest)** on **Radix**
-primitives, wearing the convex look from the Morze landing: a 135° gradient, a
+primitives, wearing the convex look from the Morze landing: a flat fill, a
 hairline rim, an inset highlight on top and a tone glow underneath.
 
 ![Morze UI components](docs/screenshot.png)
 
 ```
 background-color: rgb(tone);
-background-image: linear-gradient(135deg, rgba(255,255,255,.07), rgba(0,0,0,.14));
 border: 1px solid rgba(255,255,255,.18);
 box-shadow: 0 3px 10px -4px rgba(tone,.4),
             inset 0 1px 0 rgba(255,255,255,.35),
@@ -17,9 +16,24 @@ box-shadow: 0 3px 10px -4px rgba(tone,.4),
 
 That recipe is applied to **every active element**: buttons, toggles,
 checkboxes, radios, switches, sliders, tabs, the select trigger, badges and the
-active navigation item. The label itself stays flat — the embossed
-`text-shadow` is off (`--mz-convex-text-shadow: none`), as on the landing,
-because on a 34px control it only made the text shout.
+active navigation item. **Every fill is one flat colour** — the volume is drawn
+on the edges of a control, never washed across its face. The recipe carried a
+135° gloss sweep until the fills were flattened; it survives as a hook that is
+off by default (`--mz-fill-sheen`, and `--mz-face-sheen` / `--mz-glass-sheen`
+for the neutral and frosted faces), so a host that wants the gloss back
+re-points one token per family. The label stays flat for the same reason the
+landing dropped it — the embossed `text-shadow` is off
+(`--mz-convex-text-shadow: none`), because on a 34px control it only made the
+text shout.
+
+The surfaces that other content passes behind are **glass**: menus, popovers,
+dialogs, the sheet, the sidebar rail and a sticky table header are a
+translucent cut of the same surface ramp over a backdrop blur
+(`--mz-glass*`), so a menu frosts the page under it and a pinned header
+frosts the rows scrolling past. Controls stay convex and opaque — glass is
+for what things float over, not for what you press. With
+`prefers-reduced-transparency`, or in an engine without `backdrop-filter`,
+the glass falls back to the opaque ramp.
 
 ## Install
 
@@ -95,7 +109,7 @@ theme to the wrapper instead.
 
 ## Tones
 
-Every active component accepts `tone`, which re-points the gradient, the glow
+Every active component accepts `tone`, which re-points the fill, the glow
 and the focus ring:
 
 ```tsx
@@ -187,11 +201,12 @@ shrinks a little.
 }
 ```
 
-The tone fill is stored as a flat colour (`--mz-fill`) under a fixed sheen
-gradient (`--mz-fill-sheen`), so `background-color` animates smoothly —
-browsers do not interpolate gradients. Darkening goes through `color-mix()`;
-where that is unsupported the element simply does not darken and everything
-else still works.
+The tone fill is a flat colour (`--mz-fill`), so `background-color` animates
+smoothly; the neutral face (`--mz-face`) is flat for the same reason. Both used
+to be split into a colour under a fixed sheen purely because browsers cannot
+interpolate a gradient — with the sweeps gone, so is the split. Darkening goes
+through `color-mix()`; where that is unsupported the element simply does not
+darken and everything else still works.
 
 Only **filled** surfaces darken: `primary`, `destructive`, a pressed toggle, the
 active tab, a checked checkbox, radio or switch. Neutral variants (`secondary`,
@@ -226,7 +241,9 @@ Safari 16.2+, the same baseline as the rest of the kit.
 Everything is driven by custom properties; override them after importing the
 styles. The main groups: surfaces (`--mz-bg`, `--mz-surface`, `--mz-elevated`),
 borders, text, tones, the convex recipe (`--mz-convex-*`, `--mz-face*`,
-`--mz-well*`), geometry (`--mz-radius*`), type (`--mz-font-*`, `--mz-label-*`),
+`--mz-well*`), the glass layer (`--mz-glass`, `--mz-glass-chrome`,
+`--mz-glass-well`, `--mz-glass-filter`, `--mz-glass-sheen`),
+geometry (`--mz-radius*`), type (`--mz-font-*`, `--mz-label-*`),
 motion and states (`--mz-ease`, `--mz-duration`, `--mz-hover-scale`,
 `--mz-press-scale`, `--mz-hover-mix`, `--mz-press-mix`), focus (`--mz-ring-*`).
 
@@ -449,7 +466,12 @@ What it does:
   and the floating bar can escalate to "all N matching" (in that mode a bulk
   action must travel with the query, not with a list of ids).
 - **Columns** — visibility, order (drag and drop plus arrows for the keyboard)
-  and pinning; all of it saved to `localStorage` under `persistKey`.
+  and pinning; all of it saved to `localStorage` under `persistKey`. The list
+  is grouped the way the table paints — pinned left, loose, pinned right — and
+  a move stays inside its group, so what you drag is where it lands. A column
+  whose header is a node rather than text is listed by position: “#3”.
+  `columnManager={false}` drops the button for a layout the host fixes or
+  drives itself; the layout props keep working without it.
 - **Expandable rows** and **inline cell editing** on double click, with
   optimistic saving and a rollback on failure.
 - **States** — skeletons on the first load, a thin progress line when refetching

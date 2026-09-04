@@ -68,6 +68,12 @@ export type DataTableProps<T> = {
 
   toolbar?: React.ReactNode
   /**
+   * `false` drops the Columns button — for a table whose layout the host
+   * fixes, or drives from its own UI. The layout itself still works: `layout`,
+   * `onLayoutChange` and `persistKey` are unaffected.
+   */
+  columnManager?: boolean
+  /**
    * Stretches the columns to fill the container on mount and on container
    * resize, so there is no dead space at the right edge. Columns the user
    * resized by hand keep their width. `false` uses the declared widths as-is.
@@ -124,6 +130,7 @@ export function DataTable<T>({
   onLayoutChange,
   persistKey = null,
   toolbar,
+  columnManager = true,
   autoFit = true,
   density = 'normal',
   stickyHeader = true,
@@ -153,7 +160,6 @@ export function DataTable<T>({
     setWidth,
     toggleHidden,
     setPinned,
-    move,
     moveTo,
     reset,
     fitTo,
@@ -465,23 +471,28 @@ export function DataTable<T>({
       className={cn('mz-dt', className)}
       style={widthVars}
     >
-      {(toolbar || chips.length > 0 || columns.some((c) => c.hideable !== false)) && (
-        <div className="mz-dt__toolbar">
-          <div className="mz-dt__toolbar-main">{toolbar}</div>
-          <div className="mz-dt__toolbar-side">
-            <ColumnManager
-              columns={columns}
-              layout={layout}
-              labels={labelsProp}
-              onToggleHidden={toggleHidden}
-              onSetPinned={setPinned}
-              onMove={move}
-              onMoveTo={moveTo}
-              onReset={reset}
-            />
+      {(() => {
+        const showManager = columnManager && columns.some((c) => c.hideable !== false)
+        if (!toolbar && chips.length === 0 && !showManager) return null
+        return (
+          <div className="mz-dt__toolbar">
+            <div className="mz-dt__toolbar-main">{toolbar}</div>
+            {showManager && (
+              <div className="mz-dt__toolbar-side">
+                <ColumnManager
+                  columns={columns}
+                  layout={layout}
+                  labels={labelsProp}
+                  onToggleHidden={toggleHidden}
+                  onSetPinned={setPinned}
+                  onMoveTo={moveTo}
+                  onReset={reset}
+                />
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {chips.length > 0 && (
         <div className="mz-dt__chips">

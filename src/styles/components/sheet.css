@@ -8,11 +8,17 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 60%),
-    var(--mz-elevated);
+  /* Glass, like the floating panels: a sheet slides over the very content it
+     relates to, and the frost keeps that content present behind it. */
+  background-color: var(--mz-glass);
+  background-image: var(--mz-glass-sheen);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
   border: 1px solid var(--mz-border-strong);
-  box-shadow: var(--mz-shadow-3);
+  /* The same top-edge light every glass surface catches. It used to come from
+     the sheen alone, so flattening the fill would have left the sheet the one
+     frosted surface with no edge at all. */
+  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-glass-edge);
   color: var(--mz-text);
   outline: none;
 }

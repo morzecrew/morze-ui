@@ -49,7 +49,9 @@ execFileSync(
   chrome,
   [
     '--headless=new',
-    '--disable-gpu',
+    // Software GL, not --disable-gpu: the latter silently drops backdrop-filter,
+    // and the still would show the glass surfaces sharp instead of frosted.
+    '--use-angle=swiftshader',
     '--hide-scrollbars',
     '--no-sandbox',
     `--user-data-dir=${profile}`,

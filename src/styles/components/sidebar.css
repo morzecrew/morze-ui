@@ -13,7 +13,14 @@
   align-items: stretch;
   width: 100%;
   min-height: 100dvh;
-  background: var(--mz-bg);
+  /* The layout paints the page, so it repeats the root's aurora — an opaque
+     bg here was hiding it, and the frosted sidebar needs light behind the
+     glass to have anything to frost. Same recipe as .mz-root; --mz-halo:
+     transparent switches both off together. */
+  background-color: var(--mz-bg);
+  background-image: radial-gradient(1100px 520px at 50% -140px, var(--mz-halo), transparent 62%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: var(--mz-text);
 }
 
@@ -25,7 +32,10 @@
   width: var(--mz-sidebar-w);
   height: var(--mz-sidebar-h);
   overflow: hidden;
-  background: var(--mz-surface);
+  /* Frosted chrome: the layout's aurora glows through the rail. */
+  background: var(--mz-glass-chrome);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
   border-right: 1px solid var(--mz-border);
   transition: width var(--mz-duration) var(--mz-ease), padding var(--mz-duration) var(--mz-ease);
 }
@@ -45,13 +55,16 @@
   margin: 8px;
   border: 1px solid var(--mz-border);
   border-radius: var(--mz-radius-lg);
-  box-shadow: var(--mz-shadow-2), inset 0 1px 0 var(--mz-face-top);
+  /* Glass edge, not the control highlight: the floating rail is frosted. */
+  box-shadow: var(--mz-shadow-2), inset 0 1px 0 var(--mz-glass-edge);
 }
 
 /* Inset is the other way round: the navigation sits directly on the page
    background and the content is the raised surface. */
 .mz-sidebar[data-variant='inset'] {
   background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border: none;
 }
 
@@ -94,15 +107,15 @@
   background: var(--mz-surface);
   border-top-left-radius: var(--mz-sidebar-panel-radius, 22px);
   box-shadow:
-    -24px -24px 64px -24px rgba(0, 0, 0, 0.14),
-    -8px -8px 24px -12px rgba(0, 0, 0, 0.1);
+    -24px -24px 64px -24px color-mix(in srgb, var(--mz-shade) 14%, transparent),
+    -8px -8px 24px -12px color-mix(in srgb, var(--mz-shade) 10%, transparent);
 }
 .mz-sidebar-layout:has(.mz-sidebar[data-side='right']) .mz-sidebar-panel {
   border-top-left-radius: 0;
   border-top-right-radius: var(--mz-sidebar-panel-radius, 22px);
   box-shadow:
-    24px -24px 64px -24px rgba(0, 0, 0, 0.14),
-    8px -8px 24px -12px rgba(0, 0, 0, 0.1);
+    24px -24px 64px -24px color-mix(in srgb, var(--mz-shade) 14%, transparent),
+    8px -8px 24px -12px color-mix(in srgb, var(--mz-shade) 10%, transparent);
 }
 
 /* Optional chrome texture behind the navigation. */
@@ -216,6 +229,7 @@
   background: transparent;
   color: var(--mz-text-muted);
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 .mz-sidebar__group-action:hover { background: rgba(var(--mz-text-rgb), 0.08); color: var(--mz-text); }
 .mz-sidebar__group-action svg { width: 14px; height: 14px; }

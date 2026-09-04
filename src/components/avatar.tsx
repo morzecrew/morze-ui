@@ -25,6 +25,15 @@ function Avatar({
   )
 }
 
+/**
+ * Lays avatars in an overlapping stack. Each avatar gets a ring in the
+ * surface colour so the overlap reads as depth; set `--mz-avatar-ring` on the
+ * group when it sits on something other than a card.
+ */
+function AvatarGroup({ className, ...props }: React.ComponentProps<'div'>) {
+  return <div data-slot="avatar-group" role="group" className={cn('mz-avatar-group', className)} {...props} />
+}
+
 function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
   return (
     <AvatarPrimitive.Image
@@ -48,4 +57,4 @@ function AvatarFallback({
   )
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+export { Avatar, AvatarGroup, AvatarImage, AvatarFallback }

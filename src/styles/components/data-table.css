@@ -65,6 +65,7 @@
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 .mz-dt__chip button:hover { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
 
@@ -76,7 +77,9 @@
   border-radius: var(--mz-radius-lg);
   background: var(--mz-surface);
   border: 1px solid var(--mz-border);
-  box-shadow: var(--mz-shadow-2), inset 0 1px 0 var(--mz-face-top);
+  /* No inset highlight of its own: it would land on the header's top edge and
+     stack with the th hairline into a double-bright rim. */
+  box-shadow: var(--mz-shadow-2);
   overscroll-behavior-x: contain;
 }
 
@@ -109,10 +112,20 @@
   font-weight: 600;
   color: var(--mz-text-dim);
   white-space: nowrap;
-  background: var(--mz-well);
+  /* The frosted well: translucent so a sticky header can frost the rows that
+     scroll behind it. In a static table nothing moves back there and the same
+     fill just composites over the surface. */
+  background: var(--mz-glass-well);
   border-bottom: 1px solid var(--mz-border-strong);
-  box-shadow: inset 0 1px 0 var(--mz-face-top);
+  box-shadow: inset 0 1px 0 var(--mz-glass-edge);
   user-select: none;
+}
+/* Blur only where content actually passes behind the cell: rows under a
+   sticky header, columns under a pinned one. */
+.mz-dt__table[data-sticky] .mz-dt__th,
+.mz-dt__th[data-pinned] {
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
 }
 .mz-dt__table[data-sticky] .mz-dt__th { position: sticky; top: 0; z-index: 2; }
 .mz-dt__th[data-align='right'] { text-align: right; }
@@ -154,6 +167,11 @@
   transition: opacity 0.16s ease, color 0.16s ease;
 }
 .mz-dt__sort-icon svg { width: 13px; height: 13px; }
+/* The idle stack is drawn from two chevrons that fill a third of the 24 grid,
+   where the sorted arrow fills most of it — at one size the unsorted state
+   came out visibly smaller and finer than the sorted one. A larger box and a
+   heavier stroke put the two on equal footing. */
+.mz-dt__sort-icon:not([data-active]) svg { width: 16px; height: 16px; stroke-width: 3; }
 .mz-dt__sort-icon[data-active] { opacity: 1; color: rgb(var(--mz-primary-rgb)); }
 .mz-dt__sort-icon b { font-size: 10px; font-weight: 700; }
 .mz-dt__sort:hover .mz-dt__sort-icon { opacity: 0.9; }
@@ -174,12 +192,20 @@
 }
 .mz-dt__filter svg { width: 13px; height: 13px; }
 .mz-dt__filter:hover { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
-.mz-dt__filter[data-active] {
-  color: #fff;
-  border-color: var(--mz-convex-hairline);
-  background-color: var(--mz-fill);
-  background-image: var(--mz-fill-sheen);
+/* A column that is filtering says so in the brand colour, the way the active
+   sort arrow does. It used to ask for --mz-fill, which nothing defines on a
+   table header: the fill came out transparent and "active" was a white icon —
+   invisible on the light theme's white header. */
+.mz-dt__filter[data-active],
+.mz-dt__filter[data-active]:hover {
+  color: rgb(var(--mz-tone-rgb, var(--mz-primary-rgb)));
+  background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.16);
+  border-color: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.45);
 }
+.mz-dt__filter[data-active]:hover { background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.24); }
+/* Solid funnel while it filters: the state survives a monochrome print and a
+   colour-blind reader, where the tint alone would not. */
+.mz-dt__filter[data-active] svg { fill: currentColor; }
 
 /* Resize handle: a wide grab zone over a hairline. It stays inside its own
    cell — overhanging into the neighbour puts it under that header, since every
@@ -357,11 +383,14 @@
   align-self: center;
   padding: 10px 10px 10px 16px;
   border-radius: var(--mz-radius-lg);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%),
-    var(--mz-elevated);
+  /* The panel recipe, not an opaque fill: the bar rides sticky over the very
+     rows it acts on, which is exactly what the glass layer is for. */
+  background-color: var(--mz-glass);
+  background-image: var(--mz-glass-sheen);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
   border: 1px solid var(--mz-border-strong);
-  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-face-top);
+  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-glass-edge);
   animation: mz-pop-in 0.18s var(--mz-ease);
 }
 .mz-dt__bulkbar-count { font-size: 13px; font-weight: 600; white-space: nowrap; }
@@ -434,9 +463,16 @@
   border-radius: var(--mz-radius-sm);
   font-size: 13px;
   cursor: grab;
+  transition: background 0.16s ease, opacity 0.16s ease;
 }
 .mz-dt__columns-item:hover { background: rgba(var(--mz-text-rgb), 0.06); }
 .mz-dt__columns-item[data-dragging] { opacity: 0.45; cursor: grabbing; }
+/* Where the dragged column lands — it takes this row's place. Only rows that
+   accept the drop get it, so an invalid target says so by staying plain. */
+.mz-dt__columns-item[data-drop] {
+  background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.5);
+}
 .mz-dt__columns-grip { display: grid; place-content: center; color: var(--mz-text-muted); }
 .mz-dt__columns-grip svg { width: 14px; height: 14px; }
 .mz-dt__columns-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -460,3 +496,9 @@
 .mz-dt__icon-btn:hover:not(:disabled) { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
 .mz-dt__icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .mz-dt__icon-btn[data-active] { color: rgb(var(--mz-primary-rgb)); }
+
+/* The needle points at the edge the column is pinned to, so the three states
+   of the pin button differ by more than a colour the unpinned one cannot show. */
+.mz-dt__pin svg { transition: transform var(--mz-duration) var(--mz-ease); }
+.mz-dt__pin[data-pinned='left'] svg { transform: rotate(-45deg); }
+.mz-dt__pin[data-pinned='right'] svg { transform: rotate(45deg); }

@@ -57,7 +57,7 @@ export {
 export { Alert, AlertTitle, AlertDescription } from './components/alert'
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './components/accordion'
 export { Progress } from './components/progress'
-export { Avatar, AvatarImage, AvatarFallback } from './components/avatar'
+export { Avatar, AvatarGroup, AvatarImage, AvatarFallback } from './components/avatar'
 export { Separator } from './components/separator'
 export { Skeleton } from './components/skeleton'
 export { Spinner } from './components/spinner'

@@ -46,7 +46,7 @@
 .mz-checkbox__indicator svg {
   width: 12px;
   height: 12px;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--mz-shade) 35%, transparent));
 }
 /* Both glyphs are rendered; the root's data-state picks one. Reading it from
    props would miss uncontrolled and Radix-driven indeterminate states. */
@@ -115,7 +115,11 @@
   height: 6px;
   border-radius: var(--mz-radius-pill);
   background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 8px rgba(255, 255, 255, 0.6);
+  /* The white glow belongs to the dot on its tone fill (the landing's
+     .btn-dot recipe); only the drop under it is cut from the shade. */
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--mz-shade) 35%, transparent),
+    0 0 8px rgba(255, 255, 255, 0.6);
   animation: mz-pop-in 0.18s var(--mz-ease);
 }
 
@@ -159,11 +163,13 @@
   width: calc(var(--mz-switch-h) - 8px);
   height: calc(var(--mz-switch-h) - 8px);
   border-radius: 4px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--mz-cap) 100%);
+  /* One flat cap — see --mz-cap. The three shadows below are what round it:
+     a drop underneath, a white line on the top edge, a shade on the bottom. */
+  background: var(--mz-cap);
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.45),
+    0 2px 6px color-mix(in srgb, var(--mz-shade) 45%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.14);
+    inset 0 -1px 0 color-mix(in srgb, var(--mz-shade) 14%, transparent);
   /* Rail is the content box: track width minus 2px border and 2x2px padding.
      Travel = rail - thumb = (w - 6) - (h - 8) = w - h + 2, which leaves the
      same 3px on both ends. */
@@ -209,15 +215,18 @@
 .mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: 14px; }
 .mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: 15px; }
 
+/* The secondary button's face, in the same two lines: flat colour, sheen hook. */
 .mz-toggle--outline {
-  background: var(--mz-face);
+  background-color: var(--mz-face);
+  background-image: var(--mz-face-sheen);
   border-color: var(--mz-border-strong);
   box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
 }
 
 .mz-toggle:hover {
   color: var(--mz-text);
-  background: var(--mz-face-hover);
+  background-color: var(--mz-face-hover);
+  background-image: var(--mz-face-sheen);
   border-color: var(--mz-border-strong);
 }
 
@@ -275,16 +284,19 @@
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
 
-/* Joined: items share edges, like a single convex bar. */
+/* Joined: items share edges, like a single convex bar. Same flat face as the
+   outline toggle. */
 .mz-toggle-group--joined .mz-toggle {
   border-radius: 0;
   margin-left: -1px;
-  background: var(--mz-face);
+  background-color: var(--mz-face);
+  background-image: var(--mz-face-sheen);
   border-color: var(--mz-border-strong);
   box-shadow: inset 0 1px 0 var(--mz-face-top);
 }
 .mz-toggle-group--joined .mz-toggle:hover {
-  background: var(--mz-face-hover);
+  background-color: var(--mz-face-hover);
+  background-image: var(--mz-face-sheen);
   color: var(--mz-text);
 }
 /* Keeps the label legible on the tone fill: the hover rules above are more
@@ -348,13 +360,12 @@
 .mz-slider[data-orientation='horizontal'] .mz-slider__track { height: 8px; width: 100%; }
 .mz-slider[data-orientation='vertical'] .mz-slider__track { width: 8px; height: 100%; }
 
+/* The filled part of the track: the solid tone, not a run-up to it. The old
+   90° fade left the low end of every slider looking washed out at small
+   values, where the range is nothing but its own first stop. */
 .mz-slider__range {
   position: absolute;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--mz-tone-rgb), 0.85) 0%,
-    rgb(var(--mz-tone-rgb)) 100%
-  );
+  background: rgb(var(--mz-tone-rgb));
   box-shadow:
     0 0 14px rgba(var(--mz-tone-rgb), 0.55),
     inset 0 1px 0 var(--mz-convex-top);
@@ -363,34 +374,41 @@
 .mz-slider[data-orientation='vertical'] .mz-slider__range { width: 100%; }
 
 .mz-slider__thumb {
+  position: relative;
   display: block;
   width: 16px;
   height: 20px;
   border-radius: 5px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--mz-cap) 100%);
-  border: 1px solid var(--mz-convex-hairline);
+  background: var(--mz-cap);
+  border: 1px solid var(--mz-cap-edge);
   /* No tone halo around the cap: a ring standing off the thumb read as a
      second control drawn around it. The drop shadow alone lifts it. */
   box-shadow:
-    0 4px 12px -2px rgba(0, 0, 0, 0.5),
+    0 4px 12px -2px color-mix(in srgb, var(--mz-shade) 50%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
   cursor: grab;
   transition:
-    background-image var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
     transform 0.15s var(--mz-ease);
 }
-/* Hover darkens the cap, the way every other filled surface darkens. The halo
-   keeps its size: a ring that grows under the cursor reads as a second control
-   appearing around the thumb. */
-.mz-slider__thumb:hover {
-  background-image: linear-gradient(
-    180deg,
-    color-mix(in srgb, #ffffff 94%, #000) 0%,
-    color-mix(in srgb, var(--mz-cap) 94%, #000) 100%
-  );
+/* Hover darkens the cap, the way every other filled surface darkens — via a
+   6% shade wash fading in over the face. The halo keeps its size: a ring that
+   grows under the cursor reads as a second control appearing around the
+   thumb. */
+.mz-slider__thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--mz-shade) 6%, transparent);
+  opacity: 0;
+  transition: opacity var(--mz-duration) ease;
 }
-.mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); }
+.mz-slider__thumb:hover::after { opacity: 1; }
+/* No focus ring while the mouse holds the cap: the offset primary outline is
+   a keyboard affordance, and during a drag it read as a frame chasing the
+   cursor. Keyboard nudges never set :active, so the ring stays for them. */
+.mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); outline: none; }
 
 /* Hover darkens the toned fill, matching the buttons. */
 .mz-checkbox[data-state='checked']:hover,

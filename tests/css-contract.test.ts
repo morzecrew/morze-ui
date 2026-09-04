@@ -71,13 +71,16 @@ describe('hover states', () => {
   it('darkens only filled surfaces', () => {
     expect(css).toContain('--mz-fill-hover')
     // Neutral variants lighten through the face token instead.
-    expect(css).toMatch(/\.mz-btn--secondary:hover\{[^}]*--mz-face-fill-hover/)
+    expect(css).toMatch(/\.mz-btn--secondary:hover\{[^}]*--mz-face-hover/)
   })
 
-  it('animates the neutral face instead of snapping to a new gradient', () => {
-    // A gradient cannot be interpolated, so the face is split the way the tone
-    // fill is: flat colour under a fixed sheen.
-    expect(css).toMatch(/\.mz-btn--secondary\{[^}]*background-color:var\(--mz-face-fill\)/)
+  it('animates the neutral face instead of snapping to a new one', () => {
+    // The face used to be split in two (--mz-face-fill under --mz-face-sheen)
+    // purely so hover had a plain colour to interpolate: browsers cannot
+    // tween a gradient, and swapping one sweep for another jumped. The fill is
+    // flat now, so the split has collapsed back into one token — and the sheen
+    // above it, the `none` hook, must stay put through the hover.
+    expect(css).toMatch(/\.mz-btn--secondary\{[^}]*background-color:var\(--mz-face\)/)
     expect(css).toMatch(/\.mz-btn--secondary\{[^}]*background-image:var\(--mz-face-sheen\)/)
     expect(css).not.toMatch(/\.mz-btn--secondary:hover\{[^}]*background-image/)
   })
@@ -176,7 +179,17 @@ describe('accessibility contracts', () => {
   })
 })
 
-describe('neutral greys', () => {
+describe('the night ramp', () => {
+  // History, because this contract has flipped once in each direction: the
+  // kit launched on the landing's violet-tinted darks, was neutralised to
+  // graphite when the fixed violet leaked into every host, and the graphite
+  // then read as one flat grey sheet — a card was indistinguishable from the
+  // page. The current contract keeps the good half of each: the literals
+  // carry the landing's *cold* cast (blue a step above red/green, never a
+  // nameable colour), and every drop of actual brand hue still comes from
+  // one place — --mz-tint, following --mz-primary-rgb — so a re-branded host
+  // gets its own night, not Morze's violet.
+
   /** Every hex the token is declared as, expanded to r/g/b. */
   const channelsOf = (token: string) =>
     [...css.matchAll(new RegExp(`\\${token}:([^;}]+)`, 'g'))]
@@ -187,40 +200,228 @@ describe('neutral greys', () => {
         return [full.slice(0, 2), full.slice(2, 4), full.slice(4, 6)]
       })
 
-  it('keeps the text on a grey ramp', () => {
-    // Text carries no hue: its contrast is calibrated, and a saturated brand
-    // dragged through it costs more than it buys.
+  it('keeps the text base grey so its hue comes from the tint alone', () => {
+    // Text is tinted by mixing the brand into a grey literal at use — the
+    // literal itself stays neutral, so contrast is calibrated in one axis.
     for (const token of ['--mz-text', '--mz-text-dim', '--mz-text-muted']) {
       const values = channelsOf(token)
       expect(values.length, token).toBeGreaterThan(0)
       for (const [r, g, b] of values) expect([token, r, g, b].join(' ')).toBe([token, r, r, r].join(' '))
+      expect(css, token).toMatch(new RegExp(`\\${token}:color-mix\\([^;}]*var\\(--mz-tint\\)`))
     }
   })
 
-  it('builds the surfaces from a grey plus a whisper of the brand', () => {
+  it('builds the surfaces from a cold base plus the brand tint', () => {
     expect(css).toContain('--mz-tint:rgb(var(--mz-primary-rgb))')
-    for (const token of ['--mz-bg', '--mz-surface', '--mz-elevated', '--mz-well', '--mz-cap']) {
+    // --mz-well is deliberately absent: it is a control face, not a step of
+    // the ramp, and is cut from the ink in both themes — see the test below.
+    for (const token of ['--mz-bg', '--mz-surface', '--mz-elevated', '--mz-cap']) {
       expect(css, token).toMatch(new RegExp(`\\${token}:[^;}]*var\\(--mz-tint\\)`))
-      // The base under the tint stays neutral: the hue comes from one place.
+      // Cold or neutral only: r and g stay equal and b never falls below
+      // them. A base that leans red or green is a second hue source.
       for (const [r, g, b] of channelsOf(token)) {
-        expect([token, r, g, b].join(' ')).toBe([token, r, r, r].join(' '))
+        expect(r, `${token} r/g`).toBe(g)
+        expect(parseInt(b, 16), `${token} blue channel`).toBeGreaterThanOrEqual(parseInt(r, 16))
       }
     }
   })
 
-  it('keeps that whisper a whisper', () => {
-    // Five channel steps out of 255. Past ~6% it stops reading as a neutral
-    // and starts reading as a colour — which is what the violet cast did.
-    const strength = css.match(/--mz-tint-strength:(\d+)%/)
-    expect(strength).not.toBeNull()
-    expect(Number(strength![1])).toBeLessThanOrEqual(6)
+  it('keeps the tint a tint', () => {
+    // Past ~6% the brand mixed into a surface stops reading as temperature
+    // and starts reading as a colour of its own.
+    const strengths = [...css.matchAll(/--mz-tint-strength:([\d.]+)%/g)]
+    expect(strengths.length).toBeGreaterThan(0)
+    for (const m of strengths) expect(Number(m[1])).toBeLessThanOrEqual(6)
   })
 
-  it('leaves none of the old tinted literals behind', () => {
-    for (const literal of ['#0a0a14', '#14141f', '#1c1c2b', '#f0eff6', '#e5e4ef', '#dcdae8', '#17162a']) {
-      expect(css, literal).not.toContain(literal)
+  it('turns the field face over instead of digging it darker', () => {
+    // The well is the convex face mirrored: the same mean level, lit from the
+    // far side, with --mz-well-inset moving the shadow to the top edge. An
+    // input and a select trigger share a form row, and a field a full step off
+    // its neighbour read as switched off in dark and as a grey slab in light.
+    // Both were the same defect — a fixed literal instead of a cut of the ink
+    // — so every theme's well is an ink cut and a hex here is the regression.
+    const wells = [...css.matchAll(/--mz-well:([^;}]+)/g)].map((m) => m[1]!)
+    expect(wells.length).toBeGreaterThan(1)
+    for (const well of wells) {
+      expect(well).toContain('var(--mz-ink)')
+      expect(well, 'a literal cannot track the surface it lies on').not.toMatch(/#[0-9a-f]{3}/)
     }
+    // The inversion itself: shadow on the top edge, highlight on the bottom.
+    expect(css).toMatch(/--mz-well-inset:inset 0 1px 2px[^;}]*inset 0 -1px 0/)
+  })
+
+  it('cuts every white and grey line from one ink', () => {
+    // Alpha'd pure white over a tinted ramp drifts back toward grey; the
+    // hairlines, borders and sheens all derive from --mz-ink instead, so the
+    // lines sit in the same temperature as the surfaces under them.
+    expect(css).toMatch(/--mz-ink:color-mix\([^;}]*var\(--mz-tint\)/)
+    for (const token of ['--mz-border', '--mz-border-strong', '--mz-convex-hairline', '--mz-face-top']) {
+      expect(css, token).toMatch(new RegExp(`\\${token}:color-mix\\([^;}]*var\\(--mz-ink\\)`))
+    }
+  })
+
+  it('carries no fixed violet that would bypass the tint', () => {
+    // The one leak the neutralisation was for: hue hardcoded outside
+    // --mz-primary-rgb / --mz-tint, which a re-branded host cannot override.
     expect(css).not.toContain('16,12,40')
+    expect(css).not.toContain('#17162a')
+  })
+})
+
+describe('the glass layer', () => {
+  // Glassmorphism joined the kit without displacing the convex language:
+  // controls stay raised and opaque, and the frost goes only where other
+  // content actually passes behind a surface — floating panels, the sheet,
+  // the sidebar chrome, a sticky table header.
+
+  it('cuts every glass fill from the live ramp, never a hue of its own', () => {
+    // A glass token with its own colour would be a second hue source the
+    // night-ramp contract exists to prevent; the fills are transparency cuts
+    // of the ramp steps, so a re-branded host frosts its own night.
+    expect(css).toMatch(/--mz-glass:color-mix\(in srgb, ?var\(--mz-elevated\)/)
+    expect(css).toMatch(/--mz-glass-chrome:color-mix\(in srgb, ?var\(--mz-surface-2\)/)
+    // The light theme's well twin carries the one glass literal; it must stay
+    // cold (r = g, b ≥ r) and take its hue from the tint alone.
+    for (const m of [...css.matchAll(/--mz-glass-well:([^;}]+)/g)]) {
+      for (const hex of [...m[1]!.matchAll(/#([0-9a-f]{6})\b/g)]) {
+        const [r, g, b] = [hex[1]!.slice(0, 2), hex[1]!.slice(2, 4), hex[1]!.slice(4, 6)]
+        expect(r, '--mz-glass-well r/g').toBe(g)
+        expect(parseInt(b!, 16), '--mz-glass-well blue').toBeGreaterThanOrEqual(parseInt(r!, 16))
+      }
+    }
+  })
+
+  it('frosts the floating surfaces and the chrome', () => {
+    expect(css).toMatch(/\.mz-panel\{[^}]*backdrop-filter:var\(--mz-glass-filter\)/)
+    expect(css).toMatch(/\.mz-sheet\{[^}]*backdrop-filter:var\(--mz-glass-filter\)/)
+    expect(css).toMatch(/\.mz-sidebar\{[^}]*backdrop-filter:var\(--mz-glass-filter\)/)
+  })
+
+  it('blurs a table header only where rows or columns pass behind it', () => {
+    expect(css).toMatch(/\.mz-dt__th\{[^}]*background:var\(--mz-glass-well\)/)
+    expect(css).toMatch(/\.mz-dt__table\[data-sticky\] \.mz-dt__th[^{]*\{[^}]*backdrop-filter/)
+    expect(css).toMatch(/\.mz-dt__th\[data-pinned\][^{]*\{[^}]*backdrop-filter/)
+  })
+
+  it('keeps the panel frost off the controls', () => {
+    // Glass is for what things float over, not for what you press: a control
+    // face borrowing --mz-glass* would dissolve the convex recipe. The one
+    // control with any frost — the outline button — keeps its own constant
+    // blur(8px), which predates the glass layer; it deliberately does not
+    // reference the panel tokens.
+    for (const control of ['.mz-btn', '.mz-input', '.mz-card', '.mz-toggle', '.mz-tabs-list']) {
+      expect(css, control).not.toMatch(
+        new RegExp(`\\${control}[^,{]*\\{[^}]*--mz-glass`)
+      )
+    }
+  })
+
+  it('falls back to the opaque ramp without backdrop support or on request', () => {
+    // A see-through fill with nothing frosting behind it is just a leak.
+    expect(css).toContain('prefers-reduced-transparency')
+    expect(css).toMatch(/@supports not/)
+    expect(css).toMatch(/--mz-glass:var\(--mz-elevated\)/)
+    expect(css).toMatch(/--mz-glass-filter:none/)
+  })
+
+  it('paints the aurora behind the frosted sidebar', () => {
+    // The layout's opaque background used to hide the root halo; the glass
+    // rail needs light behind it to have anything to frost.
+    expect(css).toMatch(/\.mz-sidebar-layout\{[^}]*var\(--mz-halo\)/)
+  })
+})
+
+describe('flat fills', () => {
+  // 2026-09-04: the gloss came off. Every fill in the kit — a toned control, a
+  // neutral face, a field well, a frosted panel — is one flat colour now, and
+  // the volume that used to be washed across a face is drawn on its edges
+  // instead: --mz-convex-top / --mz-convex-bottom on a raised control,
+  // --mz-well-inset turned over on a sunken one, --mz-glass-edge on glass.
+  // The sheens survive as `none` hooks, the way --mz-convex-text-shadow does,
+  // so a host that wants the gloss back re-points one token per family.
+
+  /** The four places a gradient still earns its keep, and why. */
+  const ALLOWED = [
+    '.mz-root', // the page aurora: ambient light over the whole page, not a fill
+    '.mz-sidebar-layout', // the same aurora, repeated so the glass rail has something to frost
+    '.mz-skeleton', // the shimmer: the gradient *is* the animation
+    '.mz-dt__loading-bar', // the refetch sweep, same reason
+  ]
+
+  /** Every value a custom property is declared as, across both themes. */
+  const valuesOf = (token: string) =>
+    [...css.matchAll(new RegExp(`\\${token}:([^;}]+)`, 'g'))].map((m) => m[1]!)
+
+  it('keeps every sheen token off', () => {
+    for (const token of ['--mz-fill-sheen', '--mz-face-sheen', '--mz-glass-sheen']) {
+      const values = valuesOf(token)
+      expect(values.length, token).toBeGreaterThan(0)
+      for (const value of values) expect(value.trim(), token).toBe('none')
+    }
+  })
+
+  it('cuts the faces and the well as flat colours', () => {
+    // Flat is also what makes them animate: a hover that swaps one plain
+    // colour for another interpolates, which is why the split pair existed.
+    for (const token of ['--mz-face', '--mz-face-hover', '--mz-well']) {
+      const values = valuesOf(token)
+      expect(values.length, token).toBeGreaterThan(0)
+      for (const value of values) expect(value, token).not.toContain('gradient')
+    }
+  })
+
+  it('keeps the split face tokens as aliases so a host override still lands', () => {
+    // --mz-face-fill / --mz-face-fill-hover were public; nothing in the kit
+    // reads them any more, but re-pointing them must not silently do nothing.
+    for (const value of valuesOf('--mz-face-fill')) expect(value.trim()).toBe('var(--mz-face)')
+    for (const value of valuesOf('--mz-face-fill-hover')) {
+      expect(value.trim()).toBe('var(--mz-face-hover)')
+    }
+  })
+
+  it('carries no gradient outside the aurora and the two sweeps', () => {
+    // A rule-level scan of the shipped bundle, so a gradient reintroduced
+    // anywhere in the kit fails here under its own selector.
+    const offenders: string[] = []
+    for (const m of css.matchAll(/([^{}]*)\{([^{}]*)\}/g)) {
+      if (!m[2]!.includes('gradient')) continue
+      const selector = m[1]!.trim()
+      if (!ALLOWED.some((allowed) => selector.includes(allowed))) offenders.push(selector)
+    }
+    expect(offenders).toEqual([])
+  })
+
+  it('draws the top edge of every glass surface with the glass hairline', () => {
+    // --mz-face-top is the raised-*control* highlight. On a frosted surface it
+    // used to double with the sheen into a bright rim, and with the sheen gone
+    // it is simply the wrong light — --mz-glass-edge exists for exactly this,
+    // and the table header was already the only surface using it.
+    for (const surface of ['.mz-panel', '.mz-sheet', '.mz-dt__bulkbar']) {
+      const rule = css.match(new RegExp(`\\${surface}\\{[^}]*\\}`))?.[0] ?? ''
+      expect(rule, surface).toContain('var(--mz-glass-edge)')
+      expect(rule, surface).not.toContain('var(--mz-face-top)')
+    }
+    expect(css).toMatch(/\.mz-sidebar\[data-variant=floating\]\{[^}]*var\(--mz-glass-edge\)/)
+  })
+
+  it('leaves the convex volume on the edges of a filled control', () => {
+    // What replaced the 135° sweep: light on the top edge, shade on the
+    // bottom, the tone glow underneath. Losing these would flatten the kit
+    // outright rather than un-gloss it.
+    const primary = css.match(/\.mz-btn--primary\{[^}]*\}/)?.[0] ?? ''
+    expect(primary).toContain('inset 0 1px 0 var(--mz-convex-top)')
+    expect(primary).toContain('inset 0 -1px 0 var(--mz-convex-bottom)')
+    expect(primary).toContain('background-color:var(--mz-fill)')
+  })
+
+  it('keeps the sunken read on the well inset alone', () => {
+    // The well and the face now hold the same value in each theme; the only
+    // thing telling an input from a select trigger is where the light falls.
+    const face = valuesOf('--mz-face')
+    const well = valuesOf('--mz-well')
+    expect(face.length).toBe(well.length)
+    expect(css).toMatch(/--mz-well-inset:inset 0 1px 2px[^;}]*inset 0 -1px 0/)
   })
 })
 

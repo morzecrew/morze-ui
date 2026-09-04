@@ -91,11 +91,10 @@
 }
 
 /* ---- Secondary: convex, but built from the neutral face ----
-   Flat colour under a fixed sheen, the same split the tone fill uses: the face
-   gradients cannot be interpolated, so hovering used to snap to the new face
-   instead of fading into it. */
+   One flat colour, animatable by construction; the sheen above it is the
+   `none` hook. Its convexity is the pair of inset lines plus the drop. */
 .mz-btn--secondary {
-  background-color: var(--mz-face-fill);
+  background-color: var(--mz-face);
   background-image: var(--mz-face-sheen);
   color: var(--mz-text);
   border-color: var(--mz-border-strong);
@@ -108,11 +107,15 @@
    border and shadow carry over untouched. */
 .mz-btn--secondary:hover {
   transform: scale(var(--mz-hover-scale));
-  background-color: var(--mz-face-fill-hover);
+  background-color: var(--mz-face-hover);
 }
 .mz-btn--secondary:active { transform: scale(var(--mz-press-scale)); }
 
-/* ---- Outline / ghost: from .btn-ghost on the landing ---- */
+/* ---- Outline / ghost: from .btn-ghost on the landing ----
+   The one control with any frost, inherited from the landing. The blur is a
+   constant: hovering used to jump it to blur(24px) saturate(180%), and
+   animating backdrop-filter repaints everything behind the button on every
+   frame — the tone border and the lighter wash carry the hover instead. */
 .mz-btn--outline {
   background: color-mix(in srgb, var(--mz-surface) 65%, transparent);
   color: var(--mz-text);
@@ -136,8 +139,6 @@
   transform: scale(var(--mz-hover-scale));
   color: rgb(var(--mz-tone-rgb));
   border-color: rgb(var(--mz-tone-rgb));
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
 }
 .mz-btn--outline:hover::before { opacity: 1; }
 .mz-btn--outline:active { transform: scale(var(--mz-press-scale)); }
@@ -191,10 +192,17 @@
   text-transform: none;
   letter-spacing: normal;
   font-family: inherit;
+  /* The underline is always there, only its colour is off: toggling
+     text-decoration itself cannot fade in. */
+  text-decoration: underline;
+  text-decoration-color: transparent;
   text-underline-offset: 4px;
   overflow: visible;
+  transition:
+    color var(--mz-duration) ease,
+    text-decoration-color var(--mz-duration) ease;
 }
-.mz-btn--link:hover { text-decoration: underline; }
+.mz-btn--link:hover { text-decoration-color: currentColor; }
 
 /* ---- Loading ---- */
 .mz-btn[data-loading='true'] {

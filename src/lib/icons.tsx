@@ -58,10 +58,15 @@ export const ChevronsRightIcon = icon(
 )
 export const ArrowUpIcon = icon(<path d="M12 19V5m-7 7 7-7 7 7" />)
 export const ArrowDownIcon = icon(<path d="M12 5v14m7-7-7 7-7-7" />)
+/**
+ * The idle state of a sortable header: a chevron up over a chevron down, the
+ * stack the EIS application uses. Centred on the 24 grid — the pair this
+ * replaced sat around x=10 and hung visibly left of every header label.
+ */
 export const SortIcon = icon(
   <>
-    <path d="m7 15 3 3 3-3" opacity="0.9" />
-    <path d="m7 9 3-3 3 3" opacity="0.9" />
+    <path d="m8 10 4-4 4 4" />
+    <path d="m8 14 4 4 4-4" />
   </>
 )
 export const FilterIcon = icon(<path d="M4 5h16l-6.5 7.5V19l-3 2v-8.5L4 5Z" />)
@@ -81,7 +86,19 @@ export const GripIcon = icon(
     <circle cx="15" cy="17" r="1.4" fill="currentColor" />
   </>
 )
-export const PinIcon = icon(<path d="M15 3 21 9l-4 1-4 4-1 5-6-6 5-1 4-4 1-4Z" />)
+/**
+ * A pushpin seen head-on: a wide head, a waist, and the needle below it. The
+ * outline this replaced tried to draw head and needle as one closed polygon
+ * and self-intersected into a bowtie — unreadable at the 13px the column
+ * manager renders it at.
+ */
+export const PinIcon = icon(
+  <>
+    <path d="M9 4h6v5l3 4v2H6v-2l3-4V4Z" />
+    <path d="M8 4h8" />
+    <path d="M12 15v5" />
+  </>
+)
 export const EyeIcon = icon(
   <>
     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />

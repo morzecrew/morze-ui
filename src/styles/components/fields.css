@@ -66,13 +66,15 @@
 .mz-input:hover,
 .mz-textarea:hover { border-color: rgba(var(--mz-text-rgb), 0.24); }
 
+/* The drop glow stays modest: a sunken well casting a strong shadow outward
+   read as the field popping up on focus, the opposite of its shape. */
 .mz-input:focus-visible,
 .mz-textarea:focus-visible {
   border-color: rgba(var(--mz-tone-rgb), 0.65);
   box-shadow:
     var(--mz-well-inset),
     0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
-    0 8px 26px -14px rgba(var(--mz-tone-rgb), 0.7);
+    0 8px 26px -14px rgba(var(--mz-tone-rgb), 0.45);
 }
 
 .mz-input:disabled,

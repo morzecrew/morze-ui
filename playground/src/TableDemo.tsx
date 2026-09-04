@@ -157,7 +157,6 @@ export default function TableDemo() {
       persistKey="playground.orders"
       selection={selection}
       onSelectionChange={setSelection}
-      rowClassName={(row) => (row.status === 'done' ? 'demo-row--done' : undefined)}
       rowProps={(row) => ({ 'data-status': row.status })}
       bulkActions={() => (
         <>

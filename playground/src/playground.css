@@ -42,6 +42,3 @@ body { background: var(--mz-bg); font-family: var(--mz-font-sans); }
 .pg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .pg-col { display: flex; flex-direction: column; gap: 14px; }
 .pg-check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--mz-text); }
-
-/* Row-level styling hook: the kit paints the row, the host tints it. */
-.demo-row--done .mz-dt__td { color: color-mix(in srgb, var(--mz-text) 70%, transparent); }

@@ -1,7 +1,10 @@
 /* ==========================================================================
    Morze UI — design tokens
    Palette and the "convex" recipe are lifted from morze-landing (.btn-primary):
-   135° gradient + hairline border + inset top highlight + tone glow.
+   flat fill + hairline border + inset top highlight + tone glow. The recipe
+   carried a 135° gloss sweep until the fills were flattened: volume is drawn
+   on the edges of a control now, never washed across its face. Every sheen is
+   kept as a `none` hook, so a host can put the gloss back in one place.
    Dark is the default theme; light is opt-in via [data-mz-theme="light"].
    ========================================================================== */
 
@@ -10,51 +13,63 @@
 .mz-theme-dark {
   color-scheme: dark;
 
-  /* ---- Surfaces: a graphite ramp under a whisper of the brand ----
-     Graphite rather than near-black: at #0b0b0b the page read as a hole and
-     the elevation steps had nowhere to go. The tint is deliberately tiny —
-     three channel steps out of 255 — enough that a panel is not flat
-     cardboard, not enough to name a colour, and it follows --mz-primary-rgb
-     rather than the fixed violet the kit used to carry. Dark runs it weaker
-     than light (2.5% against 4%): the brand is far lighter than the surfaces
-     it sits in here, so the same percentage pulls a lot more hue.
+  /* ---- Surfaces: the landing's night ramp, tinted by the brand ----
+     The kit used to run a neutral graphite ramp (#090909…#171717 under a
+     0.6% tint) with steps of three to five channel units. In practice that
+     read as one flat grey sheet: a card was indistinguishable from the page,
+     and nothing on screen said where a section began. The landing the kit is
+     styled after never was grey — its page is a cold night violet (#0A0A14)
+     with the surface a full ten channel units above it — so the ramp goes
+     back to those literals, and the steps are sized so each level is visible
+     as a fill, not only as a hairline.
 
-     The steps are taken from the EIS application (app-eis.morze.tech): its
-     card and table header sit at #111116, its input fill at #19191f, its hover
-     at #222227. The kit keeps its own elevation language on top of that — the
-     page is a little below the card, and a well stays sunken rather than
-     lifted, which is where it parts ways with EIS.
-
-     The literals are pre-compensated: at the default strength each surface
-     lands on the lightness above, so raising the strength lifts the ramp a
-     little and 0% drops it back to the bare literal. For a neutral kit point the tint at
-     a grey instead: --mz-tint: #808080. */
+     The literals lean blue on purpose (the landing's own cast); the brand
+     hue on top comes from the tint, so a host that re-points
+     --mz-primary-rgb (the playground runs green) gets a matching night of
+     its own rather than someone else's violet. For a neutral kit point the
+     tint at a grey instead: --mz-tint: #808080. */
   --mz-tint: rgb(var(--mz-primary-rgb));
-  --mz-tint-strength: 0.6%;
+  --mz-tint-strength: 3.5%;
 
-  --mz-bg: color-mix(in srgb, #0c0c0c, var(--mz-tint) var(--mz-tint-strength));
-  --mz-bg-rgb: 16, 16, 16;
-  --mz-bg-2: color-mix(in srgb, #0f0f0f, var(--mz-tint) var(--mz-tint-strength));
-  --mz-surface: color-mix(in srgb, #111111, var(--mz-tint) var(--mz-tint-strength));
-  --mz-surface-rgb: 21, 21, 21;
-  --mz-surface-2: color-mix(in srgb, #161616, var(--mz-tint) var(--mz-tint-strength));
-  --mz-elevated: color-mix(in srgb, #1b1b1b, var(--mz-tint) var(--mz-tint-strength));
-  --mz-elevated-rgb: 31, 31, 31;
+  /* The static -rgb companions cannot follow the tint, so they stay on the
+     cold cast alone (r = g, b ≥ r) — a triplet with the default violet baked
+     in would leak Morze's hue into a re-branded host through every wash. */
+  --mz-bg: color-mix(in srgb, #0a0a12, var(--mz-tint) var(--mz-tint-strength));
+  --mz-bg-rgb: 15, 15, 26;
+  --mz-bg-2: color-mix(in srgb, #0e0e18, var(--mz-tint) var(--mz-tint-strength));
+  --mz-surface: color-mix(in srgb, #12121c, var(--mz-tint) var(--mz-tint-strength));
+  --mz-surface-rgb: 22, 22, 35;
+  --mz-surface-2: color-mix(in srgb, #171723, var(--mz-tint) var(--mz-tint-strength));
+  --mz-elevated: color-mix(in srgb, #1c1c2b, var(--mz-tint) var(--mz-tint-strength));
+  --mz-elevated-rgb: 31, 31, 48;
+
+  /* Brand-washed white: the source colour for every "white" line the kit
+     draws — borders, hairlines, sheens, secondary text. Alpha'd pure white
+     over a tinted ramp drifts back toward grey; this keeps the lines in the
+     same temperature as the surfaces under them, whatever the brand hue. */
+  --mz-ink: color-mix(in srgb, #ffffff 80%, var(--mz-tint));
+
+  /* The ink's opposite number: the one black every shadow and shade is cut
+     from. It leans the same way as the ramp, so a shadow darkens the night
+     under it instead of punching a neutral hole in it — component-level
+     shadows (a thumb's drop, the sidebar panel's cast) take their cuts from
+     here too, so a bespoke shadow cannot drift back to neutral black. */
+  --mz-shade: #03030a;
 
   /* ---- Lines ----
-     Strong enough to carry a panel edge on their own: on this ramp the step
-     between a card and the page is small, so the hairline does the separating
-     rather than the fill. */
-  --mz-border: rgba(255, 255, 255, 0.11);
-  --mz-border-strong: rgba(255, 255, 255, 0.2);
+     The fill steps now carry most of the separation; the hairline outlines
+     it. Slightly stronger than before so a panel edge still reads on the
+     lifted ramp. */
+  --mz-border: color-mix(in srgb, var(--mz-ink) 13%, transparent);
+  --mz-border-strong: color-mix(in srgb, var(--mz-ink) 24%, transparent);
 
-  /* ---- Text ---- */
-  --mz-text: #fafafa;
-  --mz-text-rgb: 250, 250, 250;
-  --mz-text-dim: #a3a3a3;
-  /* Lifted with the ramp: on graphite the old #696969 fell under 3:1 on a
-     raised panel. */
-  --mz-text-muted: #767676;
+  /* ---- Text ----
+     Same recipe as the landing's #ECECF5 / #A3A0B8: white and grey pulled a
+     step toward the brand. Muted stays above 4:1 on an elevated panel. */
+  --mz-text: color-mix(in srgb, #f2f2f2 92%, var(--mz-tint));
+  --mz-text-rgb: 235, 235, 242;
+  --mz-text-dim: color-mix(in srgb, #a6a6a6 86%, var(--mz-tint));
+  --mz-text-muted: color-mix(in srgb, #808080 88%, var(--mz-tint));
 
   /* ---- Tones ---- */
   --mz-primary-rgb: 168, 124, 248;
@@ -72,44 +87,96 @@
   /* ---- The convex recipe ----
      Every active element (button, toggle, checkbox, radio, switch, slider,
      tab, select trigger) is built from these four layers. */
-  --mz-convex-hairline: rgba(255, 255, 255, 0.18);
-  --mz-convex-top: rgba(255, 255, 255, 0.35);
-  --mz-convex-bottom: rgba(0, 0, 0, 0.2);
+  --mz-convex-hairline: color-mix(in srgb, var(--mz-ink) 20%, transparent);
+  --mz-convex-top: color-mix(in srgb, var(--mz-ink) 38%, transparent);
+  --mz-convex-bottom: color-mix(in srgb, var(--mz-shade) 22%, transparent);
   /* Off: the landing dropped the embossed label, and on a small control it
      only made the text shout. Kept as a hook for a host that wants it back. */
   --mz-convex-text-shadow: none;
 
-  /* Idle (unfilled) control face: a faint upward gradient over the surface. */
-  --mz-face: linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-  --mz-face-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.04) 100%);
-  /* The same neutral face, split the way the tone fill is: a flat colour under
-     a fixed sheen, so hover can animate — browsers do not interpolate
-     gradients, and --mz-face → --mz-face-hover jumps. */
-  --mz-face-fill: rgba(255, 255, 255, 0.02);
-  --mz-face-fill-hover: rgba(255, 255, 255, 0.06);
-  --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
-  --mz-face-top: rgba(255, 255, 255, 0.1);
-  --mz-face-bottom: rgba(0, 0, 0, 0.35);
-  /* The physical cap on a slider thumb: white on top, grey underneath. */
-  --mz-cap: color-mix(in srgb, #dddddd, var(--mz-tint) var(--mz-tint-strength));
+  /* Idle (unfilled) control face: one flat cut of the ink over the surface.
+     It used to be a 180° sweep (8% → 2%) shadowed by a second, split pair
+     (--mz-face-fill under --mz-face-sheen) that existed only because browsers
+     cannot interpolate gradients, so a hover swapping one sweep for another
+     snapped. With the sweep gone that whole problem goes with it: one flat
+     value at the old mean, and hover interpolates for free. */
+  --mz-face: color-mix(in srgb, var(--mz-ink) 5.5%, transparent);
+  --mz-face-hover: color-mix(in srgb, var(--mz-ink) 9%, transparent);
+  /* Aliases of the pair above, kept so a host that re-cut the split faces
+     keeps working. Nothing inside the kit reads them any more. */
+  --mz-face-fill: var(--mz-face);
+  --mz-face-fill-hover: var(--mz-face-hover);
+  /* The neutral gloss hook, off: point it at a gradient to put the sheen back
+     on every unfilled face at once. */
+  --mz-face-sheen: none;
+  --mz-face-top: color-mix(in srgb, var(--mz-ink) 11%, transparent);
+  --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 38%, transparent);
+  /* The physical cap on a slider thumb or a switch knob: one flat near-white,
+     sitting where the old #ffffff → #d9d9e4 sweep averaged out. Its roundness
+     comes from the inset highlight on the top edge and the drop underneath,
+     the same way every other surface in the kit gets its volume. The edge is
+     the hairline in dark — a white cap on a dark ramp separates by itself;
+     light overrides it with a real dark line. */
+  --mz-cap: color-mix(in srgb, #ececf2, var(--mz-tint) var(--mz-tint-strength));
+  --mz-cap-edge: var(--mz-convex-hairline);
 
-  /* Field face — inputs, table headers, tracks, wells. It sits *above* the
-     surface it lies in, the way EIS paints an input (its fill is the border
-     colour at 30%, a step lighter than the card). On a ramp this dark a carved
-     well turns into a hole; the field reads better as a lighter patch with a
-     hairline. The inner shadow stays, softened, so it is still a field and not
-     a button. */
-  --mz-well: linear-gradient(
-    180deg,
-    color-mix(in srgb, #151515, var(--mz-tint) var(--mz-tint-strength)) 0%,
-    color-mix(in srgb, #1c1c1c, var(--mz-tint) var(--mz-tint-strength)) 100%
-  );
-  --mz-well-inset: inset 0 1px 2px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+  /* Field face — inputs, tracks, wells. Exactly --mz-face, at the same level:
+     an input and a select trigger share a form row, and a field a full step
+     below its neighbour read as switched off. What separates them is not the
+     fill but the light — --mz-well-inset puts the shadow on the top edge and
+     the highlight on the bottom, the mirror of the raised face — so the pair
+     reads sunken and raised at one lightness.
 
-  --mz-overlay: rgba(10, 10, 10, 0.72);
-  --mz-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --mz-shadow-2: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
-  --mz-shadow-3: 0 24px 64px -24px rgba(0, 0, 0, 0.85);
+     It was a 4% → 7% sweep before the fills were flattened; the direction of
+     that sweep was never what made a field look recessed (at Δ13 it read as
+     gloss lit from below, which is why the amplitude was cut to 3% in the
+     first place), so the inset carries the whole illusion on its own now.
+     Cut from the ink, so the distance to whatever it lies on holds — a card,
+     a frosted popover, the page. */
+  --mz-well: color-mix(in srgb, var(--mz-ink) 5.5%, transparent);
+  --mz-well-inset: inset 0 1px 2px color-mix(in srgb, var(--mz-shade) 30%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--mz-ink) 6%, transparent);
+
+  /* ---- The glass layer ----
+     Surfaces that other content passes behind — a menu over the page, a sheet
+     over a table, a sticky header over its rows — are frosted instead of
+     opaque: a translucent cut of the same ramp step over a backdrop blur.
+     Cuts, not colours: every glass fill is the live ramp token with some
+     transparency, so a re-branded host frosts its own night and the ramp
+     contract (cold literals, hue only from the tint) holds by construction.
+     Controls stay convex and opaque — glass is for what things float over,
+     not for what you press. */
+  --mz-glass: color-mix(in srgb, var(--mz-elevated) 85%, transparent);
+  /* Chrome — the sidebar rail: one step quieter than a floating panel. */
+  --mz-glass-chrome: color-mix(in srgb, var(--mz-surface-2) 80%, transparent);
+  /* The frosted twin of --mz-well, for the table header. Cut from surface-2,
+     not elevated: the cold-blue lean of a ramp literal grows with the step's
+     lightness while the brand tint stays fixed, so on a non-violet brand a
+     header cut from elevated — the largest always-visible area of that step —
+     read bluer than everything around it. (Elevated at 82% had also sat a
+     full surface step above the rows and read as a lit strip, not glass.) */
+  --mz-glass-well: color-mix(in srgb, var(--mz-surface-2) 80%, transparent);
+  /* Saturate lifts the night tint back through the frost; blur alone greys it. */
+  --mz-glass-filter: blur(20px) saturate(1.4);
+  /* The gloss hook for a frosted surface, off like the other two: a glass
+     panel is a flat translucent cut of the ramp, and the light along its top
+     edge is drawn by --mz-glass-edge as a hairline, not washed down its face. */
+  --mz-glass-sheen: none;
+  /* The hairline a glass surface catches on its top edge. Quieter than
+     --mz-face-top: that 11% line belongs to raised controls, and on the table
+     header it doubled with the sheen into a bright rim. */
+  --mz-glass-edge: color-mix(in srgb, var(--mz-ink) 7%, transparent);
+
+  /* The ambient brand glow .mz-root bleeds in from above the fold — the
+     landing's aurora, and an orientation cue: light from one edge tells the
+     eye where the page starts. Set it to transparent to run a flat page. */
+  --mz-halo: rgba(var(--mz-primary-rgb), 0.1);
+
+  /* Every shadow is a cut of --mz-shade — see its note above. */
+  --mz-overlay: rgba(8, 8, 17, 0.74);
+  --mz-shadow-1: 0 1px 2px color-mix(in srgb, var(--mz-shade) 45%, transparent);
+  --mz-shadow-2: 0 8px 24px -12px color-mix(in srgb, var(--mz-shade) 75%, transparent);
+  --mz-shadow-3: 0 24px 64px -24px color-mix(in srgb, var(--mz-shade) 90%, transparent);
 }
 
 [data-mz-theme='light'],
@@ -117,25 +184,38 @@
   color-scheme: light;
 
   --mz-tint: rgb(var(--mz-primary-rgb));
-  --mz-tint-strength: 4%;
+  --mz-tint-strength: 5%;
 
-  --mz-bg: color-mix(in srgb, #fcfcfc, var(--mz-tint) var(--mz-tint-strength));
-  --mz-bg-rgb: 246, 246, 246;
+  /* The EIS pattern, with the brand hue in place of its fixed zinc: the page
+     is a clearly tinted grey and the cards are plain white, so a card pops
+     off the page by fill alone — the reverse of dark, where the card is the
+     lighter step. At 4% on #fcfcfc the old page was one hair off white and
+     the two read as the same sheet. */
+  --mz-bg: color-mix(in srgb, #f2f2f5, var(--mz-tint) var(--mz-tint-strength));
+  --mz-bg-rgb: 237, 237, 245;
   --mz-bg-2: #ffffff;
   --mz-surface: #ffffff;
   --mz-surface-rgb: 255, 255, 255;
-  --mz-surface-2: color-mix(in srgb, #f8f8f8, var(--mz-tint) var(--mz-tint-strength));
+  --mz-surface-2: color-mix(in srgb, #f6f6f9, var(--mz-tint) 4%);
   --mz-elevated: #ffffff;
   --mz-elevated-rgb: 255, 255, 255;
 
-  --mz-border: rgba(16, 16, 16, 0.12);
-  /* Strong enough for control outlines to clear 3:1 against a white page. */
-  --mz-border-strong: rgba(16, 16, 16, 0.26);
+  /* The dark counterpart of the ink above: a deep brand-leaning navy that
+     every grey line and shadow in light mode is cut from. */
+  --mz-ink: color-mix(in srgb, #15152b 82%, var(--mz-tint));
+  /* In light the shadow black is the ink itself: a neutral grey shadow on a
+     tinted page goes muddy, so every shadow cut goes tinted by construction. */
+  --mz-shade: var(--mz-ink);
 
-  --mz-text: #181818;
-  --mz-text-rgb: 24, 24, 24;
-  --mz-text-dim: #5b5b5b;
-  --mz-text-muted: #8b8b8b;
+  --mz-border: color-mix(in srgb, var(--mz-ink) 15%, transparent);
+  /* Strong enough for control outlines to clear 3:1 against a white page. */
+  --mz-border-strong: color-mix(in srgb, var(--mz-ink) 32%, transparent);
+
+  --mz-text: color-mix(in srgb, #141414 92%, var(--mz-tint));
+  --mz-text-rgb: 30, 30, 38;
+  --mz-text-dim: color-mix(in srgb, #545454 88%, var(--mz-tint));
+  /* #8a8a8a fell to 2.98:1 on the tinted page with a mid-lightness brand. */
+  --mz-text-muted: color-mix(in srgb, #7c7c7c 90%, var(--mz-tint));
 
   --mz-primary-rgb: 124, 74, 232;
   --mz-accent-rgb: 16, 175, 122;
@@ -146,36 +226,78 @@
 
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);
-  --mz-convex-bottom: rgba(0, 0, 0, 0.18);
+  --mz-convex-bottom: color-mix(in srgb, var(--mz-shade) 18%, transparent);
   --mz-convex-text-shadow: none;
 
-  --mz-face: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    color-mix(in srgb, #f6f6f6, var(--mz-tint) var(--mz-tint-strength)) 100%
-  );
-  --mz-face-hover: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    color-mix(in srgb, #efefef, var(--mz-tint) var(--mz-tint-strength)) 100%
-  );
-  --mz-face-fill: color-mix(in srgb, #f6f6f6, var(--mz-tint) var(--mz-tint-strength));
-  --mz-face-fill-hover: color-mix(in srgb, #efefef, var(--mz-tint) var(--mz-tint-strength));
-  --mz-face-sheen: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  /* One near-white step where the #ffffff → #f4f4f8 sweep used to run — at the
+     sweep's *body* colour, not its mean. Light is the theme where that matters:
+     the card under the control is pure white, so the mean (#fafafd) left a
+     secondary button five units off its background and reading as a bare
+     outline. --mz-face-top still lays a white line along the top edge, which is
+     what says "raised" now that nothing is washed down the face. */
+  --mz-face: color-mix(in srgb, #f4f4f8, var(--mz-tint) var(--mz-tint-strength));
+  --mz-face-hover: color-mix(in srgb, #ececf2, var(--mz-tint) var(--mz-tint-strength));
+  --mz-face-fill: var(--mz-face);
+  --mz-face-fill-hover: var(--mz-face-hover);
+  --mz-face-sheen: none;
   --mz-face-top: rgba(255, 255, 255, 0.9);
-  --mz-face-bottom: rgba(16, 16, 16, 0.12);
+  --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 13%, transparent);
 
-  --mz-well: linear-gradient(
-    180deg,
-    color-mix(in srgb, #ebebeb, var(--mz-tint) var(--mz-tint-strength)) 0%,
-    color-mix(in srgb, #f9f9f9, var(--mz-tint) var(--mz-tint-strength)) 100%
+  /* A white cap on a light track vanished at the edges: a quiet dark line
+     draws it — a step past --mz-border-strong, no more — and the drop shadow
+     under it gives it back its body now that the face itself is flat. */
+  --mz-cap: color-mix(in srgb, #ebebf3, var(--mz-tint) var(--mz-tint-strength));
+  --mz-cap-edge: color-mix(in srgb, var(--mz-ink) 36%, transparent);
+
+  /* The same mirror as dark, pointed the other way: an ink cut that darkens
+     what it lies on, deepest at the top edge and lifting toward the bottom,
+     with --mz-well-inset putting the shadow on top. Its mean (4% ink ⇒ about
+     nine units under a white card) lands on the raised face's mean, so a
+     field and a select trigger in one form row read at one level here too.
+
+     It replaces a pair of grey literals (#ebebf1→#f4f4f8). Those were the
+     source of the dullness: 5% of a mid-dark brand mixed into a near-white
+     literal drags it down some eight units *and* muddies it, so a field on a
+     pure white card sat ~25 units below it and read as a grey slab rather
+     than a recess. Cutting from the ink keeps the field a fixed distance
+     from its surface — card, page or frosted popover — and its faint cast
+     is the brand's, the same one the borders carry.
+
+     Flat for the same reason as dark, and the sweep was never the part that
+     worked: the old #e7e7ee→#f8f8fb span (Δ17) turned every field into a
+     glossy dish on a white card, and even the shallow 5.5%→2.5% that replaced
+     it only ever read through --mz-well-inset. That inset is the whole recipe
+     now. */
+  --mz-well: color-mix(in srgb, var(--mz-ink) 4%, transparent);
+  --mz-well-inset: inset 0 1px 2px color-mix(in srgb, var(--mz-shade) 14%, transparent),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+
+  /* Glass in light is milk, not smoke: the elevated step is plain white, so
+     the cut goes a little deeper before text behind it starts to show, and
+     the saturate stays modest — a boosted light backdrop discolours. The
+     well's twin darkens instead of lightening, the same inversion the opaque
+     well makes. */
+  --mz-glass: color-mix(in srgb, var(--mz-elevated) 78%, transparent);
+  --mz-glass-chrome: color-mix(in srgb, var(--mz-surface-2) 70%, transparent);
+  --mz-glass-well: color-mix(
+    in srgb,
+    color-mix(in srgb, #e9e9f1, var(--mz-tint) var(--mz-tint-strength)) 76%,
+    transparent
   );
-  --mz-well-inset: inset 0 1px 2px rgba(16, 16, 16, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+  --mz-glass-filter: blur(20px) saturate(1.15);
+  --mz-glass-sheen: none;
+  /* Softer than the 0.9 control highlight, for the same reason as dark. */
+  --mz-glass-edge: rgba(255, 255, 255, 0.55);
 
-  --mz-overlay: rgba(25, 25, 25, 0.35);
-  --mz-shadow-1: 0 1px 2px rgba(16, 16, 16, 0.08);
-  --mz-shadow-2: 0 8px 24px -12px rgba(16, 16, 16, 0.22);
-  --mz-shadow-3: 0 24px 64px -24px rgba(16, 16, 16, 0.35);
+  /* Weaker than dark: over a light page the same alpha reads twice as loud. */
+  --mz-halo: rgba(var(--mz-primary-rgb), 0.06);
+
+  /* Cut from the shade (= the ink), never a fixed navy: a hardcoded veil
+     colour was a second hue source a re-branded host could not override. */
+  --mz-overlay: color-mix(in srgb, var(--mz-shade) 38%, transparent);
+  --mz-shadow-1: 0 1px 2px color-mix(in srgb, var(--mz-shade) 10%, transparent);
+  --mz-shadow-2: 0 8px 24px -12px color-mix(in srgb, var(--mz-shade) 26%, transparent);
+  --mz-shadow-3: 0 24px 64px -24px color-mix(in srgb, var(--mz-shade) 40%, transparent);
 }
 
 :root {
@@ -204,7 +326,7 @@
   --mz-label-font: inherit;
   --mz-label-transform: none;
   --mz-label-tracking: 0;
-  --mz-label-weight: 600;
+  --mz-label-weight: 500;
 
   /* ---- Geometry ----
      Rectangular by default: controls share one small radius, surfaces a
@@ -231,11 +353,48 @@
   --mz-hover-mix: 88%;
   --mz-press-mix: 80%;
 
-  /* Fixed convex sheen laid over the flat fill colour, so the colour itself
-     stays a plain animatable value. */
-  --mz-fill-sheen: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(0, 0, 0, 0.14) 100%);
+  /* The gloss hook for every toned fill, off by default. A filled control is
+     one flat colour: its volume is drawn on the edges — --mz-convex-top along
+     the top, --mz-convex-bottom along the bottom, the tone glow underneath —
+     not washed diagonally across its face. This was the kit's one sanctioned
+     use of literal white and black; with it off, every light in the kit is a
+     cut of --mz-ink or --mz-shade. Point it at a gradient to put the gloss
+     back on every convex fill at once. */
+  --mz-fill-sheen: none;
 
   /* ---- Focus ---- */
   --mz-ring-width: 2px;
   --mz-ring-offset: 2px;
+}
+
+/* Solid ground on request — and in any engine without backdrop blur, where a
+   see-through fill with nothing frosting behind it is just a leak. Both
+   blocks re-point the glass at the live ramp tokens, so they hold in either
+   theme; they sit after the theme blocks on purpose, to win on order.
+
+   The header falls back to --mz-surface-2, the step its frost is cut from,
+   and not to --mz-well: the well is itself a translucent ink cut, so handing
+   it to a sticky header would let the rows scroll through the very fallback
+   that exists to stop them. */
+@media (prefers-reduced-transparency: reduce) {
+  :root,
+  [data-mz-theme],
+  .mz-theme-dark,
+  .mz-theme-light {
+    --mz-glass: var(--mz-elevated);
+    --mz-glass-chrome: var(--mz-surface-2);
+    --mz-glass-well: var(--mz-surface-2);
+    --mz-glass-filter: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  [data-mz-theme],
+  .mz-theme-dark,
+  .mz-theme-light {
+    --mz-glass: var(--mz-elevated);
+    --mz-glass-chrome: var(--mz-surface-2);
+    --mz-glass-well: var(--mz-surface-2);
+  }
 }

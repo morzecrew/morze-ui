@@ -105,9 +105,16 @@
   gap: 18px;
   padding: 20px;
   border-radius: var(--mz-radius-lg);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 60%),
-    var(--mz-surface);
+  /* The plain surface step. The sheen above it is the `none` hook, still
+     sized to the top 60px rather than the whole card: a tall card under a
+     full-height wash ran visibly lighter than the raw surface all the way
+     down, and anything cut from --mz-surface on it (the avatar group's ring)
+     read as a dark halo against the lifted fill. A card's lift is the top
+     hairline and the drop shadow. */
+  background-color: var(--mz-surface);
+  background-image: var(--mz-face-sheen);
+  background-size: 100% 60px;
+  background-repeat: no-repeat;
   border: 1px solid var(--mz-border);
   box-shadow: var(--mz-shadow-2), inset 0 1px 0 var(--mz-face-top);
   color: var(--mz-text);
@@ -160,11 +167,13 @@
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
 }
+/* A tinted wash inside a tone border — no gloss line on the top edge: at 8%
+   literal white it was a leftover of the gradient era, and it was the wrong
+   sign in the light theme, where a "highlight" cut from the ink is a shadow. */
 .mz-badge--soft {
   background: rgba(var(--mz-tone-rgb), 0.14);
   color: rgb(var(--mz-tone-rgb));
   border-color: rgba(var(--mz-tone-rgb), 0.32);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .mz-badge--outline {
   background: transparent;
@@ -181,11 +190,12 @@
   width: 100%;
   padding: 14px 16px;
   border-radius: var(--mz-radius);
-  background:
-    linear-gradient(135deg, rgba(var(--mz-tone-rgb), 0.16) 0%, rgba(var(--mz-tone-rgb), 0.05) 100%),
-    var(--mz-surface);
+  /* One tinted surface, mixed rather than layered: two flat colours cannot be
+     stacked as background layers, and the 135° wash this replaces averaged
+     out at about a tenth of the tone anyway. */
+  background: color-mix(in srgb, var(--mz-surface), rgb(var(--mz-tone-rgb)) 11%);
   border: 1px solid rgba(var(--mz-tone-rgb), 0.32);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 10px 30px -20px rgba(var(--mz-tone-rgb), 0.8);
+  box-shadow: 0 10px 30px -20px rgba(var(--mz-tone-rgb), 0.8);
   color: var(--mz-text);
   font-size: 14px;
 }
@@ -277,45 +287,82 @@
   border: 1px solid var(--mz-border);
   box-shadow: var(--mz-well-inset);
 }
+/* Solid tone, like the slider range: a bar that faded in from 80% opacity was
+   at its palest exactly when there was least of it to read. */
 .mz-progress__indicator {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    rgba(var(--mz-tone-rgb), 0.8) 0%,
-    rgb(var(--mz-tone-rgb)) 100%
-  );
+  background: rgb(var(--mz-tone-rgb));
   box-shadow: 0 0 14px rgba(var(--mz-tone-rgb), 0.6), inset 0 1px 0 var(--mz-convex-top);
   transition: transform 0.5s var(--mz-ease);
 }
 
-/* -------------------------------- Avatar -------------------------------- */
+/* -------------------------------- Avatar --------------------------------
+   The fallback face speaks the button's convex language: the solid tone between
+   the same two inset lines, so an initials avatar sits in the UI the way a
+   primary button does instead of reading as a washed-out swatch. The tone
+   follows --mz-tone-rgb, so `data-tone` recolours it the same way it does a
+   badge — identity avatars can vary the tone per person. */
+/* Round, like a face: --mz-radius-pill is what the kit keeps for the shapes
+   that are round by meaning. Override --mz-avatar-radius for a squared crop. */
 .mz-avatar {
+  --mz-avatar-radius: var(--mz-radius-pill);
   position: relative;
   display: flex;
   flex-shrink: 0;
   width: 40px;
   height: 40px;
   overflow: hidden;
-  border-radius: var(--mz-radius);
-  border: 1px solid var(--mz-border-strong);
-  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 2px 8px -4px rgba(0, 0, 0, 0.6);
+  border-radius: var(--mz-avatar-radius);
+  box-shadow: var(--mz-shadow-1);
 }
-.mz-avatar--sm { width: 30px; height: 30px; border-radius: var(--mz-radius-sm); }
-.mz-avatar--lg { width: 56px; height: 56px; border-radius: var(--mz-radius-lg); }
+/* The hairline is drawn over the face, not around it: a real border plus the
+   rounded overflow clip left a background-coloured seam between the two at
+   fractional device pixels — the ring overlapping the fill's edge cannot
+   open a gap at any zoom. */
+.mz-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--mz-border-strong);
+  pointer-events: none;
+}
+.mz-avatar--sm { width: 30px; height: 30px; }
+.mz-avatar--lg { width: 56px; height: 56px; }
 .mz-avatar__image { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 1 / 1; }
 .mz-avatar__fallback {
   display: grid;
   place-content: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(var(--mz-primary-rgb), 0.45) 0%, rgba(var(--mz-primary-rgb), 0.18) 100%);
-  color: var(--mz-text);
+  background-color: rgb(var(--mz-tone-rgb));
+  /* Its own wider diagonal sweep used to sit here, the one place the fill
+     gloss was hand-rolled instead of taken from --mz-fill-sheen. Both are gone
+     the same way: the tone is flat and the light is on the edges. */
+  background-image: var(--mz-fill-sheen);
+  box-shadow: inset 0 1px 0 var(--mz-convex-top), inset 0 -1px 0 var(--mz-convex-bottom);
+  color: #fff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+.mz-avatar--sm .mz-avatar__fallback { font-size: 10px; }
+.mz-avatar--lg .mz-avatar__fallback { font-size: 17px; }
+
+/* Overlapping stack. The ring is cut from the surface the group lies on —
+   point --mz-avatar-ring somewhere else when it does not sit on a card. */
+.mz-avatar-group {
+  --mz-avatar-ring: var(--mz-surface);
+  display: flex;
+  align-items: center;
+}
+.mz-avatar-group .mz-avatar {
+  box-shadow: 0 0 0 2px var(--mz-avatar-ring), var(--mz-shadow-1);
+}
+.mz-avatar-group .mz-avatar + .mz-avatar { margin-left: -10px; }
+.mz-avatar-group .mz-avatar--sm + .mz-avatar--sm { margin-left: -8px; }
 
 /* ------------------------------- Separator ------------------------------ */
 .mz-separator {

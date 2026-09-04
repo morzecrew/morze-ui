@@ -1,6 +1,6 @@
 import { StrictMode, act } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, renderHook, screen } from '@testing-library/react'
+import { createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -470,5 +470,146 @@ describe('column auto-fit', () => {
     act(() => result.current.fitTo(500))
     expect(result.current.widthOf('actions')).toBe(60)
     expect(result.current.widthOf('a')).toBe(440)
+  })
+})
+
+describe('column manager', () => {
+  type Wide = { id: string; a: string }
+  const wideRows: Wide[] = [{ id: '1', a: 'x' }]
+  const wideColumns: DataTableColumn<Wide>[] = [
+    { id: 'num', header: '#', label: 'Number', pinned: 'left', accessor: (r) => r.id },
+    { id: 'name', header: 'Name', accessor: (r) => r.a },
+    { id: 'blank', header: '', accessor: () => 'b' },
+    { id: 'node', header: <b>X</b>, accessor: () => 'n' },
+  ]
+
+  const manager = async (props: Partial<React.ComponentProps<typeof DataTable<Wide>>> = {}) => {
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={wideColumns}
+        data={wideRows}
+        rowKey={(r) => r.id}
+        total={1}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        {...props}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: /Columns/ }))
+    return user
+  }
+
+  const listed = () =>
+    Array.from(document.querySelectorAll('.mz-dt__columns-label')).map((n) => n.textContent)
+  const painted = () =>
+    Array.from(document.querySelectorAll('.mz-dt__th')).map((n) => n.textContent?.trim())
+
+  it('names a column with no text header after its position', async () => {
+    // A header may be a node, and an id is a developer's string — both used to
+    // reach the list as a blank row or as a raw `node`.
+    await manager()
+    expect(listed()).toEqual(['Number', 'Name', '#3', '#4'])
+  })
+
+  it('lists the columns in the order the table paints them', async () => {
+    // The list showed the raw order, so a column dragged to the top of it
+    // landed second on screen, behind whatever was pinned.
+    const user = await manager()
+    const headerOf: Record<string, string> = { Number: '#', Name: 'Name', '#3': '', '#4': 'X' }
+    const agrees = () => expect(listed().map((l) => headerOf[l!])).toEqual(painted().slice(0, 4))
+    agrees()
+    await user.click(screen.getByRole('button', { name: /Move “#4” up/ }))
+    agrees()
+    expect(listed()).toEqual(['Number', 'Name', '#4', '#3'])
+  })
+
+  it('keeps a move inside the column’s own pin group', async () => {
+    const user = await manager()
+    // "Name" is the first loose column: it cannot climb over the pinned one,
+    // which is what used to reorder the layout without moving anything on
+    // screen. Its own group still moves.
+    expect(screen.getByRole('button', { name: /Move “Name” up/ })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: /Move “Name” down/ }))
+    expect(listed()).toEqual(['Number', '#3', 'Name', '#4'])
+    expect(painted().slice(0, 4)).toEqual(['#', '', 'Name', 'X'])
+  })
+
+  it('does not start a drag from the row’s own buttons', async () => {
+    await manager()
+    const eye = screen.getAllByRole('button', { name: /Hide|Show/ })[3]!
+    const start = createEvent.dragStart(eye)
+    fireEvent(eye, start)
+    expect(start.defaultPrevented).toBe(true)
+  })
+
+  it('drops a dragged column onto a target in the same group', async () => {
+    await manager()
+    const items = Array.from(document.querySelectorAll('.mz-dt__columns-item'))
+    fireEvent.dragStart(items[3]!)
+    fireEvent.dragOver(items[1]!)
+    fireEvent.drop(items[1]!)
+    expect(listed()).toEqual(['Number', '#4', 'Name', '#3'])
+  })
+
+  it('refuses a drop across the pin boundary', async () => {
+    await manager()
+    const items = Array.from(document.querySelectorAll('.mz-dt__columns-item'))
+    fireEvent.dragStart(items[1]!)
+    const over = createEvent.dragOver(items[0]!)
+    fireEvent(items[0]!, over)
+    // Not preventing the dragover is what tells the browser this is no target.
+    expect(over.defaultPrevented).toBe(false)
+    fireEvent.drop(items[0]!)
+    expect(listed()).toEqual(['Number', 'Name', '#3', '#4'])
+  })
+
+  it('hides the button — and an empty toolbar with it — on columnManager={false}', async () => {
+    render(
+      <DataTable
+        columns={wideColumns}
+        data={wideRows}
+        rowKey={(r) => r.id}
+        total={1}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        columnManager={false}
+      />
+    )
+    expect(screen.queryByRole('button', { name: /Columns/ })).toBeNull()
+    expect(document.querySelector('.mz-dt__toolbar')).toBeNull()
+  })
+
+  it('still shows the toolbar for a host’s own controls without the button', () => {
+    render(
+      <DataTable
+        columns={wideColumns}
+        data={wideRows}
+        rowKey={(r) => r.id}
+        total={1}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        columnManager={false}
+        toolbar={<input aria-label="Search" />}
+      />
+    )
+    expect(screen.getByLabelText('Search')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Columns/ })).toBeNull()
+  })
+})
+
+describe('header state', () => {
+  it('marks a filtering column active so the trigger can carry the brand colour', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={{ ...emptyQuery, filters: { name: { type: 'text', value: 'abc' } } }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    expect(document.querySelector('.mz-dt__filter')).toHaveAttribute('data-active', 'true')
   })
 })
