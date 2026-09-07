@@ -251,13 +251,13 @@ The full list lives in `dist/morze-ui-tokens.css`.
 
 ## Components
 
-| Input and actions | Navigation and output | Overlays |
-| --- | --- | --- |
-| `Button` `Toggle` `ToggleGroup` | `Tabs` `Accordion` | `Dialog` |
-| `Checkbox` `RadioGroup` `Switch` | `Card` `Alert` `Badge` | `DropdownMenu` |
-| `Slider` `Input` `Textarea` | `Progress` `Avatar` | `Popover` |
-| `Label` `Field` `Select` | `Separator` `Skeleton` `Spinner` | `Tooltip` |
-| `DataTable` | `Sidebar` | `Sheet` |
+| Input and actions | Navigation | Output | Overlays |
+| --- | --- | --- | --- |
+| `Button` `Toggle` `ToggleGroup` | `Tabs` `Accordion` | `Card` `Alert` `Badge` | `Dialog` `AlertDialog` |
+| `Checkbox` `RadioGroup` `Switch` | `Sidebar` `Breadcrumb` | `Progress` `Avatar` | `DropdownMenu` `Menubar` |
+| `Slider` `Input` `Textarea` | `Menubar` `NavigationMenu` | `Separator` `Skeleton` `Spinner` | `Popover` `Tooltip` |
+| `Label` `Field` `Select` | `ScrollArea` | `Table` `Chart` | `Sheet` `Toast` |
+| `Calendar` `DataTable` | | | |
 
 The API mirrors shadcn/ui: same names, same sub-component composition,
 `asChild`, a `data-slot` on every part — so examples from the shadcn docs work
@@ -286,6 +286,16 @@ What this kit adds on top:
   `label={null}` makes it purely decorative.
 - `Badge` — `variant`: `solid` `soft` `outline`.
 - `Field` / `FieldHint` / `FieldError` — form scaffolding.
+- `TabsList` — `overflow`: `wrap` (default), `scroll`, or `menu`, which
+  collapses whatever does not fit into a trailing menu. See [Tabs that run out
+  of room](#tabs-that-run-out-of-room).
+- `AlertDialogAction` / `AlertDialogCancel` — `variant`, `size` and `tone` from
+  `Button`, so a destructive confirmation is `tone="danger"`.
+- `Table` — brings its own horizontal scroll container, because a wide table
+  otherwise scrolls the page instead of itself; `containerRef` hands that
+  element back for a synchronised header or a virtualiser.
+- `ScrollArea` — the kit's scrollbar in place of the platform's, so a pane
+  looks scrollable on macOS too. `viewportRef` reaches the scrolling element.
 
 ```tsx
 <ToggleGroup type="single" defaultValue="week" appearance="segmented">
@@ -293,6 +303,149 @@ What this kit adds on top:
   <ToggleGroupItem value="week">Week</ToggleGroupItem>
 </ToggleGroup>
 ```
+
+## Tabs that run out of room
+
+`overflow="menu"` keeps a tab row on one line and folds the rest into a menu:
+
+```tsx
+<TabsList overflow="menu" overflowLabel="More">
+  {sections.map((s) => <TabsTrigger key={s.id} value={s.id}>{s.name}</TabsTrigger>)}
+</TabsList>
+```
+
+Every trigger stays mounted inside the list — Radix wires them into one
+roving-focus group and a trigger outside it throws — so the collapsed ones are
+hidden rather than unmounted, which also takes them out of the tab order. The
+button lights up when the *selected* tab is one of the hidden ones, so the row
+never looks as if nothing is chosen. Widths are measured off a mirror row of
+inert spans: a hidden trigger measures zero, and a second row of real triggers
+would duplicate every `value`.
+
+## Calendar
+
+A month grid with no date library behind it. Names come from `Intl`, so a
+locale tag is the whole of the localisation story.
+
+```tsx
+<Calendar mode="single" selected={date} onSelect={setDate} locale="ru-RU" />
+
+<Calendar
+  mode="range"
+  numberOfMonths={2}
+  selected={range}
+  onSelect={setRange}
+  disabled={{ before: new Date() }}
+/>
+```
+
+`mode`: `single` (clicking the chosen day clears it unless `required`),
+`multiple`, `range` (the ends are ordered for you, and the span under the
+pointer previews before you commit). `disabled` takes a `Date`, a `Date[]`, a
+`{ from, to }` span, an open `{ before, after }` bound, or a predicate.
+`fromDate` / `toDate` bound both selection and paging; `captionLayout="dropdown"`
+swaps the caption for month and year selects; `showWeekNumbers` adds the ISO
+column; `weekStartsOn` overrides what the locale says.
+
+Six week rows are always drawn, so paging never resizes the popover it sits in.
+Arrows move a day, `Home`/`End` a week, `PageUp`/`PageDown` a month, and exactly
+one day is ever in the tab order.
+
+## Toast
+
+`Toaster` mounts once; `toast()` is a plain function, callable from a fetch
+handler or a store — the places a failure actually happens are rarely places
+that can call a hook.
+
+```tsx
+// once, at the root
+<Toaster position="bottom-right" />
+
+// anywhere
+toast({ title: 'Saved', tone: 'success' })
+
+const t = toast({ title: 'Uploading…', duration: Infinity })
+t.update({ title: 'Uploaded', tone: 'success', duration: 4000 })
+t.dismiss()
+```
+
+Three live at once; beyond that the oldest is dropped, because a taller stack
+is a log and nobody reads a log that is covering the page. `useToast()` returns
+the same `{ toasts, toast, dismiss }` for the rare case that needs to render
+the queue itself.
+
+## Chart
+
+The kit does not draw charts — it dresses them. `ChartContainer` publishes each
+series colour as a CSS custom property scoped to itself, so any library that
+takes a CSS colour can consume it, and the tooltip and legend read like the
+rest of the interface.
+
+```tsx
+const config = {
+  shipped: { label: 'Shipped', color: 'var(--mz-primary)' },
+  returned: { label: 'Returned', theme: { light: '#c2410c', dark: '#fb923c' } },
+} satisfies ChartConfig
+
+<ChartContainer config={config} className="h-64">
+  <ResponsiveContainer>
+    <BarChart data={rows}>
+      <Bar dataKey="shipped" fill="var(--color-shipped)" />
+      <Tooltip content={<ChartTooltipContent />} />
+    </BarChart>
+  </ResponsiveContainer>
+</ChartContainer>
+```
+
+The responsive wrapper stays yours: sizing belongs to the charting library, and
+a container that owned it would only ever work with one of them. Config values
+are validated before they are interpolated into the stylesheet — a config is
+data, and data ends up coming from a server.
+
+`ChartTooltipContent` and `ChartLegendContent` take `nameKey` (and the tooltip
+also `labelKey`) for the charts whose series key lives *inside* the datum
+rather than in `dataKey` — a pie, where every slice comes from one series:
+
+```tsx
+<Tooltip content={<ChartTooltipContent nameKey="material" hideLabel />} />
+```
+
+`ChartTooltip` and `ChartLegend` are not exported: they were only ever
+recharts' own `Tooltip` and `Legend`, so import those from recharts directly.
+
+## Forms
+
+React Hook Form bindings live behind their own entry point, because
+`react-hook-form` is an *optional* peer dependency — an application that does
+not use it should not carry it:
+
+```tsx
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage }
+  from '@morze/ui/form'
+
+<Form {...form}>
+  <FormField
+    control={form.control}
+    name="email"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>Email</FormLabel>
+        <FormControl><Input {...field} /></FormControl>
+        <FormMessage />
+      </FormItem>
+    )}
+  />
+</Form>
+```
+
+What it adds over `Field` is the wiring nobody enjoys writing: one generated id
+per field, `htmlFor` on the label, `aria-describedby` pointing at both the
+description and the message, and `aria-invalid` flipped by the field's own
+state. `FormMessage` renders nothing at all when there is no error, so a form
+does not reserve a blank line under every input.
+
+Without React Hook Form, `Field` / `FieldHint` / `FieldError` from the main
+entry are the same layout with none of the binding.
 
 ## Sidebar
 
@@ -506,8 +659,13 @@ column pinned, it does not reflow into cards.
 ## Localisation
 
 Component strings default to English and every one of them can be replaced.
-`Dialog`/`Sheet` take `closeLabel`, `Spinner` takes `label`, `Sidebar` takes
-`mobileTitle` / `mobileDescription` and `SidebarTrigger` takes `label`.
+`Dialog`/`Sheet`/`Toaster` take `closeLabel`, `Spinner` takes `label`, `Sidebar`
+takes `mobileTitle` / `mobileDescription`, `SidebarTrigger` takes `label`,
+`BreadcrumbEllipsis` takes `label` and `TabsList` takes `overflowLabel`.
+
+`Calendar` reads its month, weekday and day names from `Intl` — a `locale` tag
+is enough — and takes a partial `labels` object for the four strings `Intl`
+cannot supply (the nav buttons, the caption selects, the week-number column).
 
 `DataTable` has more strings than the rest, so it takes a partial `labels`
 object — anything omitted falls back to the English default:
@@ -537,14 +695,16 @@ does not hand-carry ~50 strings — and does not silently drift as the kit adds
 them:
 
 ```tsx
-import { dataTable as ru, common } from '@morze/ui/locales/ru'
+import { dataTable as ru, calendar, common } from '@morze/ui/locales/ru'
 
 <DataTable labels={ru} locale="ru-RU" … />
+<Calendar labels={calendar} locale="ru-RU" … />
 <Dialog><DialogContent closeLabel={common.close}>…</DialogContent></Dialog>
 ```
 
 `common` carries the strings the rest of the kit takes as individual props
-(`close`, `loading`, `sidebarNavigation`, `sidebarSections`, `toggleSidebar`).
+(`close`, `loading`, `more`, `sidebarNavigation`, `sidebarSections`,
+`toggleSidebar`), and `calendar` the four the month grid needs.
 A bundle is plain data — no React, no styles — so it is safe to import from a
 server component. `@morze/ui/locales/en` is the same shape for English, and
 `MorzeLocale` types a language of your own.

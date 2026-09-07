@@ -70,7 +70,9 @@
   .mz-btn, .mz-badge, .mz-toggle, .mz-toggle-group, .mz-checkbox, .mz-radio,
   .mz-switch, .mz-slider, .mz-tabs-list, .mz-progress, .mz-alert, .mz-input,
   .mz-textarea, .mz-select-trigger, .mz-item, .mz-tooltip-content,
-  .mz-accordion-trigger__icon, .mz-sidebar__menu-button, .mz-avatar
+  .mz-accordion-trigger__icon, .mz-sidebar__menu-button, .mz-avatar,
+  .mz-table, .mz-menubar, .mz-navmenu, .mz-scroll-area, .mz-toast,
+  .mz-calendar, .mz-chart
 ) {
   --mz-tone-rgb: var(--mz-primary-rgb);
 

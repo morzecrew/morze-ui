@@ -117,7 +117,99 @@ describe('table rows', () => {
   })
 })
 
+describe('tone defaults reach every toned component', () => {
+  /**
+   * A component that reads --mz-tone-rgb without a default gets an invalid
+   * var() substitution, and the browser drops the whole declaration — the
+   * border simply vanishes rather than falling back to something. Each of
+   * these has to appear in the :where() list in base.css.
+   */
+  // Read inside the test, not in the describe body: the bundle is loaded in
+  // beforeAll, and a describe body runs before that.
+  const tonedRoot = () => css.match(/:where\(([^)]*)\)\{--mz-tone-rgb/)?.[1] ?? ''
+
+  it.each([
+    ['.mz-toast', '.mz-toast'],
+    ['.mz-calendar', '.mz-calendar'],
+    ['.mz-table', '.mz-table'],
+    ['.mz-menubar', '.mz-menubar'],
+    ['.mz-navmenu', '.mz-navmenu'],
+    ['.mz-scroll-area', '.mz-scroll-area'],
+    ['.mz-chart', '.mz-chart'],
+  ])('gives %s a tone to fall back on', (_name, selector) => {
+    expect(tonedRoot()).toContain(selector)
+  })
+
+  it('still applies an explicit tone after the new defaults', () => {
+    // tones.css is imported last so [data-tone] outranks a component default.
+    expect(at('[data-tone=accent]')).toBeGreaterThan(at('.mz-toast'))
+    expect(at('[data-tone=accent]')).toBeGreaterThan(at('.mz-calendar__day'))
+  })
+})
+
+describe('backdrop blur survives the build', () => {
+  it('keeps the unprefixed property Firefox needs', () => {
+    // Given a literal, lightningcss decided the -webkit- form covered every
+    // target and dropped the unprefixed one — the only spelling Firefox knows.
+    // The value goes through --mz-overlay-filter so it cannot make that call.
+    const rule = css.match(/\.mz-dialog-overlay\{[^}]*\}/)?.[0] ?? ''
+    // Anchored on a boundary: a bare toContain would match the unprefixed
+    // spelling inside the -webkit- one and pass with the bug still there.
+    expect(rule).toMatch(/[;{]backdrop-filter:var\(--mz-overlay-filter\)/)
+    expect(rule).toMatch(/[;{]-webkit-backdrop-filter:var\(--mz-overlay-filter\)/)
+  })
+
+  it('keeps both spellings on the glass panel too', () => {
+    const rule = css.match(/\.mz-panel\{[^}]*\}/)?.[0] ?? ''
+    expect(rule).toMatch(/[;{]backdrop-filter:var\(--mz-glass-filter\)/)
+    expect(rule).toMatch(/[;{]-webkit-backdrop-filter:var\(--mz-glass-filter\)/)
+  })
+})
+
+describe('calendar', () => {
+  it('rings today instead of filling it', () => {
+    // A fill would be indistinguishable from the selection on the day the two
+    // coincide, which is the most common day to be looking at.
+    const today = css.match(/\.mz-calendar__day\[data-today\]\{[^}]*\}/)?.[0] ?? ''
+    expect(today).toContain('border-color')
+    expect(today).not.toContain('background')
+  })
+
+  it('keeps the tentative range visually apart from a chosen one', () => {
+    const preview = css.match(/\.mz-calendar__day\[data-preview\]\{[^}]*\}/)?.[0] ?? ''
+    expect(preview).toContain('background:rgba(var(--mz-tone-rgb)')
+    // No convex fill and no glow: those belong to a committed selection.
+    expect(preview).toContain('box-shadow:none')
+  })
+})
+
+describe('toast', () => {
+  it('reveals the close button for keyboards, not only for pointers', () => {
+    // A control that exists only on hover is a control a keyboard never finds.
+    expect(css).toContain('.mz-toast__close:focus-visible')
+    expect(css).toMatch(/\.mz-toast__close:focus-visible\{opacity:1|,\s*\.mz-toast__close:focus-visible\{opacity:1/)
+  })
+})
+
+describe('table', () => {
+  it('makes the component scroll rather than the page', () => {
+    expect(css).toMatch(/\.mz-table-wrap\{[^}]*overflow-x:auto/)
+  })
+
+  it('keeps borders separate so the header rule survives a sticky header', () => {
+    expect(css).toMatch(/\.mz-table\{[^}]*border-collapse:separate/)
+  })
+})
+
 describe('scoping', () => {
+  it('confines the chart library selectors to the chart container', () => {
+    // The kit reaches into foreign SVG in exactly one place, and it may never
+    // do so from the document root.
+    for (const match of css.matchAll(/([^{}]*\.recharts-[^{}]*)\{/g)) {
+      expect(match[1]).toContain('.mz-chart')
+    }
+  })
+
   it('has no descendant selector that reaches consumer markup', () => {
     expect(css).not.toMatch(/\[class\^=mz-\] \*/)
     expect(css).not.toMatch(/\[class\*=" mz-"\] \*/)

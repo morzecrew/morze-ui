@@ -9,3 +9,4 @@ playground/dist-playground
 # Carries the npm auth token — never commit it.
 .npmrc
 .idea
+*.tgz

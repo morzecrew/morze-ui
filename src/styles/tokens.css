@@ -362,6 +362,14 @@
      back on every convex fill at once. */
   --mz-fill-sheen: none;
 
+  /* Blur behind a dialog. It goes through a custom property for a reason that
+     is not cosmetic: given the literal, lightningcss decides the -webkit- form
+     covers every target and drops the unprefixed one — and the unprefixed one
+     is the only spelling Firefox understands, so the overlay lost its blur
+     there entirely. Behind a var() it cannot reason about the value and keeps
+     both, which is also how .mz-panel survived. */
+  --mz-overlay-filter: blur(6px);
+
   /* ---- Focus ---- */
   --mz-ring-width: 2px;
   --mz-ring-offset: 2px;

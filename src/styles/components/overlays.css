@@ -186,8 +186,11 @@
   inset: 0;
   z-index: 50;
   background: var(--mz-overlay);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Prefixed first, standard second — the order every other frosted surface in
+     the kit uses. Reversed, lightningcss collapses the pair down to the
+     -webkit- form alone, and Firefox is left with no blur at all. */
+  -webkit-backdrop-filter: var(--mz-overlay-filter);
+  backdrop-filter: var(--mz-overlay-filter);
 }
 .mz-dialog-overlay[data-state='open'] { animation: mz-fade-in 0.2s ease; }
 .mz-dialog-overlay[data-state='closed'] { animation: mz-fade-out 0.16s ease; }
@@ -246,6 +249,11 @@
   color: var(--mz-text);
 }
 .mz-dialog-close svg { width: 15px; height: 15px; }
+
+/* AlertDialog: narrower than a Dialog because it holds a question and two
+   buttons, and it has no close control to leave room for in the corner. */
+.mz-alert-dialog-content { max-width: 26rem; padding-right: 22px; }
+.mz-alert-dialog-content .mz-dialog-footer { margin-top: 4px; }
 
 /* -------------------------------- Tooltip ------------------------------- */
 .mz-tooltip-content {

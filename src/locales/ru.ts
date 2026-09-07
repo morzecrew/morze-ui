@@ -7,6 +7,7 @@
  * Pure data: no React, no styles, safe to import from a server component.
  */
 import type { DataTableLabels } from '../components/data-table/labels'
+import type { CalendarLabels } from '../components/calendar'
 import type { MorzeCommonLabels, MorzeLocale } from './types'
 
 export const dataTable: DataTableLabels = {
@@ -64,13 +65,22 @@ export const dataTable: DataTableLabels = {
   bulkActions: 'Действия над выбранными строками',
 }
 
+export const calendar: CalendarLabels = {
+  previousMonth: 'Предыдущий месяц',
+  nextMonth: 'Следующий месяц',
+  month: 'Месяц',
+  year: 'Год',
+  weekNumber: 'Неделя',
+}
+
 export const common: MorzeCommonLabels = {
   close: 'Закрыть',
   loading: 'Загрузка',
+  more: 'Ещё',
   sidebarNavigation: 'Навигация',
   sidebarSections: 'Разделы приложения',
   toggleSidebar: 'Свернуть или развернуть меню',
 }
 
-export const ru: MorzeLocale = { dataTable, common }
+export const ru: MorzeLocale = { dataTable, calendar, common }
 export default ru

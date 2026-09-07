@@ -8,6 +8,12 @@
 @import './components/overlays.css';
 @import './components/display.css';
 @import './components/data-table.css';
+@import './components/table.css';
+@import './components/navigation.css';
+@import './components/calendar.css';
+@import './components/scroll-area.css';
+@import './components/toast.css';
+@import './components/chart.css';
 @import './components/sheet.css';
 @import './components/sidebar.css';
 @import './tones.css';

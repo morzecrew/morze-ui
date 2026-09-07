@@ -17,6 +17,9 @@
 }
 .mz-label[data-disabled],
 .mz-label:has(+ :disabled) { opacity: 0.5; }
+/* A label over a field that failed validation. The colour is the whole of the
+   signal here — the message under the field carries the reason. */
+.mz-label--error { color: rgb(var(--mz-danger-rgb)); }
 
 .mz-field {
   display: flex;

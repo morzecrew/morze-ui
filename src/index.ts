@@ -43,6 +43,7 @@ export {
 } from './components/select'
 
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs'
+export type { TabsListProps } from './components/tabs'
 
 export {
   Card,
@@ -104,6 +105,112 @@ export {
 } from './components/dropdown-menu'
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip'
+
+export {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from './components/alert-dialog'
+
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from './components/breadcrumb'
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from './components/table'
+
+export { ScrollArea, ScrollBar } from './components/scroll-area'
+
+export {
+  Menubar,
+  MenubarPortal,
+  MenubarMenu,
+  MenubarTrigger,
+  MenubarContent,
+  MenubarGroup,
+  MenubarSeparator,
+  MenubarLabel,
+  MenubarItem,
+  MenubarShortcut,
+  MenubarCheckboxItem,
+  MenubarRadioGroup,
+  MenubarRadioItem,
+  MenubarSub,
+  MenubarSubTrigger,
+  MenubarSubContent,
+} from './components/menubar'
+
+export {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuContent,
+  NavigationMenuTrigger,
+  NavigationMenuLink,
+  NavigationMenuIndicator,
+  NavigationMenuViewport,
+  navigationMenuTriggerStyle,
+} from './components/navigation-menu'
+
+export {
+  Toaster,
+  toast,
+  dismiss,
+  useToast,
+  Toast,
+  ToastProvider,
+  ToastViewport,
+  ToastTitle,
+  ToastDescription,
+  ToastAction,
+  ToastClose,
+} from './components/toast'
+export type {
+  ToastOptions,
+  ToastRecord,
+  ToastHandle,
+  ToasterProps,
+} from './components/toast'
+
+export { Calendar } from './components/calendar'
+export type { CalendarProps, CalendarLabels, DateRange, DateMatcher } from './components/calendar'
+
+export {
+  ChartContainer,
+  ChartStyle,
+  ChartTooltipContent,
+  ChartLegendContent,
+  useChart,
+} from './components/chart'
+export type {
+  ChartConfig,
+  ChartSeriesConfig,
+  ChartPayloadItem,
+  ChartTooltipContentProps,
+  ChartLegendContentProps,
+} from './components/chart'
 
 export {
   Sheet,

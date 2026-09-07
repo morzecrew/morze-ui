@@ -1,0 +1,158 @@
+/* ==========================================================================
+   Calendar
+   ========================================================================== */
+
+.mz-calendar {
+  position: relative;
+  display: inline-block;
+  padding: 12px;
+  color: var(--mz-text);
+  font-size: 13px;
+  user-select: none;
+}
+
+/* The arrows sit above the captions rather than beside one of them: with two
+   months on screen a pair per caption reads as four ways to page. */
+.mz-calendar__nav {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 4px;
+  z-index: 1;
+}
+.mz-calendar__nav-button {
+  display: grid;
+  place-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--mz-border);
+  border-radius: var(--mz-radius-sm);
+  background: var(--mz-face);
+  color: var(--mz-text-dim);
+  cursor: pointer;
+  transition: background var(--mz-duration) ease, color var(--mz-duration) ease;
+}
+.mz-calendar__nav-button svg { width: 15px; height: 15px; }
+.mz-calendar__nav-button:hover:not(:disabled) { background: var(--mz-face-hover); color: var(--mz-text); }
+.mz-calendar__nav-button:disabled { opacity: 0.4; cursor: default; }
+
+.mz-calendar__months { display: flex; gap: 20px; align-items: flex-start; }
+.mz-calendar__month { display: flex; flex-direction: column; gap: 8px; }
+
+.mz-calendar__caption {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  /* Room for the arrows, so a long month name never runs under them. */
+  padding-right: 64px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.mz-calendar__caption--dropdown { gap: 6px; padding-right: 64px; }
+
+.mz-calendar__dropdown {
+  height: 26px;
+  padding: 0 4px;
+  border: 1px solid var(--mz-border);
+  border-radius: var(--mz-radius-sm);
+  background: var(--mz-face);
+  color: var(--mz-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mz-calendar__grid { border-collapse: separate; border-spacing: 2px; }
+
+.mz-calendar__weekday,
+.mz-calendar__weeknum-head {
+  width: 34px;
+  padding: 0 0 2px;
+  color: var(--mz-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mz-calendar__weeknum {
+  width: 26px;
+  color: var(--mz-text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.mz-calendar__cell { padding: 0; }
+
+.mz-calendar__day {
+  display: grid;
+  place-content: center;
+  width: 34px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background var(--mz-duration) ease,
+    color var(--mz-duration) ease,
+    border-color var(--mz-duration) ease;
+}
+.mz-calendar__day:hover:not([aria-disabled]) { background: var(--mz-face-hover); }
+/* An unavailable day stays focusable (see aria-disabled in calendar.tsx), so it
+   is dimmed on the attribute rather than on :disabled. The shared
+   [data-disabled] rule in base.css takes care of blocking the pointer. */
+.mz-calendar__day[aria-disabled='true'] { opacity: 0.3; cursor: not-allowed; }
+.mz-calendar__day[data-outside] { color: var(--mz-text-muted); opacity: 0.6; }
+
+/* Today is a ring, never a fill — a fill would be indistinguishable from the
+   selection on the day they coincide. */
+.mz-calendar__day[data-today] { border-color: rgba(var(--mz-tone-rgb), 0.55); font-weight: 600; }
+
+.mz-calendar__day[data-selected] {
+  background-color: var(--mz-fill);
+  background-image: var(--mz-fill-sheen);
+  border-color: var(--mz-convex-hairline);
+  color: #fff;
+  font-weight: 600;
+  box-shadow:
+    0 6px 18px -8px rgba(var(--mz-tone-rgb), 0.7),
+    inset 0 1px 0 var(--mz-convex-top);
+}
+.mz-calendar__day[data-selected]:hover { background-color: var(--mz-fill-hover); }
+
+/* The span between the ends: a tint, so the ends stay the only solid days. */
+.mz-calendar__day[data-range-middle] {
+  background: rgba(var(--mz-tone-rgb), 0.16);
+  border-radius: 0;
+  color: var(--mz-text);
+}
+.mz-calendar__day[data-range-start]:not([data-range-end]) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.mz-calendar__day[data-range-end]:not([data-range-start]) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* The half-committed range under the pointer. Dashed and unfilled: it has to
+   read as "this is what you would get", not as a range already chosen. */
+.mz-calendar__day[data-preview] {
+  background: rgba(var(--mz-tone-rgb), 0.09);
+  border-color: transparent;
+  color: var(--mz-text);
+  box-shadow: none;
+}
+.mz-calendar__day[data-preview][data-range-end] {
+  border: 1px dashed rgba(var(--mz-tone-rgb), 0.7);
+}

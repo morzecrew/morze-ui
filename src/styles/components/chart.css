@@ -1,0 +1,88 @@
+/* ==========================================================================
+   Chart — the frame, the tooltip and the legend. The plot is the host's
+   charting library; these are the parts a design system owns.
+   ========================================================================== */
+
+.mz-chart {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--mz-text-dim);
+}
+
+/* Chart libraries render SVG the kit does not control, so these are the one
+   place in the package that reaches into foreign markup — kept to the axis,
+   grid and reference furniture, and never to the marks themselves. */
+.mz-chart svg { overflow: visible; }
+.mz-chart .recharts-cartesian-grid line,
+.mz-chart line[stroke-dasharray] { stroke: var(--mz-border); }
+.mz-chart .recharts-cartesian-axis-line,
+.mz-chart .recharts-cartesian-axis-tick-line { stroke: var(--mz-border); }
+.mz-chart text { fill: var(--mz-text-muted); font-family: inherit; }
+/* The band a hovered category is painted with. Recharts fills it with a
+   hardcoded near-black by default, which is a solid block in a dark theme. */
+.mz-chart .recharts-rectangle.recharts-tooltip-cursor {
+  fill: rgba(var(--mz-text-rgb), 0.06);
+}
+.mz-chart .recharts-curve.recharts-tooltip-cursor {
+  stroke: rgba(var(--mz-tone-rgb), 0.5);
+}
+.mz-chart .recharts-sector[stroke='#fff'] { stroke: var(--mz-surface); }
+.mz-chart .recharts-dot[stroke='#fff'] { stroke: var(--mz-surface); }
+
+/* -------------------------------- Tooltip ------------------------------- */
+.mz-chart__tooltip {
+  min-width: 9rem;
+  padding: 9px 11px;
+  border-radius: var(--mz-radius-sm);
+  font-size: 12px;
+  /* Above the plot but below dialogs and menus: a chart tooltip that outranked
+     an open dropdown would show through it. */
+  z-index: 40;
+}
+.mz-chart__tooltip-label {
+  margin-bottom: 6px;
+  color: var(--mz-text);
+  font-weight: 600;
+}
+.mz-chart__tooltip-items { display: flex; flex-direction: column; gap: 4px; }
+.mz-chart__tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--mz-text-dim);
+}
+.mz-chart__tooltip-name { flex: 1; }
+.mz-chart__tooltip-value {
+  color: var(--mz-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.mz-chart__tooltip-icon { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* -------------------------------- Legend -------------------------------- */
+.mz-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 12px;
+}
+.mz-chart__legend-item { display: flex; align-items: center; gap: 6px; }
+
+/* --------------------------------- Swatch -------------------------------- */
+.mz-chart__swatch {
+  flex-shrink: 0;
+  background: var(--mz-chart-color, currentColor);
+  border-radius: 2px;
+}
+.mz-chart__swatch--dot { width: 9px; height: 9px; border-radius: var(--mz-radius-pill); }
+.mz-chart__swatch--line { width: 12px; height: 3px; }
+.mz-chart__swatch--dashed {
+  width: 12px;
+  height: 0;
+  background: none;
+  border-top: 2px dashed var(--mz-chart-color, currentColor);
+}

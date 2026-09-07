@@ -98,6 +98,47 @@
 }
 .mz-tabs-content { flex: 1; outline: none; }
 
+/* Tabs that ran out of room — see TabsList `overflow`. */
+.mz-tabs-list--scroll {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* The row is the scroller, so its triggers must not be squeezed to fit it. */
+  flex-wrap: nowrap;
+}
+.mz-tabs-list--scroll::-webkit-scrollbar { display: none; }
+.mz-tabs-list--scroll .mz-tabs-trigger { flex: 0 0 auto; }
+
+.mz-tabs-list-wrap { position: relative; min-width: 0; width: 100%; }
+.mz-tabs-list--menu { display: flex; width: 100%; flex-wrap: nowrap; min-width: 0; }
+.mz-tabs-list--menu .mz-tabs-trigger { flex: 0 1 auto; min-width: 0; }
+
+/* The measuring row. Off-screen rather than hidden: `visibility: hidden` still
+   reserves its height and pushed the real row down by a full control. */
+.mz-tabs-list__mirror {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+/* Shrink-to-fit, unlike the live row: a mirror trigger that stretched would
+   report the width it was given rather than the width it needs. */
+.mz-tabs-list__mirror .mz-tabs-trigger { flex: 0 0 auto; }
+
+.mz-tabs-overflow { flex: 0 0 auto; margin-left: auto; gap: 0.35em; }
+.mz-tabs-overflow__icon { width: 16px; height: 16px; }
+.mz-tabs-overflow__caret { width: 13px; height: 13px; opacity: 0.7; }
+/* The active tab is inside the menu: the row would otherwise read as if
+   nothing at all were selected. */
+.mz-tabs-overflow[data-active] { color: rgb(var(--mz-tone-rgb)); }
+.mz-tabs-overflow[data-state='open'] { color: var(--mz-text); background: var(--mz-face); }
+@media (max-width: 640px) {
+  .mz-tabs-overflow__label { display: none; }
+}
+
 /* --------------------------------- Card --------------------------------- */
 .mz-card {
   display: flex;

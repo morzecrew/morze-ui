@@ -1,0 +1,55 @@
+/* ==========================================================================
+   ScrollArea — the kit's scrollbar in place of the platform's.
+   ========================================================================== */
+
+.mz-scroll-area {
+  position: relative;
+  overflow: hidden;
+}
+
+.mz-scroll-area__viewport {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  outline: none;
+}
+
+.mz-scrollbar {
+  display: flex;
+  touch-action: none;
+  user-select: none;
+  padding: 2px;
+  background: transparent;
+  /* Radix fades the bar in and out; the transition is what keeps it from
+     appearing mid-scroll as a hard-edged rectangle. */
+  transition: background var(--mz-duration) ease, opacity var(--mz-duration) ease;
+}
+.mz-scrollbar[data-orientation='vertical'] { width: 10px; }
+.mz-scrollbar--horizontal,
+.mz-scrollbar[data-orientation='horizontal'] { flex-direction: column; height: 10px; }
+.mz-scrollbar:hover { background: rgba(var(--mz-text-rgb), 0.06); }
+
+.mz-scrollbar__thumb {
+  position: relative;
+  flex: 1;
+  border-radius: var(--mz-radius-pill);
+  background: rgba(var(--mz-text-rgb), 0.22);
+  transition: background var(--mz-duration) ease;
+}
+.mz-scrollbar__thumb:hover { background: rgba(var(--mz-text-rgb), 0.34); }
+.mz-scrollbar__thumb:active { background: rgba(var(--mz-tone-rgb), 0.6); }
+
+/* The 44px hit area a pointer needs, without a 44px-wide bar. */
+.mz-scrollbar__thumb::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 100%;
+  height: 100%;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.mz-scroll-area__corner { background: transparent; }

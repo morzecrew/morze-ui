@@ -1,0 +1,106 @@
+/* ==========================================================================
+   Toast
+   ========================================================================== */
+
+.mz-toast-viewport {
+  position: fixed;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(400px, calc(100vw - 32px));
+  max-height: 100dvh;
+  padding: 16px;
+  margin: 0;
+  list-style: none;
+  outline: none;
+}
+.mz-toast-viewport--bottom-right { right: 0; bottom: 0; }
+.mz-toast-viewport--bottom-left { left: 0; bottom: 0; }
+/* Growing downwards from the top means the newest toast appears where the eye
+   already is, instead of pushing the stack past it. */
+.mz-toast-viewport--top-right { right: 0; top: 0; flex-direction: column-reverse; }
+.mz-toast-viewport--top-left { left: 0; top: 0; flex-direction: column-reverse; }
+
+.mz-toast {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--mz-radius);
+  /* The left edge is the whole of the tone: a fully tinted toast competes with
+     the page it is reporting on, and the default toast has no tone at all. */
+  border-left: 3px solid rgba(var(--mz-tone-rgb), 0.9);
+}
+.mz-toast:not([data-tone]) { border-left-color: var(--mz-border-strong); }
+
+.mz-toast__body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.mz-toast__title { font-size: 14px; font-weight: 600; color: var(--mz-text); }
+.mz-toast__description {
+  font-size: 13px;
+  color: var(--mz-text-dim);
+  overflow-wrap: anywhere;
+}
+
+.mz-toast__action {
+  grid-column: 2;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--mz-radius-sm);
+  border: 1px solid var(--mz-border-strong);
+  background: var(--mz-face);
+  color: var(--mz-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--mz-duration) ease;
+}
+.mz-toast__action:hover { background: var(--mz-face-hover); }
+
+.mz-toast__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--mz-duration) ease, background var(--mz-duration) ease;
+}
+.mz-toast__close svg { width: 13px; height: 13px; }
+/* Revealed on approach, and always for keyboards — a control that only exists
+   on hover is a control a keyboard user never finds. */
+.mz-toast:hover .mz-toast__close,
+.mz-toast__close:focus-visible { opacity: 1; }
+.mz-toast__close:hover { background: rgba(var(--mz-text-rgb), 0.1); }
+
+.mz-toast { position: relative; }
+.mz-toast[data-state='open'] { animation: mz-toast-in 0.22s var(--mz-ease); }
+.mz-toast[data-state='closed'] { animation: mz-toast-out 0.16s var(--mz-ease); }
+.mz-toast[data-swipe='move'] {
+  transform: translateX(var(--radix-toast-swipe-move-x));
+  transition: none;
+}
+.mz-toast[data-swipe='cancel'] { transform: translateX(0); transition: transform 0.2s var(--mz-ease); }
+.mz-toast[data-swipe='end'] { animation: mz-toast-swipe-out 0.12s var(--mz-ease); }
+
+@keyframes mz-toast-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97) }
+  to { opacity: 1; transform: none }
+}
+@keyframes mz-toast-out {
+  from { opacity: 1; transform: none }
+  to { opacity: 0; transform: scale(0.97) }
+}
+@keyframes mz-toast-swipe-out {
+  from { transform: translateX(var(--radix-toast-swipe-end-x)) }
+  to { transform: translateX(110%) }
+}

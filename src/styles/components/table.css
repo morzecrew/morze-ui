@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Table — the hand-laid-out kind. The data grid lives in data-table.css.
+   ========================================================================== */
+
+/* The scroll container is the component's own, not the host's: a table wide
+   enough to overflow otherwise scrolls the page instead of itself. */
+.mz-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--mz-radius);
+}
+
+.mz-table {
+  width: 100%;
+  caption-side: bottom;
+  border-collapse: separate;
+  /* Separate, not collapse: a collapsed border cannot be rounded, and the
+     sticky header would lose its bottom rule as it scrolls. */
+  border-spacing: 0;
+  font-size: 14px;
+  color: var(--mz-text);
+}
+
+.mz-table__caption {
+  padding-top: 10px;
+  color: var(--mz-text-muted);
+  font-size: 13px;
+}
+
+.mz-table__th {
+  position: relative;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--mz-text-dim);
+  font-family: var(--mz-label-font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: var(--mz-label-tracking);
+  text-transform: var(--mz-label-transform);
+  background: var(--mz-well);
+  border-bottom: 1px solid var(--mz-border);
+}
+
+.mz-table__td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--mz-border);
+}
+
+.mz-table__row { transition: background var(--mz-duration) ease; }
+.mz-table__body .mz-table__row:hover { background: rgba(var(--mz-text-rgb), 0.035); }
+.mz-table__row[data-state='selected'] { background: rgba(var(--mz-tone-rgb), 0.12); }
+
+/* The last rule in the body would draw a line with nothing under it — unless a
+   footer follows, where it is the seam between the two. */
+.mz-table__body > .mz-table__row:last-child > .mz-table__td { border-bottom: 0; }
+
+.mz-table__foot {
+  background: var(--mz-well);
+  font-weight: 600;
+}
+.mz-table__foot .mz-table__td { border-bottom: 0; border-top: 1px solid var(--mz-border); }
+
+/* Checkbox and action columns: no text to align, so the padding is the cell. */
+.mz-table__th:has(> .mz-checkbox),
+.mz-table__td:has(> .mz-checkbox) {
+  width: 1%;
+  padding-right: 0;
+}

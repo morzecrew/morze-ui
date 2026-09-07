@@ -35,6 +35,14 @@ export const ChevronUpIcon = icon(<path d="m18 15-6-6-6 6" />)
 export const ChevronRightIcon = icon(<path d="m9 18 6-6-6-6" />)
 export const CircleIcon = icon(<circle cx="12" cy="12" r="10" />)
 export const DotIcon = icon(<circle cx="12" cy="12" r="4" fill="currentColor" />)
+/** Three dots — a collapsed breadcrumb, a row of tabs that did not fit. */
+export const EllipsisIcon = icon(
+  <>
+    <circle cx="5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    <circle cx="19" cy="12" r="1.5" fill="currentColor" stroke="none" />
+  </>
+)
 
 export const SpinnerIcon = icon(
   <>

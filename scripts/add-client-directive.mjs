@@ -10,7 +10,7 @@ import { dirname, resolve } from 'node:path'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const DIRECTIVE = '"use client";\n'
 
-for (const file of ['dist/index.js', 'dist/index.cjs']) {
+for (const file of ['dist/index.js', 'dist/index.cjs', 'dist/form/index.js', 'dist/form/index.cjs']) {
   const path = resolve(root, file)
   const code = readFileSync(path, 'utf8')
   if (code.startsWith('"use client"') || code.startsWith("'use client'")) continue

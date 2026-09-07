@@ -1,0 +1,240 @@
+/* ==========================================================================
+   Breadcrumb · Menubar · NavigationMenu
+   The menus reuse .mz-item and .mz-panel from overlays.css; what is here is
+   the bar each one hangs from.
+   ========================================================================== */
+
+/* ------------------------------ Breadcrumb ------------------------------ */
+.mz-breadcrumb { font-size: 13px; color: var(--mz-text-muted); }
+
+.mz-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+}
+
+.mz-breadcrumb__item { display: inline-flex; align-items: center; gap: 6px; }
+
+.mz-breadcrumb__link {
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--mz-radius-sm);
+  transition: color var(--mz-duration) ease;
+}
+.mz-breadcrumb__link:hover { color: var(--mz-text); }
+
+/* The page you are on: the trail's one piece of solid text. */
+.mz-breadcrumb__page { color: var(--mz-text); font-weight: 500; }
+
+.mz-breadcrumb__separator {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.5;
+}
+.mz-breadcrumb__separator > svg { width: 13px; height: 13px; }
+
+.mz-breadcrumb__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+.mz-breadcrumb__ellipsis > svg { width: 15px; height: 15px; }
+
+/* -------------------------------- Menubar ------------------------------- */
+.mz-menubar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--mz-radius);
+  background: var(--mz-well);
+  border: 1px solid var(--mz-border);
+  box-shadow: var(--mz-well-inset);
+}
+
+.mz-menubar__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-dim);
+  font-family: var(--mz-label-font);
+  font-size: 13px;
+  font-weight: var(--mz-label-weight);
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition: background var(--mz-duration) ease, color var(--mz-duration) ease;
+}
+.mz-menubar__trigger:hover { color: var(--mz-text); background: var(--mz-face); }
+/* An open menu keeps its trigger lit — the bar is how you tell which one is
+   showing once the pointer has moved down into the panel. */
+.mz-menubar__trigger[data-state='open'] {
+  color: var(--mz-text);
+  background: rgba(var(--mz-tone-rgb), 0.16);
+  border-color: rgba(var(--mz-tone-rgb), 0.28);
+}
+
+/* ---------------------------- Navigation menu --------------------------- */
+.mz-navmenu {
+  position: relative;
+  display: flex;
+  max-width: max-content;
+  justify-content: center;
+}
+
+.mz-navmenu__list {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+}
+
+.mz-navmenu__item { position: relative; }
+
+.mz-navmenu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--mz-radius);
+  background: transparent;
+  color: var(--mz-text-dim);
+  font-family: var(--mz-label-font);
+  font-size: 14px;
+  font-weight: var(--mz-label-weight);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition: background var(--mz-duration) ease, color var(--mz-duration) ease;
+}
+.mz-navmenu__trigger:hover { color: var(--mz-text); background: var(--mz-face); }
+.mz-navmenu__trigger[data-state='open'] { color: var(--mz-text); background: var(--mz-face); }
+
+.mz-navmenu__trigger-icon {
+  width: 13px;
+  height: 13px;
+  opacity: 0.7;
+  transition: transform var(--mz-duration) var(--mz-ease);
+}
+.mz-navmenu__trigger[data-state='open'] .mz-navmenu__trigger-icon { transform: rotate(180deg); }
+
+.mz-navmenu__content {
+  padding: 14px;
+  /* Slides in from whichever side the previous panel was on, so moving along
+     the bar reads as one surface travelling rather than two panels blinking. */
+}
+.mz-navmenu__content[data-motion='from-start'] { animation: mz-navmenu-from-left 0.2s var(--mz-ease); }
+.mz-navmenu__content[data-motion='from-end'] { animation: mz-navmenu-from-right 0.2s var(--mz-ease); }
+.mz-navmenu__content[data-motion='to-start'] { animation: mz-navmenu-to-left 0.2s var(--mz-ease); }
+.mz-navmenu__content[data-motion='to-end'] { animation: mz-navmenu-to-right 0.2s var(--mz-ease); }
+
+/* Without a viewport each panel is absolutely placed under its own trigger,
+   so it needs the surface the shared viewport would otherwise have carried. */
+.mz-navmenu[data-viewport='false'] .mz-navmenu__content {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 60;
+  min-width: 14rem;
+  background-color: var(--mz-glass);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
+  border: 1px solid var(--mz-border-strong);
+  border-radius: var(--mz-radius-lg);
+  box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-glass-edge);
+}
+
+.mz-navmenu__viewport-wrap {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  z-index: 60;
+}
+.mz-navmenu__viewport {
+  position: relative;
+  margin-top: 8px;
+  overflow: hidden;
+  /* Radix measures the active panel and publishes it here; animating both
+     axes is what makes the surface morph between panels of different size. */
+  width: var(--radix-navigation-menu-viewport-width);
+  height: var(--radix-navigation-menu-viewport-height);
+  transition: width var(--mz-duration) var(--mz-ease), height var(--mz-duration) var(--mz-ease);
+}
+.mz-navmenu__viewport[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
+.mz-navmenu__viewport[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+
+.mz-navmenu__link {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border-radius: var(--mz-radius-sm);
+  color: var(--mz-text);
+  font-size: 14px;
+  text-decoration: none;
+  outline: none;
+  transition: background 0.14s ease, box-shadow 0.14s ease;
+}
+.mz-navmenu__link:hover,
+.mz-navmenu__link[data-active] {
+  background: rgba(var(--mz-tone-rgb), 0.14);
+  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.26);
+}
+
+.mz-navmenu__indicator {
+  display: flex;
+  justify-content: center;
+  height: 8px;
+  top: 100%;
+  z-index: 61;
+  overflow: hidden;
+  transition: all var(--mz-duration) var(--mz-ease);
+}
+.mz-navmenu__indicator[data-state='hidden'] { opacity: 0; }
+.mz-navmenu__arrow {
+  position: relative;
+  top: 60%;
+  width: 10px;
+  height: 10px;
+  rotate: 45deg;
+  border-top-left-radius: 2px;
+  background: var(--mz-glass);
+  border-top: 1px solid var(--mz-border-strong);
+  border-left: 1px solid var(--mz-border-strong);
+}
+
+@keyframes mz-navmenu-from-left {
+  from { opacity: 0; transform: translateX(-14px) }
+  to { opacity: 1; transform: none }
+}
+@keyframes mz-navmenu-from-right {
+  from { opacity: 0; transform: translateX(14px) }
+  to { opacity: 1; transform: none }
+}
+@keyframes mz-navmenu-to-left {
+  from { opacity: 1; transform: none }
+  to { opacity: 0; transform: translateX(-14px) }
+}
+@keyframes mz-navmenu-to-right {
+  from { opacity: 1; transform: none }
+  to { opacity: 0; transform: translateX(14px) }
+}
