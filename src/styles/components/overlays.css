@@ -64,8 +64,8 @@
   overflow: hidden;
   padding: 6px;
 }
-.mz-select-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
-.mz-select-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-select-content[data-state='open'] { animation: mz-panel-in 0.16s var(--mz-ease); }
+.mz-select-content[data-state='closed'] { animation: mz-panel-out 0.12s var(--mz-ease); }
 .mz-select-content--popper[data-side='bottom'] { margin-top: 6px; }
 .mz-select-content--popper[data-side='top'] { margin-bottom: 6px; }
 .mz-select-viewport { padding: 0; }
@@ -159,8 +159,8 @@
   overflow: hidden auto;
   padding: 6px;
 }
-.mz-menu-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
-.mz-menu-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-menu-content[data-state='open'] { animation: mz-panel-in 0.16s var(--mz-ease); }
+.mz-menu-content[data-state='closed'] { animation: mz-panel-out 0.12s var(--mz-ease); }
 
 .mz-menu-sub-trigger[data-state='open'] {
   background: rgba(var(--mz-text-rgb), 0.06);
@@ -174,8 +174,8 @@
   padding: 16px;
   outline: none;
 }
-.mz-popover-content[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
-.mz-popover-content[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-popover-content[data-state='open'] { animation: mz-panel-in 0.16s var(--mz-ease); }
+.mz-popover-content[data-state='closed'] { animation: mz-panel-out 0.12s var(--mz-ease); }
 .mz-popover-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .mz-popover-title { font-size: 15px; font-weight: 700; }
 .mz-popover-description { font-size: 13px; color: var(--mz-text-dim); }
@@ -271,6 +271,10 @@
   font-size: 12px;
   line-height: 1.35;
   text-shadow: var(--mz-convex-text-shadow);
+  /* Radix publishes the anchor corner on the popper wrapper and it
+     inherits down to here. Without it the bubble scales from its own
+     centre and slides a couple of pixels away from the trigger. */
+  transform-origin: var(--radix-popper-transform-origin, center);
 }
 .mz-tooltip-content[data-state='delayed-open'] { animation: mz-pop-in 0.14s var(--mz-ease); }
 .mz-tooltip-content[data-state='closed'] { animation: mz-pop-out 0.1s var(--mz-ease); }

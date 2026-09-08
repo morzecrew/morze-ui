@@ -257,6 +257,28 @@ describe('motion', () => {
   it('respects prefers-reduced-motion', () => {
     expect(css).toContain('prefers-reduced-motion')
   })
+
+  it('never scales a frosted panel open', () => {
+    // A scale on a backdrop-filtered surface makes the engine re-blur its
+    // backdrop every frame at a fractional factor, and a centre-scale walked
+    // a 240px popover's left edge nearly 5px on the way in. The glass rises
+    // and fades; only opaque marks keep the pop.
+    expect(css).toMatch(/@keyframes mz-panel-in\{[^@]*?\}/)
+    const glassIn = css.match(/@keyframes mz-panel-in\{.*?to\{[^}]*\}\}/)?.[0] ?? ''
+    expect(glassIn).not.toContain('scale')
+    for (const panel of ['.mz-popover-content', '.mz-menu-content', '.mz-select-content']) {
+      expect(css).toContain(`${panel}[data-state=open]{animation:mz-panel-in`)
+    }
+  })
+
+  it('anchors what still scales to the corner Radix measured', () => {
+    // The tooltip is the one popper surface that keeps the pop, so it is the
+    // one that needs the origin — without it the bubble grows from its own
+    // centre and drifts away from the trigger.
+    expect(css).toMatch(
+      /\.mz-tooltip-content\{[^}]*transform-origin:var\(--radix-popper-transform-origin/
+    )
+  })
 })
 
 describe('accessibility contracts', () => {

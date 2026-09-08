@@ -179,8 +179,8 @@
   height: var(--radix-navigation-menu-viewport-height);
   transition: width var(--mz-duration) var(--mz-ease), height var(--mz-duration) var(--mz-ease);
 }
-.mz-navmenu__viewport[data-state='open'] { animation: mz-pop-in 0.16s var(--mz-ease); }
-.mz-navmenu__viewport[data-state='closed'] { animation: mz-pop-out 0.12s var(--mz-ease); }
+.mz-navmenu__viewport[data-state='open'] { animation: mz-panel-in 0.16s var(--mz-ease); }
+.mz-navmenu__viewport[data-state='closed'] { animation: mz-panel-out 0.12s var(--mz-ease); }
 
 .mz-navmenu__link {
   display: flex;

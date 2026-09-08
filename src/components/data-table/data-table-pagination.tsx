@@ -44,15 +44,31 @@ export function DataTablePagination({
 }) {
   const labels = resolveLabels(labelsProp)
   const sizes = pageSizeOptions === false ? [] : pageSizeOptions
+  /**
+   * `total` is optional — a cursor-paged backend, or one where `COUNT(*)` is
+   * too expensive, simply does not know it. There is no last page to compute
+   * then, and `pageCount` says 1, so clamping to it used to leave every
+   * forward control permanently disabled: the reader could not get off page
+   * one. All that can honestly be said without a total is whether the page
+   * that arrived was full — if it was, there is probably another behind it.
+   */
+  const unknownTotal = total === undefined
   const pages = pageCount(total, query.pageSize)
+  const canPrevious = query.page > 1
+  const canNext = unknownTotal ? rowsOnPage >= query.pageSize : query.page < pages
+  const empty = total === 0 || (unknownTotal && rowsOnPage === 0)
   const from = total === 0 ? 0 : (query.page - 1) * query.pageSize + 1
-  const to = total === undefined ? from + rowsOnPage - 1 : Math.min(query.page * query.pageSize, total)
-  const go = (page: number) => onQueryChange({ ...query, page: Math.min(Math.max(page, 1), pages) })
+  const to = unknownTotal ? from + rowsOnPage - 1 : Math.min(query.page * query.pageSize, total)
+  const go = (page: number) =>
+    onQueryChange({
+      ...query,
+      page: unknownTotal ? Math.max(page, 1) : Math.min(Math.max(page, 1), pages),
+    })
 
   return (
     <div className="mz-dt__pagination" data-slot="data-table-pagination">
       <div className="mz-dt__pagination-info">
-        {total === 0 ? (
+        {empty ? (
           labels.nothingFound
         ) : (
           <>
@@ -92,12 +108,13 @@ export function DataTablePagination({
 
       <div className="mz-dt__pagination-nav">
         <span className="mz-dt__pagination-page">
-          {query.page} / {pages}
+          {query.page}
+          {unknownTotal ? null : ` / ${pages}`}
         </span>
         <Button
           variant="secondary"
           size="icon-sm"
-          disabled={query.page <= 1}
+          disabled={!canPrevious}
           onClick={() => go(1)}
           aria-label={labels.firstPage}
         >
@@ -106,7 +123,7 @@ export function DataTablePagination({
         <Button
           variant="secondary"
           size="icon-sm"
-          disabled={query.page <= 1}
+          disabled={!canPrevious}
           onClick={() => go(query.page - 1)}
           aria-label={labels.previousPage}
         >
@@ -115,21 +132,24 @@ export function DataTablePagination({
         <Button
           variant="secondary"
           size="icon-sm"
-          disabled={query.page >= pages}
+          disabled={!canNext}
           onClick={() => go(query.page + 1)}
           aria-label={labels.nextPage}
         >
           <ChevronRightIcon />
         </Button>
-        <Button
-          variant="secondary"
-          size="icon-sm"
-          disabled={query.page >= pages}
-          onClick={() => go(pages)}
-          aria-label={labels.lastPage}
-        >
-          <ChevronsRightIcon />
-        </Button>
+        {/* Nothing to jump to when the last page is unknown. */}
+        {unknownTotal ? null : (
+          <Button
+            variant="secondary"
+            size="icon-sm"
+            disabled={query.page >= pages}
+            onClick={() => go(pages)}
+            aria-label={labels.lastPage}
+          >
+            <ChevronsRightIcon />
+          </Button>
+        )}
       </div>
     </div>
   )

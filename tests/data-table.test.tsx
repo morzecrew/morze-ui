@@ -613,3 +613,127 @@ describe('header state', () => {
     expect(document.querySelector('.mz-dt__filter')).toHaveAttribute('data-active', 'true')
   })
 })
+
+describe('layout hook with an inline columns array', () => {
+  it('does not re-render itself forever', () => {
+    // A host almost never memoises `columns`, so the hook sees a new array on
+    // every render. Keying the baseline on that identity made the hook commit
+    // a fresh layout each time, which re-rendered the host, which built the
+    // array again. The counter fails the test instead of hanging the run.
+    let renders = 0
+    const { result } = renderHook(() => {
+      renders += 1
+      if (renders > 50) throw new Error(`render loop: ${renders} renders`)
+      return useColumnLayout({ columns: [{ id: 'a', header: 'A' }, { id: 'b', header: 'B' }] })
+    })
+    expect(renders).toBeLessThan(10)
+    expect(result.current.visible.map((c) => c.id)).toEqual(['a', 'b'])
+  })
+
+  it('still picks up a genuine change to the columns', () => {
+    const { result, rerender } = renderHook(
+      ({ ids }: { ids: string[] }) =>
+        useColumnLayout({ columns: ids.map((id) => ({ id, header: id })) }),
+      { initialProps: { ids: ['a', 'b'] } }
+    )
+    rerender({ ids: ['a', 'b', 'c'] })
+    expect(result.current.visible.map((c) => c.id)).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('pagination without a total', () => {
+  const pager = (props: Partial<React.ComponentProps<typeof DataTable<Row>>> = {}) => {
+    const onQueryChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        query={{ ...emptyQuery, pageSize: 2 }}
+        onQueryChange={onQueryChange}
+        {...props}
+      />
+    )
+    return { onQueryChange }
+  }
+
+  it('lets the reader off page one when the page came back full', async () => {
+    const { onQueryChange } = pager()
+    const next = screen.getByLabelText('Next page')
+    expect(next).toBeEnabled()
+    await userEvent.click(next)
+    expect(onQueryChange).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }))
+  })
+
+  it('stops at a partial page, because that is the last one', () => {
+    pager({ data: rows.slice(0, 1) })
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+  })
+
+  it('hides the jump-to-last control, which has nothing to point at', () => {
+    pager()
+    expect(screen.queryByLabelText('Last page')).toBeNull()
+    expect(screen.getByLabelText('First page')).toBeInTheDocument()
+  })
+
+  it('keeps the last page reachable when the total is known', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={9}
+        query={{ ...emptyQuery, pageSize: 2 }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    expect(screen.getByLabelText('Last page')).toBeEnabled()
+    expect(screen.getByText('1 / 5')).toBeInTheDocument()
+  })
+})
+
+describe('bulk bar', () => {
+  const withSelection = (selection: { keys: string[]; allMatching: boolean }, total?: number) =>
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={total}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        selection={selection}
+        onSelectionChange={vi.fn()}
+        bulkActions={() => <button type="button">Archive</button>}
+      />
+    )
+
+  it('shows for explicitly ticked rows', () => {
+    withSelection({ keys: ['1'], allMatching: false }, 2)
+    expect(screen.getByRole('region', { name: 'Actions for the selected rows' })).toBeInTheDocument()
+  })
+
+  it('survives the escalation to every matching row', () => {
+    // The count is unknowable in this mode, so it used to read as "nothing
+    // selected" and took the actions — and the only way out — off screen.
+    withSelection({ keys: ['1', '2'], allMatching: true }, 137)
+    expect(screen.getByRole('region', { name: 'Actions for the selected rows' })).toBeInTheDocument()
+    expect(screen.getByText('Archive')).toBeInTheDocument()
+    expect(screen.getByText('Clear selection')).toBeInTheDocument()
+    expect(document.querySelector('.mz-dt__bulkbar-count')).toHaveTextContent(
+      'Selected: 137 (all matching)'
+    )
+  })
+
+  it('names the mode instead of guessing a number when the total is unknown', () => {
+    withSelection({ keys: ['1'], allMatching: true })
+    expect(screen.getByRole('region', { name: 'Actions for the selected rows' })).toBeInTheDocument()
+    expect(screen.getByText('(all matching)')).toBeInTheDocument()
+    expect(screen.queryByText(/Selected: 0/)).toBeNull()
+  })
+
+  it('stays away when nothing is selected', () => {
+    withSelection({ keys: [], allMatching: false }, 2)
+    expect(screen.queryByRole('region', { name: 'Actions for the selected rows' })).toBeNull()
+  })
+})

@@ -728,13 +728,25 @@ export function DataTable<T>({
         />
       ) : null}
 
-      {selectable && (rows.count ?? 0) > 0 ? (
+      {/* `count` is undefined in the all-matching mode — the number of selected
+          rows is exactly what nobody knows there — so it cannot stand in for
+          "is anything selected". Reading it as one hid the bar at the moment
+          the user selected everything, taking the bulk actions and the only
+          way back out of the mode with it. */}
+      {selectable && (rows.allMatching || (rows.count ?? 0) > 0) ? (
         <div className="mz-dt__bulkbar" role="region" aria-label={labels.bulkActions}>
           <span className="mz-dt__bulkbar-count">
-            {labels.selectedCount(
-              selectionCount?.toLocaleString(locale) ?? String(rows.count ?? 0)
+            {selectionCount === undefined ? (
+              // Everything the filter matches is selected, but the host never
+              // said how many that is. Any number here would be a guess, so
+              // the qualifier carries the whole message on its own.
+              labels.allMatchingSuffix.trim()
+            ) : (
+              <>
+                {labels.selectedCount(selectionCount.toLocaleString(locale))}
+                {rows.allMatching ? labels.allMatchingSuffix : null}
+              </>
             )}
-            {rows.allMatching ? labels.allMatchingSuffix : null}
           </span>
           {!rows.allMatching && total !== undefined && rows.pageSelected && total > data.length ? (
             <Button variant="link" size="xs" onClick={rows.selectAllMatching}>

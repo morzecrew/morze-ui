@@ -5,6 +5,7 @@ playground/dist
 .DS_Store
 dist-playground
 playground/dist-playground
+.repowise
 
 # Carries the npm auth token — never commit it.
 .npmrc

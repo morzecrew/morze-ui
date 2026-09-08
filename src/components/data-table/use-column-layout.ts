@@ -40,6 +40,18 @@ export function useColumnLayout<T>({
   layout: controlled,
   onLayoutChange,
 }: UseColumnLayoutOptions<T>) {
+  // `columns` is almost always an array literal in the caller's render, so its
+  // identity changes on every render even when nothing about the columns did.
+  // Keying the baseline on that identity made the effect below commit a fresh
+  // layout object every render; inside <DataTable> the prop held it still, but
+  // a host calling this hook directly re-rendered itself in an unbroken loop.
+  // The baseline is built from three fields, so those are what it is keyed on.
+  // Separators no column id can contain, so two different column sets cannot
+  // flatten to the same signature.
+  const signature = columns
+    .map((c) => [c.id, c.width ?? '', c.pinned ?? ''].join('\u0000'))
+    .join('\u0001')
+
   const baseline = React.useMemo<ColumnLayout>(
     () => ({
       order: columns.map((c) => c.id),
@@ -50,7 +62,8 @@ export function useColumnLayout<T>({
       pinned: Object.fromEntries(columns.map((c) => [c.id, c.pinned])) as ColumnLayout['pinned'],
       sized: [],
     }),
-    [columns]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [signature]
   )
 
   const [internal, setInternal] = React.useState<ColumnLayout>(baseline)
