@@ -211,6 +211,17 @@
 }
 .mz-toggle > svg { width: 1.15em; height: 1.15em; flex-shrink: 0; pointer-events: none; }
 
+/* xs matches .mz-btn--xs down to the tighter gap and the smaller corner: a
+   28px control's radius has to come down with it or the pill swallows the
+   label. The rest of the scale is the shared 34/40/48. */
+.mz-toggle--xs {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  gap: 0.4em;
+  border-radius: var(--mz-radius-sm);
+}
 .mz-toggle--sm { height: 34px; min-width: 34px; padding: 0 12px; font-size: 13px; }
 .mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: 14px; }
 .mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: 15px; }
@@ -285,7 +296,12 @@
 }
 
 /* Joined: items share edges, like a single convex bar. Same flat face as the
-   outline toggle. */
+   outline toggle. The bar's own corner belongs to the group, not to the item
+   whose end it happens to be, so it is set here and stepped down for xs the
+   way .mz-btn--xs steps its own: an 8px corner on a 28px bar reads as a pill
+   that has been squared off. */
+.mz-toggle-group--joined { --mz-toggle-group-radius: var(--mz-radius); }
+.mz-toggle-group--joined[data-size='xs'] { --mz-toggle-group-radius: var(--mz-radius-sm); }
 .mz-toggle-group--joined .mz-toggle {
   border-radius: 0;
   margin-left: -1px;
@@ -309,12 +325,12 @@
 }
 .mz-toggle-group--joined .mz-toggle:first-child {
   margin-left: 0;
-  border-top-left-radius: var(--mz-radius);
-  border-bottom-left-radius: var(--mz-radius);
+  border-top-left-radius: var(--mz-toggle-group-radius);
+  border-bottom-left-radius: var(--mz-toggle-group-radius);
 }
 .mz-toggle-group--joined .mz-toggle:last-child {
-  border-top-right-radius: var(--mz-radius);
-  border-bottom-right-radius: var(--mz-radius);
+  border-top-right-radius: var(--mz-toggle-group-radius);
+  border-bottom-right-radius: var(--mz-toggle-group-radius);
 }
 /* Higher specificity than the .mz-toggle-group--joined .mz-toggle face above,
    which would otherwise flatten the pressed state. */

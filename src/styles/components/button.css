@@ -92,7 +92,12 @@
 
 /* ---- Secondary: convex, but built from the neutral face ----
    One flat colour, animatable by construction; the sheen above it is the
-   `none` hook. Its convexity is the pair of inset lines plus the drop. */
+   `none` hook. Its convexity is the pair of inset lines plus the drop.
+
+   Neutral here means neutral: the face tokens read untinted on this button —
+   it is on the plain control layer in base.css, with every other piece of
+   hardware in the kit. Beside a filled button the brand wash the ink carries
+   read as a paler primary. */
 .mz-btn--secondary {
   background-color: var(--mz-face);
   background-image: var(--mz-face-sheen);

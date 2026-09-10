@@ -191,6 +191,21 @@ function Demo() {
               <ToggleGroupItem value="c">C</ToggleGroupItem>
             </ToggleGroup>
           </div>
+          {/* size on the group is the default for every item in it. */}
+          <div className="pg-row">
+            <ToggleGroup type="single" size="xs" appearance="joined" defaultValue="day">
+              <ToggleGroupItem value="day">Day</ToggleGroupItem>
+              <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            </ToggleGroup>
+            <ToggleGroup type="single" size="sm" defaultValue="day">
+              <ToggleGroupItem value="day">Day</ToggleGroupItem>
+              <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            </ToggleGroup>
+            <ToggleGroup type="single" size="lg" appearance="joined" defaultValue="day">
+              <ToggleGroupItem value="day">Day</ToggleGroupItem>
+              <ToggleGroupItem value="week">Week</ToggleGroupItem>
+            </ToggleGroup>
+          </div>
           <div className="pg-row">
             <Switch defaultChecked />
             <Switch size="sm" />

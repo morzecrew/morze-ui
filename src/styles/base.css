@@ -83,6 +83,42 @@
   --mz-fill-press: color-mix(in srgb, rgb(var(--mz-tone-rgb)) var(--mz-press-mix), #000);
 }
 
+/* The plain control layer: the hardware runs untinted.
+   --mz-ink and --mz-shade carry the brand on purpose, so every fill, rim and
+   edge cut from them lands in the temperature of the night around it. That is
+   right for a surface and wrong for a control: at 5.5% the wash was enough to
+   make a secondary button read as a pale primary, and it ran through every
+   checkbox, switch, tab strip, track and field on the page. Each of those
+   re-points its tokens at the untinted twins — see --mz-face-plain and its
+   family — and nothing else changes: the recipes below still read --mz-face,
+   --mz-well and --mz-cap, so a host that re-cuts one still lands on all of it.
+
+   One list, not a re-point per component, so the set is legible in one place:
+   what is here is hardware, what is missing is surface (card, panel, sheet,
+   table chrome, badge, avatar) and keeps the tint. The token has to move
+   rather than the ink under it — a custom property is substituted where it is
+   *declared*, so pointing --mz-ink at white here would not re-cut a --mz-face
+   already resolved on the root. :where() keeps specificity at zero, the same
+   way the tone defaults above do, so a host override of any of these still
+   wins wherever it lands. */
+:where(
+  .mz-btn--secondary, .mz-select-trigger, .mz-checkbox, .mz-radio, .mz-switch,
+  .mz-slider, .mz-toggle, .mz-toggle-group, .mz-tabs-list, .mz-tabs-overflow,
+  .mz-input, .mz-textarea, .mz-progress, .mz-menubar, .mz-navmenu__trigger,
+  .mz-calendar__nav-button, .mz-calendar__dropdown, .mz-calendar__day,
+  .mz-toast__action, .mz-accordion-trigger__icon
+) {
+  --mz-face: var(--mz-face-plain);
+  --mz-face-hover: var(--mz-face-plain-hover);
+  --mz-face-top: var(--mz-face-plain-top);
+  --mz-face-bottom: var(--mz-face-plain-bottom);
+  --mz-border-strong: var(--mz-border-plain);
+  --mz-well: var(--mz-well-plain);
+  --mz-well-inset: var(--mz-well-plain-inset);
+  --mz-cap: var(--mz-cap-plain);
+  --mz-cap-edge: var(--mz-cap-plain-edge);
+}
+
 /* Focus is always an outline so it never fights the layered box-shadows. */
 .mz-focusable:focus-visible {
   outline: var(--mz-ring-width) solid rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.9);

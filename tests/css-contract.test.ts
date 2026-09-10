@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -12,14 +12,25 @@ const DIST = resolve(__dirname, '../dist/morze-ui.css')
 let css = ''
 
 beforeAll(() => {
-  if (!existsSync(DIST)) {
-    execFileSync('node', ['scripts/build-css.mjs'], { cwd: resolve(__dirname, '..') })
-  }
+  // Always rebuilt, never reused: the bundle on disk is whatever the last
+  // build left there, and `npm test` runs before `npm run build` in
+  // prepublishOnly. Asserting on a stale bundle passes a CSS change that was
+  // never compiled — a green run that means nothing. It costs ~50ms.
+  execFileSync('node', ['scripts/build-css.mjs'], { cwd: resolve(__dirname, '..'), stdio: 'ignore' })
   css = readFileSync(DIST, 'utf8')
 })
 
 /** Index of a selector in the bundle, or -1. Later index wins on equal specificity. */
 const at = (selector: string) => css.indexOf(selector)
+
+/**
+ * The token blocks, one per theme: the declarations sitting alongside
+ * --mz-tint. Reading tokens per block instead of counting them across the
+ * bundle is what keeps these checks honest now that components re-point a
+ * token for themselves — a bundle-wide count cannot tell a theme's
+ * declaration from a one-component override.
+ */
+const themeBlocks = () => [...css.matchAll(/([^{}]*--mz-tint:[^{}]*)\}/g)].map((m) => m[1]!)
 
 describe('tone cascade', () => {
   it('applies [data-tone] after every component default', () => {
@@ -355,9 +366,13 @@ describe('the night ramp', () => {
     // its neighbour read as switched off in dark and as a grey slab in light.
     // Both were the same defect — a fixed literal instead of a cut of the ink
     // — so every theme's well is an ink cut and a hex here is the regression.
-    const wells = [...css.matchAll(/--mz-well:([^;}]+)/g)].map((m) => m[1]!)
-    expect(wells.length).toBeGreaterThan(1)
-    for (const well of wells) {
+    // Read per theme, not across the bundle: the control layer re-points
+    // --mz-well at its untinted twin, and that override is not a theme's
+    // declaration of the token — the twin is checked by the night-ramp block.
+    const themes = themeBlocks()
+    expect(themes.length, 'one token block per theme').toBe(2)
+    for (const theme of themes) {
+      const well = /--mz-well:([^;}]+)/.exec(theme)?.[1] ?? ''
       expect(well).toContain('var(--mz-ink)')
       expect(well, 'a literal cannot track the surface it lies on').not.toMatch(/#[0-9a-f]{3}/)
     }
@@ -372,6 +387,56 @@ describe('the night ramp', () => {
     expect(css).toMatch(/--mz-ink:color-mix\([^;}]*var\(--mz-tint\)/)
     for (const token of ['--mz-border', '--mz-border-strong', '--mz-convex-hairline', '--mz-face-top']) {
       expect(css, token).toMatch(new RegExp(`\\${token}:color-mix\\([^;}]*var\\(--mz-ink\\)`))
+    }
+  })
+
+  it('keeps one untinted face for the controls that must not carry the brand', () => {
+    // The counterpart to the rule above. A face cut from the ink is right for
+    // anything that has to sit in the temperature of the night around it, and
+    // wrong for the hardware: at 5.5% the brand still read, and a secondary
+    // button beside a primary one looked like a pale wash of the same hue —
+    // as did every checkbox, switch, tab strip, track and field on the page.
+    // The plain family is the same cuts with the tint left out, applied to the
+    // control layer in base.css.
+    //
+    // Followed through every var() inside its own theme block, so a plain token
+    // quietly aliasing a tinted one fails here — an alias two hops from
+    // --mz-ink is exactly how this would come back. It is the chain of token
+    // names that gets checked, not the expanded value: expand far enough and
+    // --mz-primary-rgb turns into its own digits and the evidence is gone.
+    const chainOf = (theme: string, token: string) => {
+      const declared = (name: string) => new RegExp(`\\${name}:([^;}]+)`).exec(theme)?.[1]
+      const reached = new Set<string>()
+      let value = declared(token) ?? ''
+      for (let hop = 0; hop < 8 && /var\(--mz-/.test(value); hop++) {
+        value = value.replace(/var\((--mz-[a-z0-9-]+)\)/g, (whole, ref) => {
+          reached.add(ref)
+          return declared(ref) ?? whole
+        })
+      }
+      return { value, reached }
+    }
+    const themes = themeBlocks()
+    expect(themes.length, 'one token block per theme').toBe(2)
+    for (const theme of themes) {
+      for (const token of [
+        '--mz-face-plain',
+        '--mz-face-plain-hover',
+        '--mz-face-plain-top',
+        '--mz-face-plain-bottom',
+        '--mz-border-plain',
+        '--mz-well-plain',
+        '--mz-well-plain-inset',
+        '--mz-cap-plain',
+        '--mz-cap-plain-edge',
+      ]) {
+        const { value, reached } = chainOf(theme, token)
+        expect(value, `${token} is missing from a theme`).not.toBe('')
+        // --mz-tint and the --mz-primary-rgb it follows are the kit's one
+        // source of hue, and the one thing a plain cut may not reach.
+        expect([...reached], token).not.toContain('--mz-tint')
+        expect([...reached], token).not.toContain('--mz-primary-rgb')
+      }
     }
   })
 
@@ -530,11 +595,18 @@ describe('flat fills', () => {
   })
 
   it('keeps the sunken read on the well inset alone', () => {
-    // The well and the face now hold the same value in each theme; the only
+    // The well and the face still hold the same value in each theme; the only
     // thing telling an input from a select trigger is where the light falls.
-    const face = valuesOf('--mz-face')
-    const well = valuesOf('--mz-well')
-    expect(face.length).toBe(well.length)
+    // Paired inside the theme block, because --mz-face is declared a third and
+    // fourth time further down the bundle — the secondary button and the select
+    // trigger re-point it at the untinted twin — and counting the two tokens
+    // across the bundle reads those overrides as themes that lost their well.
+    const themes = themeBlocks()
+    expect(themes.length, 'one token block per theme').toBe(2)
+    for (const theme of themes) {
+      expect(theme, 'the raised face').toMatch(/--mz-face:/)
+      expect(theme, 'its sunken twin').toMatch(/--mz-well:/)
+    }
     expect(css).toMatch(/--mz-well-inset:inset 0 1px 2px[^;}]*inset 0 -1px 0/)
   })
 })

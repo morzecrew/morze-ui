@@ -273,8 +273,20 @@ What this kit adds on top:
   `asChild` the loading indicator is grafted inside the child element and the
   blocked state is expressed through `aria-disabled`, since a link has no
   `disabled`.
-- `ToggleGroup` — `appearance`: `segmented` (a sunken well with the active item
-  raised), `joined` (one continuous bar), `spaced`.
+- `Toggle` / `ToggleGroup` — `variant`: `default` `outline`; `size`: `xs` (28px)
+  `sm` (34) `md` (40, default) `lg` (48), the same scale the buttons run on;
+  `tone`. `ToggleGroup` also
+  takes `appearance`: `segmented` (a sunken well with the active item raised),
+  `joined` (one continuous bar), `spaced`. The group's `variant`, `size` and
+  `tone` are the default for every item in it, and an item that sets its own
+  still wins:
+
+  ```tsx
+  <ToggleGroup type="single" size="sm" appearance="joined" defaultValue="a">
+    <ToggleGroupItem value="a">A</ToggleGroupItem>
+    <ToggleGroupItem value="b" size="lg">B</ToggleGroupItem>
+  </ToggleGroup>
+  ```
 - `TabsList` — `variant`: `default` (well) or `line` (underline).
 - `Checkbox` / `Switch` / `Avatar` — `size`: `sm` `md` `lg`.
 - `Input` — the size prop is `inputSize` (`sm` `md` `lg`); the name differs from

@@ -13,6 +13,7 @@ const toggleVariants = cva('mz-toggle', {
       outline: 'mz-toggle--outline',
     },
     size: {
+      xs: 'mz-toggle--xs',
       sm: 'mz-toggle--sm',
       md: 'mz-toggle--md',
       lg: 'mz-toggle--lg',

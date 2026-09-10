@@ -115,6 +115,23 @@ describe('ToggleGroup', () => {
     expect(item.className).toContain('mz-toggle--lg')
   })
 
+  it('carries the group size down to every item', () => {
+    const { container } = render(
+      <ToggleGroup type="single" size="xs" appearance="joined">
+        <ToggleGroupItem value="a">A</ToggleGroupItem>
+        <ToggleGroupItem value="b">B</ToggleGroupItem>
+      </ToggleGroup>
+    )
+    const items = [...container.querySelectorAll('[data-slot="toggle-group-item"]')]
+    expect(items).toHaveLength(2)
+    for (const item of items) {
+      expect(item).toHaveAttribute('data-size', 'xs')
+      expect(item.className).toContain('mz-toggle--xs')
+    }
+    // The bar's corner is the group's, so the CSS reads it off the root.
+    expect(container.querySelector('[data-slot="toggle-group"]')).toHaveAttribute('data-size', 'xs')
+  })
+
   it('keeps the spaced gap when a consumer passes style', () => {
     const { container } = render(
       <ToggleGroup type="single" appearance="spaced" style={{ marginTop: 8 }}>

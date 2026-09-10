@@ -19,7 +19,10 @@
   font-size: 14px;
   white-space: nowrap;
   border-radius: var(--mz-radius);
-  /* The same flat face every raised control wears, under the sheen hook. */
+  /* The same flat face every raised control wears, under the sheen hook, and
+     untinted like the rest of the hardware — see the plain control layer in
+     base.css. The tone still arrives on hover and when the list is open: that
+     is state, not the trigger's resting colour. */
   background-color: var(--mz-face);
   background-image: var(--mz-face-sheen);
   border: 1px solid var(--mz-border-strong);

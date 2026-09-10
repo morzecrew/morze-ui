@@ -111,6 +111,41 @@
   --mz-face-sheen: none;
   --mz-face-top: color-mix(in srgb, var(--mz-ink) 11%, transparent);
   --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 38%, transparent);
+
+  /* ---- The plain layer: the same cuts with the tint left out ----
+     Every fill and line above is cut from --mz-ink, and the ink is part brand
+     by construction — which is right for anything that has to sit in the same
+     temperature as the night around it, and wrong for the things you press. At
+     5.5% the brand still read: a secondary button beside a primary one looked
+     like a pale wash of the same hue rather than a neutral, and the same wash
+     ran through every checkbox, switch track, tab strip and field on the page.
+     These cut from plain white instead, at the percentages their tinted twins
+     use — change one, change the other. Over a tinted ramp an alpha'd white
+     drifts back toward grey by itself, so a control lands neutral without
+     going warm against the night it sits on.
+
+     The whole set is applied in one place — see the control layer in base.css
+     for which components wear it. The surfaces under them (page, card, panel,
+     sheet, table chrome) keep the tinted cuts: the brand still colours the
+     night, it just stops colouring the hardware. */
+  --mz-face-plain: color-mix(in srgb, #ffffff 5.5%, transparent);
+  --mz-face-plain-hover: color-mix(in srgb, #ffffff 9%, transparent);
+  --mz-face-plain-top: color-mix(in srgb, #ffffff 11%, transparent);
+  /* The drop needs no twin in dark: --mz-shade is a fixed literal, so the
+     shadow under a face never carried the brand here in the first place. */
+  --mz-face-plain-bottom: var(--mz-face-bottom);
+  /* The rim shared by every plain control, at --mz-border-strong's 24%. */
+  --mz-border-plain: color-mix(in srgb, #ffffff 24%, transparent);
+  /* The field face and its inversion. The well and the face hold one value in
+     each theme — see --mz-well — and their twins hold one too, or an input and
+     the select trigger beside it would part company at the second step. */
+  --mz-well-plain: var(--mz-face-plain);
+  --mz-well-plain-inset: inset 0 1px 2px color-mix(in srgb, var(--mz-shade) 30%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, #ffffff 6%, transparent);
+  /* The cap on a switch knob or a slider thumb: the tinted one's own literal,
+     taken neat. */
+  --mz-cap-plain: #ececf2;
+  --mz-cap-plain-edge: color-mix(in srgb, #ffffff 20%, transparent);
   /* The physical cap on a slider thumb or a switch knob: one flat near-white,
      sitting where the old #ffffff → #d9d9e4 sweep averaged out. Its roundness
      comes from the inset highlight on the top edge and the drop underneath,
@@ -242,6 +277,22 @@
   --mz-face-sheen: none;
   --mz-face-top: rgba(255, 255, 255, 0.9);
   --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 13%, transparent);
+
+  /* The plain layer in light — see the dark block for what it is for. Every
+     base literal is its tinted twin's own, taken neat; the cuts that ran
+     through --mz-ink or --mz-shade go back to the untinted navy, since in
+     light the shade *is* the ink and both carried the brand. The top line
+     needs no twin: it is already plain white. */
+  --mz-face-plain: #f4f4f8;
+  --mz-face-plain-hover: #ececf2;
+  --mz-face-plain-top: var(--mz-face-top);
+  --mz-face-plain-bottom: color-mix(in srgb, #15152b 13%, transparent);
+  --mz-border-plain: color-mix(in srgb, #15152b 32%, transparent);
+  --mz-well-plain: color-mix(in srgb, #15152b 4%, transparent);
+  --mz-well-plain-inset: inset 0 1px 2px color-mix(in srgb, #15152b 14%, transparent),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+  --mz-cap-plain: #ebebf3;
+  --mz-cap-plain-edge: color-mix(in srgb, #15152b 36%, transparent);
 
   /* A white cap on a light track vanished at the edges: a quiet dark line
      draws it — a step past --mz-border-strong, no more — and the drop shadow
