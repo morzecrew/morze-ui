@@ -33,8 +33,11 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       data-tone={tone}
+      // Not mz-focusable: the trigger draws the field focus it shares with
+      // Input — tone rim plus glow — and the outline ring on top of that made
+      // it the one control in a form row with two focus indicators.
       className={cn(
-        'mz-select-trigger mz-focusable',
+        'mz-select-trigger',
         size === 'sm' && 'mz-select-trigger--sm',
         className
       )}

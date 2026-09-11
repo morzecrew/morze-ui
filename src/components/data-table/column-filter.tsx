@@ -69,10 +69,10 @@ export function ColumnFilter({ columnLabel, def, value, onApply, labels: labelsP
         </div>
         {def.type === 'custom' && def.actions === false ? null : (
           <div className="mz-dt__filter-actions">
-            <Button size="sm" variant="ghost" onClick={() => commit(undefined)}>
+            <Button type="button" size="sm" variant="ghost" onClick={() => commit(undefined)}>
               {labels.reset}
             </Button>
-            <Button size="sm" onClick={() => commit(draft)}>
+            <Button type="button" size="sm" onClick={() => commit(draft)}>
               {labels.apply}
             </Button>
           </div>
@@ -97,6 +97,10 @@ function FilterBody({
   onSubmit: () => void
   onCommit: (value: FilterValue | undefined) => void
 }) {
+  // The date fields carry labels, so they need ids — generated, not fixed:
+  // two tables on one page used to share `mz-dt-from`, and a label then
+  // pointed at whichever input came first in the document.
+  const id = React.useId()
   const submitOnEnter = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault()
@@ -184,18 +188,18 @@ function FilterBody({
       setDraft({ type: 'date-range', from: current.from, to: current.to, ...part })
     return (
       <div className="mz-dt__filter-range mz-dt__filter-range--stacked">
-        <Label htmlFor="mz-dt-from">{labels.dateFrom}</Label>
+        <Label htmlFor={`${id}-from`}>{labels.dateFrom}</Label>
         <Input
-          id="mz-dt-from"
+          id={`${id}-from`}
           inputSize="sm"
           type="date"
           value={current.from ?? ''}
           onKeyDown={submitOnEnter}
           onChange={(e) => patch({ from: e.target.value || undefined })}
         />
-        <Label htmlFor="mz-dt-to">{labels.dateTo}</Label>
+        <Label htmlFor={`${id}-to`}>{labels.dateTo}</Label>
         <Input
-          id="mz-dt-to"
+          id={`${id}-to`}
           inputSize="sm"
           type="date"
           value={current.to ?? ''}

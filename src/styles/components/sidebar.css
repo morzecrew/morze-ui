@@ -284,7 +284,7 @@
 
 /* Active item carries the convex tone fill, like a pressed toggle. */
 .mz-sidebar__menu-button[data-active] {
-  color: #fff;
+  color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
@@ -295,7 +295,7 @@
   text-shadow: var(--mz-convex-text-shadow);
 }
 .mz-sidebar__menu-button[data-active]:hover {
-  color: #fff;
+  color: var(--mz-tone-fg);
   background-color: var(--mz-fill-hover);
 }
 .mz-sidebar__menu-button[data-active] > svg { opacity: 1; }
@@ -340,7 +340,7 @@
 }
 .mz-sidebar__menu-button[data-active] ~ .mz-sidebar__menu-badge {
   background: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  color: var(--mz-tone-fg);
 }
 
 .mz-sidebar__menu-skeleton { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; }

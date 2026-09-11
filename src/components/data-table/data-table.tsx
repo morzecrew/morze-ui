@@ -21,12 +21,13 @@ import { DataTablePagination } from './data-table-pagination'
 import type {
   ColumnLayout,
   DataTableColumn,
+  DataTableFilters,
   DataTableQuery,
   RowAttributes,
   RowSelectionState,
 } from './types'
 import { resolveLabels, type DataTableLabels } from './labels'
-import { activeFilters, setFilter, sortStateOf, toggleSort } from './utils'
+import { activeFilters, serializeSort, setFilter, sortStateOf, toggleSort } from './utils'
 import { cssSafe, useColumnResize } from './use-column-resize'
 import { useColumnLayout } from './use-column-layout'
 import { useRowSelection } from './use-row-selection'
@@ -163,6 +164,7 @@ export function DataTable<T>({
     moveTo,
     reset,
     fitTo,
+    fitEpoch,
   } = useColumnLayout({ columns, persistKey, layout: controlledLayout, onLayoutChange })
 
   const resize = useColumnResize({ rootRef, widthOf, minWidthOf, onCommit: setWidth })
@@ -209,7 +211,10 @@ export function DataTable<T>({
     const observer = new ResizeObserver(run)
     observer.observe(scroller)
     return () => observer.disconnect()
-  }, [autoFit, fitTo, selectable, renderExpanded, hiddenKey, orderKey])
+    // `fitEpoch` is bumped by a layout reset: every column is flexible again
+    // and nothing about the container has changed, so nothing else would
+    // trigger the fit that has to follow.
+  }, [autoFit, fitTo, selectable, renderExpanded, hiddenKey, orderKey, fitEpoch])
 
   // Edge shadows tell the reader there is more table beyond the viewport.
   React.useEffect(() => {
@@ -249,6 +254,20 @@ export function DataTable<T>({
   // The row count the last request was made at. One request per batch of rows:
   // a host that answers with nothing new would otherwise be asked forever.
   const askedAt = React.useRef(-1)
+  // A new result set starts that count over. It used to survive a query
+  // change, and a filter whose first page happened to be as long as the rows
+  // already on screen — the first page nearly always is a full one — left
+  // `askedAt` equal to `data.length`: neither the footer scrolling into view
+  // nor the button ever asked again.
+  const queryKey = `${serializeSort(query.sort)}\u0000${filtersKey(query.filters)}\u0000${query.pageSize}`
+  React.useEffect(() => {
+    askedAt.current = -1
+  }, [queryKey])
+  React.useEffect(() => {
+    // Fewer rows than at the last request: the host replaced the list rather
+    // than appending to it, whatever the query says.
+    if (data.length < askedAt.current) askedAt.current = -1
+  }, [data.length])
 
   const canLoadMore =
     Boolean(onLoadMore) && (hasMore ?? (total === undefined || data.length < total))
@@ -278,7 +297,9 @@ export function DataTable<T>({
     // Re-observing on every batch is what keeps an endless scroll going: the
     // fresh observer reports the footer again if it is still in view.
     return () => observer.disconnect()
-  }, [showLoadMore, autoLoadMore, loading, data.length])
+    // Re-observed on a query change too: a fresh observer reports the footer
+    // again if the new, equally long result set left it in view.
+  }, [showLoadMore, autoLoadMore, loading, data.length, queryKey])
 
   // Sticky offsets are expressed as a calc() over the width variables, so they
   // stay correct while a column is being resized.
@@ -353,7 +374,17 @@ export function DataTable<T>({
                     data-pinned={pinned}
                     data-pin-edge={pinEdgeOf(column.id)}
                     data-align={column.align}
-                    aria-sort={dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : 'none'}
+                    // Only a sortable column claims the attribute: to assistive
+                    // tech `none` means "sortable, not sorted yet", not "cannot".
+                    aria-sort={
+                      column.sortable
+                        ? dir === 'asc'
+                          ? 'ascending'
+                          : dir === 'desc'
+                            ? 'descending'
+                            : 'none'
+                        : undefined
+                    }
                     className="mz-dt__th"
                     style={
                       pinned
@@ -509,7 +540,7 @@ export function DataTable<T>({
               onClear={() => onQueryChange(setFilter(query, id, undefined))}
             />
           ))}
-          <Button
+          <Button type="button"
             variant="link"
             size="xs"
             onClick={() => onQueryChange({ ...query, filters: {}, page: 1 })}
@@ -680,7 +711,7 @@ export function DataTable<T>({
                 <InboxIcon />
                 <p>{labels.empty}</p>
                 {chips.length > 0 ? (
-                  <Button
+                  <Button type="button"
                     size="sm"
                     variant="secondary"
                     onClick={() => onQueryChange({ ...query, filters: {}, page: 1 })}
@@ -698,7 +729,7 @@ export function DataTable<T>({
             <AlertIcon />
             <p>{error}</p>
             {onRetry ? (
-              <Button size="sm" variant="secondary" onClick={onRetry}>
+              <Button type="button" size="sm" variant="secondary" onClick={onRetry}>
                 {labels.retry}
               </Button>
             ) : null}
@@ -707,7 +738,7 @@ export function DataTable<T>({
 
         {showLoadMore ? (
           <div ref={moreRef} className="mz-dt__more" data-slot="data-table-load-more">
-            <Button variant="secondary" size="sm" disabled={loading} onClick={askForMore}>
+            <Button type="button" variant="secondary" size="sm" disabled={loading} onClick={askForMore}>
               {loading ? labels.loadingMore : labels.loadMore}
             </Button>
           </div>
@@ -749,13 +780,13 @@ export function DataTable<T>({
             )}
           </span>
           {!rows.allMatching && total !== undefined && rows.pageSelected && total > data.length ? (
-            <Button variant="link" size="xs" onClick={rows.selectAllMatching}>
+            <Button type="button" variant="link" size="xs" onClick={rows.selectAllMatching}>
               {labels.selectAllMatching(total.toLocaleString(locale))}
             </Button>
           ) : null}
           <div className="mz-dt__bulkbar-actions">
             {bulkActions?.(selection ?? { keys: [], allMatching: false })}
-            <Button variant="ghost" size="sm" onClick={rows.clear}>
+            <Button type="button" variant="ghost" size="sm" onClick={rows.clear}>
               {labels.clearSelection}
             </Button>
           </div>
@@ -763,6 +794,18 @@ export function DataTable<T>({
       ) : null}
     </div>
   )
+}
+
+/**
+ * One string per filter set. A `custom` value is the host's and may not
+ * serialise; the key list is then the best that can be said about it.
+ */
+function filtersKey(filters: DataTableFilters): string {
+  try {
+    return JSON.stringify(filters)
+  } catch {
+    return Object.keys(filters).join(',')
+  }
 }
 
 function describeFilter(

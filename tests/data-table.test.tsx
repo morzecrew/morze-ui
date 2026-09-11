@@ -1,5 +1,5 @@
 import { StrictMode, act } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -735,5 +735,239 @@ describe('bulk bar', () => {
   it('stays away when nothing is selected', () => {
     withSelection({ keys: [], allMatching: false }, 2)
     expect(screen.queryByRole('region', { name: 'Actions for the selected rows' })).toBeNull()
+  })
+})
+
+describe('load more across query changes', () => {
+  const page = (prefix: string): Row[] => [
+    { id: `${prefix}1`, name: `${prefix} one`, sum: 1 },
+    { id: `${prefix}2`, name: `${prefix} two`, sum: 2 },
+  ]
+
+  it('asks again for a new result set that is as long as the last one', async () => {
+    // The batch guard remembered the row count of the last request and never
+    // let go of it. A filter change whose first page is as long as the rows
+    // already on screen — and a first page nearly always is a full one — then
+    // matched the guard, and nothing ever asked for more again.
+    const onLoadMore = vi.fn()
+    const first = { ...emptyQuery, pageSize: 2 }
+    const { rerender } = render(
+      <DataTable
+        columns={columns}
+        data={page('a')}
+        rowKey={(r) => r.id}
+        total={100}
+        query={first}
+        onQueryChange={vi.fn()}
+        onLoadMore={onLoadMore}
+        autoLoadMore={false}
+      />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+
+    const filtered = { ...first, filters: { name: { type: 'text' as const, value: 'b' } } }
+    rerender(
+      <DataTable
+        columns={columns}
+        data={page('b')}
+        rowKey={(r) => r.id}
+        total={100}
+        query={filtered}
+        onQueryChange={vi.fn()}
+        onLoadMore={onLoadMore}
+        autoLoadMore={false}
+      />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(2)
+  })
+
+  it('still asks once per batch while the query stands', async () => {
+    const onLoadMore = vi.fn()
+    const query = { ...emptyQuery, pageSize: 2 }
+    const { rerender } = render(
+      <DataTable columns={columns} data={page('a')} rowKey={(r) => r.id} total={100}
+        query={query} onQueryChange={vi.fn()} onLoadMore={onLoadMore} autoLoadMore={false} />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    // The host re-renders with the same rows while the request is in flight.
+    rerender(
+      <DataTable columns={columns} data={page('a')} rowKey={(r) => r.id} total={100} loading
+        query={query} onQueryChange={vi.fn()} onLoadMore={onLoadMore} autoLoadMore={false} />
+    )
+    rerender(
+      <DataTable columns={columns} data={page('a')} rowKey={(r) => r.id} total={100}
+        query={query} onQueryChange={vi.fn()} onLoadMore={onLoadMore} autoLoadMore={false} />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('auto-fit with a controlled layout', () => {
+  const fitColumns: DataTableColumn<Row>[] = [
+    { id: 'a', header: 'A', width: 100 },
+    { id: 'b', header: 'B', width: 200 },
+    { id: 'c', header: 'C', width: 100 },
+  ]
+
+  it('still stretches the columns when the host owns the layout', () => {
+    // Fit used to be written into the hook's own state, which the controlled
+    // branch never reads — a host that owned the layout got no auto-fit at all.
+    const onLayoutChange = vi.fn()
+    const { result } = renderHook(() =>
+      useColumnLayout({
+        columns: fitColumns,
+        layout: { widths: { a: 100, b: 200, c: 100 } },
+        onLayoutChange,
+      })
+    )
+    act(() => result.current.fitTo(800))
+    const total = fitColumns.reduce((sum, c) => sum + result.current.widthOf(c.id), 0)
+    expect(total).toBe(800)
+    // Fit is derived from the container, so the host is still not told.
+    expect(onLayoutChange).not.toHaveBeenCalled()
+  })
+
+  it('lets a width the host set by hand win over the fit', () => {
+    const { result } = renderHook(() =>
+      useColumnLayout({
+        columns: fitColumns,
+        layout: { widths: { a: 100, b: 333, c: 100 }, sized: ['b'] },
+      })
+    )
+    act(() => result.current.fitTo(800))
+    expect(result.current.widthOf('b')).toBe(333)
+    expect(result.current.widthOf('a') + result.current.widthOf('c')).toBe(800 - 333)
+  })
+
+  it('keeps fitted widths out of storage on the next user action', () => {
+    // They used to ride into localStorage with the next resize, so a saved
+    // layout depended on the last window it happened to be fitted in.
+    const key = 'test.layout.fit'
+    window.localStorage.removeItem(key)
+    const { result } = renderHook(() => useColumnLayout({ columns: fitColumns, persistKey: key }))
+    act(() => result.current.fitTo(800))
+    act(() => result.current.setWidth('a', 120))
+    const stored = JSON.parse(window.localStorage.getItem(key)!) as { widths: Record<string, number> }
+    expect(stored.widths.a).toBe(120)
+    expect(stored.widths.b).toBe(200)
+    window.localStorage.removeItem(key)
+  })
+})
+
+describe('auto-fit inside the table', () => {
+  const fitColumns: DataTableColumn<Row>[] = [
+    { id: 'a', header: 'A', width: 100 },
+    { id: 'b', header: 'B', width: 300 },
+  ]
+  const widthVar = (container: HTMLElement, id: string) =>
+    parseFloat((container.querySelector('.mz-dt') as HTMLElement).style.getPropertyValue(`--mz-dt-w-${id}`))
+  let original: PropertyDescriptor | undefined
+
+  beforeEach(() => {
+    // happy-dom has no layout engine; the scroller's width is supplied here.
+    original = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth')
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.classList.contains('mz-dt__scroller') ? 1002 : 0
+      },
+    })
+  })
+  afterEach(() => {
+    if (original) Object.defineProperty(HTMLElement.prototype, 'clientWidth', original)
+    else delete (HTMLElement.prototype as { clientWidth?: number }).clientWidth
+  })
+
+  it('fills the container on mount, leaves a hand resize alone, and refits after a reset', async () => {
+    const user = userEvent.setup()
+    const { container } = render(
+      <DataTable columns={fitColumns} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    // 1002px minus the 2px the table keeps for its border, split 1:3.
+    expect(widthVar(container, 'a')).toBe(250)
+    expect(widthVar(container, 'b')).toBe(750)
+
+    // A hand resize takes the column out of the fit; the neighbour stays put.
+    screen.getByRole('separator', { name: /Width of column “A”/ }).focus()
+    await user.keyboard('{ArrowRight}')
+    expect(widthVar(container, 'a')).toBe(258)
+    expect(widthVar(container, 'b')).toBe(750)
+
+    // Reset hands every column back to the fit, which has to run again even
+    // though the container has not moved.
+    await user.click(screen.getByRole('button', { name: /Columns/ }))
+    await user.click(await screen.findByRole('button', { name: 'Reset' }))
+    expect(widthVar(container, 'a')).toBe(250)
+    expect(widthVar(container, 'b')).toBe(750)
+  })
+})
+
+describe('inside a form', () => {
+  it('never submits the form from its own buttons', async () => {
+    // Fourteen internal buttons had no type, and a button's default is submit.
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault())
+    render(
+      <form onSubmit={onSubmit}>
+        <DataTable
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          total={100}
+          query={{ ...emptyQuery, pageSize: 2 }}
+          onQueryChange={vi.fn()}
+          selection={{ keys: ['1'], allMatching: false }}
+          onSelectionChange={vi.fn()}
+        />
+      </form>
+    )
+    await userEvent.click(screen.getByLabelText('Next page'))
+    await userEvent.click(screen.getByLabelText('Last page'))
+    await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }))
+    expect(onSubmit).not.toHaveBeenCalled()
+    for (const button of document.querySelectorAll<HTMLButtonElement>('.mz-dt button.mz-btn')) {
+      expect(button).toHaveAttribute('type', 'button')
+    }
+  })
+})
+
+describe('date filter ids', () => {
+  it('gives each date filter its own field ids', async () => {
+    // The ids were fixed strings, so two date filters on one page shared them
+    // and a label pointed at whichever input came first in the document.
+    const dated: DataTableColumn<Row>[] = [
+      { id: 'created', header: 'Created', filter: { type: 'date-range' } },
+      { id: 'updated', header: 'Updated', filter: { type: 'date-range' } },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={dated} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    await user.click(screen.getByTitle('Filter: Created'))
+    const first = (await screen.findAllByLabelText('From')).at(-1)!.id
+    await user.keyboard('{Escape}')
+    await user.click(screen.getByTitle('Filter: Updated'))
+    const second = (await screen.findAllByLabelText('From')).at(-1)!.id
+    expect(first).toBeTruthy()
+    expect(second).toBeTruthy()
+    expect(first).not.toBe(second)
+    expect(first).not.toBe('mz-dt-from')
+  })
+})
+
+describe('sort semantics', () => {
+  it('claims aria-sort only where a column can be sorted', () => {
+    // To assistive tech `aria-sort="none"` says "sortable, not sorted yet".
+    const mixed: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Name', sortable: true },
+      { id: 'sum', header: 'Total' },
+    ]
+    render(
+      <DataTable columns={mixed} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    expect(screen.getByRole('columnheader', { name: /Name/ })).toHaveAttribute('aria-sort', 'none')
+    expect(screen.getByRole('columnheader', { name: /Total/ })).not.toHaveAttribute('aria-sort')
   })
 })

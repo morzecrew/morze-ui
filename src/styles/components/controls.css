@@ -17,7 +17,7 @@
   background: var(--mz-face);
   border: 1px solid var(--mz-border-strong);
   box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
-  color: #fff;
+  color: var(--mz-tone-fg);
   transition:
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
@@ -114,12 +114,13 @@
   width: 6px;
   height: 6px;
   border-radius: var(--mz-radius-pill);
-  background: #fff;
-  /* The white glow belongs to the dot on its tone fill (the landing's
-     .btn-dot recipe); only the drop under it is cut from the shade. */
+  background: var(--mz-tone-fg);
+  /* The glow belongs to the dot on its tone fill (the landing's .btn-dot
+     recipe) and is cut from the dot's own colour, so a dark dot on the amber
+     fill does not sit in a white halo; only the drop under it is the shade's. */
   box-shadow:
     0 1px 2px color-mix(in srgb, var(--mz-shade) 35%, transparent),
-    0 0 8px rgba(255, 255, 255, 0.6);
+    0 0 8px color-mix(in srgb, var(--mz-tone-fg) 60%, transparent);
   animation: mz-pop-in 0.18s var(--mz-ease);
 }
 
@@ -244,7 +245,7 @@
 .mz-toggle[data-state='on'] {
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
-  color: #fff;
+  color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
     0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
@@ -320,7 +321,7 @@
 .mz-toggle[data-state='on']:hover,
 .mz-toggle-group--segmented .mz-toggle[data-state='on']:hover,
 .mz-toggle-group--joined .mz-toggle[data-state='on']:hover {
-  color: #fff;
+  color: var(--mz-tone-fg);
   text-shadow: var(--mz-convex-text-shadow);
 }
 .mz-toggle-group--joined .mz-toggle:first-child {
@@ -336,7 +337,7 @@
    which would otherwise flatten the pressed state. */
 .mz-toggle-group--joined .mz-toggle[data-state='on'] {
   z-index: 1;
-  color: #fff;
+  color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);

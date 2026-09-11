@@ -122,7 +122,11 @@ and the focus ring:
 `primary` (violet) · `accent`/`success` (emerald) · `danger` · `warning` ·
 `info`. A tone is the `--mz-tone-rgb` custom property, so a one-off value works
 too: `style={{ '--mz-tone-rgb': '255, 100, 130' }}` (channels separated by
-commas — the value is substituted into `rgb()`/`rgba()`).
+commas — the value is substituted into `rgb()`/`rgba()`). Each tone also
+names the label colour on its fill (`--mz-primary-fg` … `--mz-info-fg`, read
+through `--mz-tone-fg`): white on primary and danger, the night's ink on
+accent, success, warning and info — white on the amber fell to 1.7:1. A
+one-off tone sets `--mz-tone-fg` alongside `--mz-tone-rgb`.
 
 ## Shape and type
 

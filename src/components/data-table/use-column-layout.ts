@@ -7,6 +7,11 @@ import type { ColumnLayout, DataTableColumn } from './types'
 const DEFAULT_WIDTH = 168
 const DEFAULT_MIN = 72
 
+// Separators no column id can contain, so two different column sets cannot
+// flatten to the same signature.
+const FIELD_SEPARATOR = String.fromCharCode(0)
+const COLUMN_SEPARATOR = String.fromCharCode(1)
+
 function readStored(key: string | null): Partial<ColumnLayout> | null {
   if (!key || typeof window === 'undefined') return null
   try {
@@ -46,11 +51,9 @@ export function useColumnLayout<T>({
   // layout object every render; inside <DataTable> the prop held it still, but
   // a host calling this hook directly re-rendered itself in an unbroken loop.
   // The baseline is built from three fields, so those are what it is keyed on.
-  // Separators no column id can contain, so two different column sets cannot
-  // flatten to the same signature.
   const signature = columns
-    .map((c) => [c.id, c.width ?? '', c.pinned ?? ''].join('\u0000'))
-    .join('\u0001')
+    .map((c) => [c.id, c.width ?? '', c.pinned ?? ''].join(FIELD_SEPARATOR))
+    .join(COLUMN_SEPARATOR)
 
   const baseline = React.useMemo<ColumnLayout>(
     () => ({
@@ -80,10 +83,28 @@ export function useColumnLayout<T>({
     setInternal((current) => merge(baseline, current, baseline))
   }, [baseline])
 
-  const layout = React.useMemo(
+  // The layout as the host or storage holds it, before auto-fit has its say.
+  const base = React.useMemo(
     () => (controlled ? merge(baseline, controlled, baseline) : internal),
     [controlled, internal, baseline]
   )
+
+  // The widths auto-fit derived from the container, kept apart from the layout
+  // on purpose. Fit is a function of the viewport: it is never stored, never
+  // reported to the host, and so never has to be controlled. It used to be
+  // written into `internal`, which the controlled branch above does not read —
+  // a host that owned the layout got no auto-fit at all — and on the
+  // uncontrolled branch the fitted widths rode into storage with the next
+  // user action, so a saved layout depended on the last window it was fitted
+  // in. The overlay covers flexible columns only; one the user sized by hand
+  // keeps the width the layout holds.
+  const [fitted, setFitted] = React.useState<Record<string, number>>({})
+  // Bumped by `reset`: every column is flexible again and nothing about the
+  // container or the column set has changed, so nothing else would trigger the
+  // fit that has to follow.
+  const [fitEpoch, setFitEpoch] = React.useState(0)
+
+  const layout = React.useMemo(() => overlayFit(base, fitted), [base, fitted])
 
   // Kept current after every commit, so `update` — and the `fitTo` the table
   // hands to a ResizeObserver as an effect dependency — keep a stable identity
@@ -101,19 +122,25 @@ export function useColumnLayout<T>({
     internalRef.current = internal
   }, [internal])
 
+  // The base layout as of the last commit, for `fitTo`: it runs from a
+  // ResizeObserver and may not close over one render's layout.
+  const baseRef = React.useRef(base)
+  React.useEffect(() => {
+    baseRef.current = base
+  }, [base])
+
   const update = React.useCallback(
     (patch: (current: ColumnLayout) => ColumnLayout, options?: { persist?: boolean }) => {
-      const base = controlled ? merge(baseline, controlled, baseline) : internalRef.current
-      const next = patch(base)
-      if (next === base) return
+      const current = controlled ? merge(baseline, controlled, baseline) : internalRef.current
+      const next = patch(current)
+      if (next === current) return
       internalRef.current = next
+      if (!controlled) baseRef.current = next
       setInternal(next)
       // Storage and the host callback are effects of the change, not part of
       // computing it. React may run a state updater more than once for a single
       // commit — under StrictMode it always does — which wrote the layout twice
       // and reported one user action to the host twice.
-      // Auto-fit is derived from the container, so it is never stored:
-      // otherwise the saved widths would depend on the last viewport used.
       if (options?.persist !== false) {
         writeStored(persistKey, next)
         onLayoutChangeRef.current?.(next)
@@ -126,6 +153,14 @@ export function useColumnLayout<T>({
     () => new Map(columns.map((c) => [c.id, c])),
     [columns]
   )
+  // `columns` is nearly always a fresh array per render, so `byId` is too. The
+  // fit reads it through a ref, which keeps `fitTo` stable: the table hands it
+  // to a ResizeObserver as an effect dependency, and re-subscribing on every
+  // render also threw away the fit-cycle history that effect keeps.
+  const byIdRef = React.useRef(byId)
+  React.useEffect(() => {
+    byIdRef.current = byId
+  })
 
   /** Visible columns in display order, pinned edges first and last. */
   const visible = React.useMemo(() => {
@@ -152,100 +187,91 @@ export function useColumnLayout<T>({
 
   /**
    * Stretches the flexible columns so the row fills `available` exactly — no
-   * gap at the right edge on a wide screen. When even the minimum widths do
-   * not fit, nothing is touched and the table scrolls sideways instead.
-   * Memoised: the DataTable observes the container with it as an effect dep.
-   */
-  /**
-   * Stretches the flexible columns so the row fills `available` exactly — no
    * dead space at the right edge on a wide screen. Widths are always derived
    * from the declared ones rather than the current ones, so the result depends
    * only on the container: growing and shrinking the window returns to the
    * same layout instead of drifting. When even the declared widths do not fit,
    * they are used as-is and the table scrolls sideways.
-   * Memoised — the DataTable observes the container with it as an effect dep.
+   *
+   * The result lands in the fit overlay, not in the layout — see `fitted`.
+   * Stable identity: the DataTable observes the container with it as an
+   * effect dependency.
    */
-  const fitTo = React.useCallback(
-    (available: number) =>
-      update(
-        (current) => {
-          const shown = current.order
-            .map((id) => byId.get(id))
-            .filter((c): c is DataTableColumn<T> => Boolean(c) && !current.hidden.includes(c!.id))
-          if (!shown.length || available <= 0) return current
+  const fitTo = React.useCallback((available: number) => {
+    const current = baseRef.current
+    const columnsById = byIdRef.current
+    const shown = current.order
+      .map((id) => columnsById.get(id))
+      .filter((c): c is DataTableColumn<T> => Boolean(c) && !current.hidden.includes(c!.id))
+    if (!shown.length || available <= 0) return
 
-          const baseOf = (c: DataTableColumn<T>) => c.width ?? DEFAULT_WIDTH
-          const isFlexible = (c: DataTableColumn<T>) =>
-            c.flex !== false && !current.sized.includes(c.id)
+    const baseOf = (c: DataTableColumn<T>) => c.width ?? DEFAULT_WIDTH
+    const isFlexible = (c: DataTableColumn<T>) =>
+      c.flex !== false && !current.sized.includes(c.id)
 
-          const flexible = shown.filter(isFlexible)
-          if (!flexible.length) return current
+    const flexible = shown.filter(isFlexible)
+    if (!flexible.length) return
 
-          const fixedTotal = shown
-            .filter((c) => !isFlexible(c))
-            .reduce((sum, c) => sum + (current.widths[c.id] ?? baseOf(c)), 0)
-          const flexBaseTotal = flexible.reduce((sum, c) => sum + baseOf(c), 0)
-          const target = available - fixedTotal
+    const fixedTotal = shown
+      .filter((c) => !isFlexible(c))
+      .reduce((sum, c) => sum + (current.widths[c.id] ?? baseOf(c)), 0)
+    const flexBaseTotal = flexible.reduce((sum, c) => sum + baseOf(c), 0)
+    const target = available - fixedTotal
 
-          const next: Record<string, number> = { ...current.widths }
+    const next: Record<string, number> = {}
 
-          // Not enough room even at the declared widths — fall back to them and
-          // let the scroller do its job.
-          if (target <= flexBaseTotal) {
-            for (const column of flexible) {
-              next[column.id] = Math.max(baseOf(column), column.minWidth ?? DEFAULT_MIN)
-            }
-          } else {
-            let remaining = target
-            let pool = flexBaseTotal
-            const growing = [...flexible]
+    // Not enough room even at the declared widths — fall back to them and
+    // let the scroller do its job.
+    if (target <= flexBaseTotal) {
+      for (const column of flexible) {
+        next[column.id] = Math.max(baseOf(column), column.minWidth ?? DEFAULT_MIN)
+      }
+    } else {
+      let remaining = target
+      let pool = flexBaseTotal
+      const growing = [...flexible]
 
-            // Columns pinned by min/max hand their surplus back, so the row
-            // still adds up to `available` once the bounds are honoured.
-            for (let pass = 0; pass < 3 && growing.length; pass += 1) {
-              const scale = remaining / pool
-              const clamped: DataTableColumn<T>[] = []
-              for (const column of growing) {
-                const min = column.minWidth ?? DEFAULT_MIN
-                const max = column.maxWidth ?? Infinity
-                const scaled = baseOf(column) * scale
-                const bounded = Math.min(Math.max(scaled, min), max)
-                if (bounded !== scaled) {
-                  next[column.id] = Math.round(bounded)
-                  remaining -= bounded
-                  pool -= baseOf(column)
-                  clamped.push(column)
-                }
-              }
-              if (!clamped.length) break
-              growing.splice(0, growing.length, ...growing.filter((c) => !clamped.includes(c)))
-            }
-
-            if (growing.length) {
-              const scale = remaining / pool
-              let used = 0
-              growing.forEach((column, index) => {
-                if (index === growing.length - 1) {
-                  // Last column swallows the rounding error so the sum is exact.
-                  next[column.id] = Math.round(remaining - used)
-                } else {
-                  const width = Math.round(baseOf(column) * scale)
-                  next[column.id] = width
-                  used += width
-                }
-              })
-            }
+      // Columns pinned by min/max hand their surplus back, so the row
+      // still adds up to `available` once the bounds are honoured.
+      for (let pass = 0; pass < 3 && growing.length; pass += 1) {
+        const scale = remaining / pool
+        const clamped: DataTableColumn<T>[] = []
+        for (const column of growing) {
+          const min = column.minWidth ?? DEFAULT_MIN
+          const max = column.maxWidth ?? Infinity
+          const scaled = baseOf(column) * scale
+          const bounded = Math.min(Math.max(scaled, min), max)
+          if (bounded !== scaled) {
+            next[column.id] = Math.round(bounded)
+            remaining -= bounded
+            pool -= baseOf(column)
+            clamped.push(column)
           }
+        }
+        if (!clamped.length) break
+        growing.splice(0, growing.length, ...growing.filter((c) => !clamped.includes(c)))
+      }
 
-          const changed = shown.some(
-            (c) => Math.abs((next[c.id] ?? 0) - (current.widths[c.id] ?? baseOf(c))) > 0.5
-          )
-          return changed ? { ...current, widths: next } : current
-        },
-        { persist: false }
-      ),
-    [update, byId]
-  )
+      if (growing.length) {
+        const scale = remaining / pool
+        let used = 0
+        growing.forEach((column, index) => {
+          if (index === growing.length - 1) {
+            // Last column swallows the rounding error so the sum is exact.
+            next[column.id] = Math.round(remaining - used)
+          } else {
+            const width = Math.round(baseOf(column) * scale)
+            next[column.id] = width
+            used += width
+          }
+        })
+      }
+    }
+
+    // Identity-stable when nothing moved: the caller is an observer, and a
+    // fresh object per tick is how an observer and React re-render each other.
+    setFitted((previous) => (sameWidths(previous, next) ? previous : next))
+  }, [])
 
   return {
     layout,
@@ -260,6 +286,8 @@ export function useColumnLayout<T>({
       })),
 
     fitTo,
+    /** Changes whenever the fit has to run again for a reason the container cannot see. */
+    fitEpoch,
 
     toggleHidden: (id: string) =>
       update((c) => ({
@@ -286,7 +314,10 @@ export function useColumnLayout<T>({
         order.splice(to, 0, ...order.splice(from, 1))
         return { ...c, order }
       }),
-    reset: () => update(() => baseline),
+    reset: () => {
+      update(() => baseline)
+      setFitEpoch((epoch) => epoch + 1)
+    },
   }
 }
 
@@ -303,4 +334,18 @@ function merge(base: ColumnLayout, patch: Partial<ColumnLayout>, fallback: Colum
     pinned: { ...fallback.pinned, ...base.pinned, ...patch.pinned },
     sized: (patch.sized ?? base.sized ?? []).filter((id) => known.has(id)),
   }
+}
+
+/** The fitted widths laid over the layout, for the columns the fit still governs. */
+function overlayFit(layout: ColumnLayout, fitted: Record<string, number>): ColumnLayout {
+  const entries = Object.entries(fitted).filter(
+    ([id]) => id in layout.widths && !layout.sized.includes(id)
+  )
+  if (!entries.length) return layout
+  return { ...layout, widths: { ...layout.widths, ...Object.fromEntries(entries) } }
+}
+
+function sameWidths(a: Record<string, number>, b: Record<string, number>) {
+  const keys = Object.keys(a)
+  return keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key])
 }
