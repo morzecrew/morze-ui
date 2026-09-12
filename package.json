@@ -1,6 +1,6 @@
 {
   "name": "@morze/ui",
-  "version": "0.3.8",
+  "version": "0.4.0",
   "description": "Morze UI — React component kit built on shadcn/ui + Radix primitives with the Morze convex look.",
   "keywords": [
     "react",
