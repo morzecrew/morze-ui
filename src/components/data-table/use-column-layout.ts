@@ -7,6 +7,22 @@ import type { ColumnLayout, DataTableColumn } from './types'
 const DEFAULT_WIDTH = 168
 const DEFAULT_MIN = 72
 
+/**
+ * The shape of what `persistKey` writes. Bump it whenever that shape changes
+ * in a way an older payload cannot satisfy — a layout stamped with anything
+ * else is dropped rather than merged, because a half-understood layout is
+ * worse than a default one: a column list that silently loses its pins is the
+ * kind of bug a user reports as "the table forgot my columns" months later,
+ * with no way left to tell which release did it.
+ *
+ * Nothing was stamped before this, so an unstamped payload is adopted as-is —
+ * its shape *is* version 1 — and the next write stamps it. Only a host that
+ * downgrades past this release loses its stored layouts.
+ */
+const LAYOUT_VERSION = 1
+
+type StoredLayout = Partial<ColumnLayout> & { v?: number }
+
 // Separators no column id can contain, so two different column sets cannot
 // flatten to the same signature.
 const FIELD_SEPARATOR = String.fromCharCode(0)
@@ -16,7 +32,10 @@ function readStored(key: string | null): Partial<ColumnLayout> | null {
   if (!key || typeof window === 'undefined') return null
   try {
     const raw = window.localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as Partial<ColumnLayout>) : null
+    if (!raw) return null
+    const stored = JSON.parse(raw) as StoredLayout
+    if (stored.v !== undefined && stored.v !== LAYOUT_VERSION) return null
+    return stored
   } catch {
     return null
   }
@@ -25,7 +44,7 @@ function readStored(key: string | null): Partial<ColumnLayout> | null {
 function writeStored(key: string | null, layout: ColumnLayout) {
   if (!key || typeof window === 'undefined') return
   try {
-    window.localStorage.setItem(key, JSON.stringify(layout))
+    window.localStorage.setItem(key, JSON.stringify({ v: LAYOUT_VERSION, ...layout }))
   } catch {
     /* blocked storage — the layout simply does not persist */
   }
@@ -314,6 +333,32 @@ export function useColumnLayout<T>({
         order.splice(to, 0, ...order.splice(from, 1))
         return { ...c, order }
       }),
+    /**
+     * Hands one column back to auto-fit. Dragging a handle marks a column
+     * `sized`, and that is permanent by design — a width the user set by hand
+     * must not be taken away by the next container resize. The trap was that
+     * nothing undid it: one stray drag on one column, and the only way back
+     * was Reset, which also threw away the order, the pins and everything
+     * hidden.
+     *
+     * The width goes back to the declared one rather than staying where the
+     * drag left it, because that is the figure `fitTo` scales every other
+     * column from; leaving the dragged width in would make the next fit
+     * depend on a gesture that is supposed to have been undone.
+     */
+    unsize: (id: string) => {
+      update((c) => {
+        if (!c.sized.includes(id)) return c
+        return {
+          ...c,
+          widths: { ...c.widths, [id]: byIdRef.current.get(id)?.width ?? DEFAULT_WIDTH },
+          sized: c.sized.filter((sizedId) => sizedId !== id),
+        }
+      })
+      // Nothing about the container or the column set has changed, so nothing
+      // else would trigger the fit that has to follow — same as `reset`.
+      setFitEpoch((epoch) => epoch + 1)
+    },
     reset: () => {
       update(() => baseline)
       setFitEpoch((epoch) => epoch + 1)

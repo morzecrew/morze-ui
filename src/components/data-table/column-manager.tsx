@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { ColumnsIcon, EyeIcon, EyeOffIcon, GripIcon, PinIcon } from '../../lib/icons'
+import { AutoWidthIcon, ColumnsIcon, EyeIcon, EyeOffIcon, GripIcon, PinIcon } from '../../lib/icons'
 import { Button } from '../button'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { Separator } from '../separator'
@@ -21,6 +21,12 @@ type Props<T> = {
    */
   onMove?: (id: string, delta: number) => void
   onMoveTo: (id: string, targetId: string) => void
+  /**
+   * Hands one column back to auto-fit. Optional so a host mounting this
+   * component against an older layout hook still type-checks; without it the
+   * control simply does not appear.
+   */
+  onUnsize?: (id: string) => void
   onReset: () => void
   labels?: Partial<DataTableLabels>
 }
@@ -59,6 +65,7 @@ export function ColumnManager<T>({
   onToggleHidden,
   onSetPinned,
   onMoveTo,
+  onUnsize,
   onReset,
   labels: labelsProp,
 }: Props<T>) {
@@ -177,6 +184,24 @@ export function ColumnManager<T>({
 
                 {/* Not a drag source: see onDragStart. */}
                 <div className="mz-dt__columns-controls" draggable={false}>
+                  {/* Only where it can do something: a column is `sized` once
+                      its handle has been dragged, and that is permanent by
+                      design — otherwise the next container resize would take
+                      the width away again. This is the way back, and before
+                      it the only one was Reset, which also threw away the
+                      order, the pins and everything hidden. A row that was
+                      never dragged keeps its four buttons. */}
+                  {onUnsize && layout.sized.includes(column.id) ? (
+                    <button
+                      type="button"
+                      className="mz-dt__icon-btn mz-focusable"
+                      onClick={() => onUnsize(column.id)}
+                      aria-label={labels.autoWidth(name)}
+                      title={labels.autoWidth(name)}
+                    >
+                      <AutoWidthIcon />
+                    </button>
+                  ) : null}
                   {/* Arrow buttons keep reordering reachable without a pointer. */}
                   <button
                     type="button"
