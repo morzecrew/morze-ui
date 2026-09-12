@@ -192,17 +192,43 @@ To bring back the landing's own look (pills plus mono caps):
 
 ## States
 
-Hover **darkens the colour** and grows the element slightly **in place** —
-nothing shifts position, and there is no shine sweep. Press darkens further and
-shrinks a little.
+**Every control at rest belongs to one of three surfaces, and the hover belongs
+to the surface, not to the component.** Which verb a control answers with is
+decided by what it looks like when nothing is happening to it:
+
+| At rest | Hover | Press | Who |
+| --- | --- | --- | --- |
+| **Filled** — a tone fill | `--mz-fill-hover` | `--mz-fill-press` | `primary` / `destructive` button, toggle on, active tab, checked switch / checkbox / radio, sidebar active, selected day, solid badge |
+| **Raised** — a neutral face | `--mz-face-hover`, rim unchanged | dip | `secondary` button, `outline` toggle, `SelectTrigger`, joined items, calendar nav |
+| **Flat** — transparent | `--mz-wash-hover` | `--mz-wash-press` | `ghost` button, plain toggle, segmented item, menubar and nav triggers, sidebar item, every icon button |
 
 ```css
 :root {
-  --mz-hover-scale: 1.02;   /* growth on hover */
-  --mz-press-scale: 0.98;   /* dip on press */
-  --mz-hover-mix: 88%;      /* fill colour: 88% tone + 12% black */
+  --mz-hover-scale: 1.02;      /* growth on hover */
+  --mz-press-scale: 0.98;      /* dip on press — one depth for the whole kit */
+  --mz-hover-mix: 88%;         /* fill colour: 88% tone + 12% black */
   --mz-press-mix: 80%;
+  --mz-wash-hover: …;          /* 8% of the ink: every flat control */
+  --mz-wash-press: …;          /* 12% */
+  --mz-duration-fast: 0.15s;   /* icon buttons, menu rows, the checkbox mark */
+  --mz-duration: 0.28s;        /* anything with a face to repaint */
 }
+```
+
+**Growth** is a button's, not a group member's: a free-standing `Button` or
+`Toggle` grows on hover; an item inside a segmented or joined `ToggleGroup`, or
+a tab, does not — a swelling item climbs over the one beside it. One documented
+exception runs the other way: the slider thumb *grows* under pressure, because
+it is held rather than clicked and a cap that shrinks out from under the finger
+reads as having slipped.
+
+**The glow under a filled control** is one recipe in three sizes, by how big
+the lit thing is:
+
+```css
+--mz-glow        /* a control: button, toggle, tab, sidebar item */
+--mz-glow-soft   /* a small mark: checkbox, radio, switch, badge, a day */
+--mz-glow-panel  /* a floating surface: tooltip, alert, card hover */
 ```
 
 The tone fill is a flat colour (`--mz-fill`), so `background-color` animates
@@ -212,10 +238,13 @@ interpolate a gradient — with the sweeps gone, so is the split. Darkening goes
 through `color-mix()`; where that is unsupported the element simply does not
 darken and everything else still works.
 
-Only **filled** surfaces darken: `primary`, `destructive`, a pressed toggle, the
-active tab, a checked checkbox, radio or switch. Neutral variants (`secondary`,
-`outline`, `ghost`) and unselected controls lighten instead — darkening would
-sink them into the page.
+Only **filled** surfaces darken. Neutral variants (`secondary`, `outline`,
+`ghost`) and unselected controls lighten instead — darkening would sink them
+into the page.
+
+**Focus** is two systems, deliberately: `.mz-focusable` draws an offset outline
+on everything you press, and the fields (`Input`, `Textarea`, `SelectTrigger`)
+draw a tone border plus a soft glow, with no outline. A field never wears both.
 
 ## Customisation
 
@@ -242,14 +271,31 @@ contrast is calibrated, and a saturated brand dragged through it costs more than
 it buys. The tinted surfaces need `color-mix()` — Chrome 111+, Firefox 113+,
 Safari 16.2+, the same baseline as the rest of the kit.
 
+The page's own background — the ramp colour and the brand aurora above the
+fold — is painted by `.mz-root::before`, a fixed layer under the content,
+rather than by `.mz-root` itself. `--mz-bg` and `--mz-halo` are the knobs; a
+host that would rather set `background` outright has to set it on the
+pseudo-element.
+
 Everything is driven by custom properties; override them after importing the
 styles. The main groups: surfaces (`--mz-bg`, `--mz-surface`, `--mz-elevated`),
-borders, text, tones, the convex recipe (`--mz-convex-*`, `--mz-face*`,
-`--mz-well*`), the glass layer (`--mz-glass`, `--mz-glass-chrome`,
+borders, text, tones and their label colours (`--mz-*-fg`), the convex recipe
+(`--mz-convex-*`, `--mz-face*`, `--mz-well*`), the flat wash
+(`--mz-wash-hover`, `--mz-wash-press`), the tone glow (`--mz-glow`,
+`--mz-glow-soft`, `--mz-glow-panel`), the shared table header
+(`--mz-th-bg`, `--mz-th-color`, `--mz-th-font-size`, `--mz-row-hover`,
+`--mz-row-selected`), the glass layer (`--mz-glass`, `--mz-glass-chrome`,
 `--mz-glass-well`, `--mz-glass-filter`, `--mz-glass-sheen`),
 geometry (`--mz-radius*`), type (`--mz-font-*`, `--mz-label-*`),
-motion and states (`--mz-ease`, `--mz-duration`, `--mz-hover-scale`,
-`--mz-press-scale`, `--mz-hover-mix`, `--mz-press-mix`), focus (`--mz-ring-*`).
+motion and states (`--mz-ease`, `--mz-duration`, `--mz-duration-fast`,
+`--mz-hover-scale`, `--mz-press-scale`, `--mz-hover-mix`, `--mz-press-mix`),
+focus (`--mz-ring-*`).
+
+Every token the kit publishes is a token the kit reads: `--mz-bg-rgb`,
+`--mz-surface-rgb`, `--mz-elevated-rgb`, `--mz-primary-soft`,
+`--mz-primary-glow` and `--mz-radius-xl` were declared and never used, so
+overriding them moved nothing — they are gone as of 0.4. `--mz-face-fill` and
+`--mz-face-fill-hover` stay as deliberate aliases.
 
 The full list lives in `dist/morze-ui-tokens.css`.
 
@@ -261,7 +307,8 @@ The full list lives in `dist/morze-ui-tokens.css`.
 | `Checkbox` `RadioGroup` `Switch` | `Sidebar` `Breadcrumb` | `Progress` `Avatar` | `DropdownMenu` `Menubar` |
 | `Slider` `Input` `Textarea` | `Menubar` `NavigationMenu` | `Separator` `Skeleton` `Spinner` | `Popover` `Tooltip` |
 | `Label` `Field` `Select` | `ScrollArea` | `Table` `Chart` | `Sheet` `Toast` |
-| `Calendar` `DataTable` | | | |
+| `Calendar` `DatePicker` | | | |
+| `DateRangePicker` `DataTable` | | | |
 
 The API mirrors shadcn/ui: same names, same sub-component composition,
 `asChild`, a `data-slot` on every part — so examples from the shadcn docs work
@@ -292,10 +339,41 @@ What this kit adds on top:
   </ToggleGroup>
   ```
 - `TabsList` — `variant`: `default` (well) or `line` (underline).
-- `Checkbox` / `Switch` / `Avatar` — `size`: `sm` `md` `lg`.
-- `Input` — the size prop is `inputSize` (`sm` `md` `lg`); the name differs from
-  shadcn to avoid clashing with the native `size` attribute on `<input>`.
-- `SelectTrigger` — `size`: `sm` `md` (no `lg`).
+- `Checkbox` / `Switch` / `Avatar` / `RadioGroupItem` — `size`: `sm` `md` `lg`.
+- `Input` / `Textarea` — the size prop is `inputSize` (`sm` `md` `lg`); the name
+  differs from shadcn to avoid clashing with the native `size` attribute on
+  `<input>`.
+- `SelectTrigger` — `size`: `sm` `md` `lg`, the same 34/40/48 scale, so a
+  select stands in a row with an `inputSize="lg"` field.
+- `Dialog` — `size`: `sm` (24rem) `md` (32, default) `lg` (44) `xl` (60)
+  `full`.
+- `Sheet` — `size`: `sm` `md` `lg` `xl` `full` (width on the side edges, height
+  on the top and bottom ones), and `SheetBody` for the scrolling middle, with
+  the padding the header and footer already had.
+- `Alert` — `live` (default `false`). `role="alert"` interrupts a screen-reader
+  user the moment the element renders, which is right for something that just
+  happened and wrong for a banner that is part of the page. Turn it on for the
+  former. (shadcn has the same problem and always sets the role.)
+- `SidebarProvider` — `shortcut` (default `'b'`, with Ctrl/⌘). `null` gives
+  Ctrl/⌘+B back to Firefox's bookmarks pane and to the editor's bold.
+- `ToggleGroupItem` — its own `tone` overrides the group's, so one destructive
+  item in a neutral bar is expressible.
+- `Progress` — `indeterminate`: a travelling slice, and no `aria-valuenow` to
+  claim a percentage nobody knows.
+- `AvatarGroup` — `max`, which closes the stack with a "+N" chip.
+- `TableHead` — `sortable`, `sorted`, `onSort`, `sortLabel`: the sort control
+  the hand-laid table was missing, drawn the way the grid draws it, with
+  `aria-sort` claimed only where a column really sorts.
+- `DatePicker` / `DateRangePicker` — the `Calendar` behind a field, with the
+  select trigger's own recipe for the trigger, a clear button, `presets` on the
+  range, and `toISODate` / `fromISODate` for the `YYYY-MM-DD` a backend speaks.
+
+  ```tsx
+  <DateRangePicker
+    value={range} onChange={setRange} locale="ru-RU"
+    presets={[{ label: 'This month', range: { from: start, to: end } }]}
+  />
+  ```
 - `Card` — `interactive` adds the hover state; combined with `onClick` the card
   also gets `role="button"`, `tabIndex` and Enter/Space activation.
 - `Spinner` — `label` (default `Loading`) is announced by screen readers;
@@ -583,6 +661,9 @@ const columns: DataTableColumn<Order>[] = [
   loading={loading} error={error}
   query={query} onQueryChange={setQuery}
   persistKey="orders"                       // column widths, order, visibility
+  maxHeight={560}                           // what makes stickyHeader work
+  search                                    // the box lives in query.search
+  summary                                   // totals row from column.footer
   selection={selection} onSelectionChange={setSelection}
   bulkActions={() => <Button size="sm">Export</Button>}
   renderExpanded={(row) => <OrderDetails id={row.id} />}
@@ -593,10 +674,40 @@ What it does:
 
 - **Sorting** — a header click cycles `asc → desc → off`, Shift adds the column
   to a composite sort (an ordered list reaches the backend).
+- **A height, or the header does not stick.** `stickyHeader` is measured
+  against the table's own scroller, so the scroller needs something to scroll
+  within: `maxHeight`, `height`, or `fill` for a table that should take the
+  room its flex parent has. Without one the scroller grows with its content and
+  never scrolls at all.
+- **`frame="plain"`** drops the scroller's border, radius and shadow, for a
+  table already inside a `Card` or a panel where the two frames doubled up.
+- **Global search** — `search` (or `{ placeholder, debounce }`) puts a box in
+  the toolbar whose value is `query.search`. Because it is part of the query it
+  resets the page, reaches the URL through `useTableQuery` as `q`, and arrives
+  at the backend in the same request as the filters. A box wired in through
+  `toolbar` does none of those.
+- **A summary row** — `summary`, with each column's `footer(rows)` filling its
+  cell. It sticks to the bottom of the scroller, the way the header sticks to
+  the top.
 - **Header filters** — `text`, `select`, `number-range`, `date-range`,
   `boolean`. A value is staged in the popover and committed on Apply: otherwise
   every keystroke would be a request. Active filters are echoed as chips above
-  the table. `type: 'custom'` renders a widget of your own in the same popover —
+  the table, written in the table's `locale` — dates as the reader writes them,
+  numbers grouped, a long value list closed with "+N".
+
+  The controls say what they mean: a `multiple: false` select and a `boolean`
+  are radio groups, not checkboxes that behave like radios. `text` takes
+  `ops: ['contains', 'equals', 'startsWith']` and sends the choice along as
+  `value.op`; `select` takes `searchable` and offers All / None; `number-range`
+  draws its `unit` beside both fields and in the chip; `date-range` takes
+  `presets` and puts the kit's own `Calendar` under the two typed fields, so
+  the usual case is a locale-correct month grid rather than the browser's.
+
+  By default a column's funnel appears under the pointer, under the keyboard,
+  and stays put whenever that column is filtering — six identical funnels in a
+  row are noise. `filterTrigger="always"` shows them all.
+
+  `type: 'custom'` renders a widget of your own in the same popover —
   an async multiselect, a range slider — and it takes part in `query.filters`
   like the built-in ones:
 
@@ -628,40 +739,72 @@ What it does:
   column to its content; arrows on the focused handle resize from the keyboard.
   During a drag the width is written to a CSS custom property rather than to
   state — not a single row re-render per pixel of travel. A column touched by
-  hand is excluded from auto-fit for good.
+  hand is excluded from auto-fit, so the next container resize cannot take the
+  width away again; the Columns list grows an "auto width" button on exactly
+  those columns to hand one back (`unsize(id)` on the hook). Before it, the
+  only way back was Reset, which also threw away the order, the pins and
+  everything hidden.
 - **Pinned columns** left and right, a sticky header, and a hairline on the seam
   between the pinned and scrolling parts.
 - **Row selection** — Shift selects a range, the header checkbox takes the page,
   and the floating bar can escalate to "all N matching" (in that mode a bulk
   action must travel with the query, not with a list of ids).
 - **Columns** — visibility, order (drag and drop plus arrows for the keyboard)
-  and pinning; all of it saved to `localStorage` under `persistKey`. The list
+  and pinning; all of it saved to `localStorage` under `persistKey`, stamped
+  with a schema version so a future release drops a payload it cannot read
+  rather than half-understanding it (a layout saved before versioning is
+  adopted as-is — its shape is the current one). The list
   is grouped the way the table paints — pinned left, loose, pinned right — and
   a move stays inside its group, so what you drag is where it lands. A column
   whose header is a node rather than text is listed by position: “#3”.
   `columnManager={false}` drops the button for a layout the host fixes or
   drives itself; the layout props keep working without it.
-- **Expandable rows** and **inline cell editing** on double click, with
-  optimistic saving and a rollback on failure.
+- **Expandable rows** — uncontrolled by default, or driven from outside with
+  `expanded` / `onExpandedChange` / `defaultExpanded`. `expandOnRowClick` opens
+  a row from anywhere on it, and the header carries an expand-all control.
+- **Inline cell editing** on double click, with optimistic saving and a
+  rollback on failure. `editable.canEdit(row)` is the per-row veto — a closed
+  period, a record someone else holds — and a refused save is rendered in the
+  cell under an `aria-live` region, in both the text and the select editor,
+  with what you typed still there to correct.
+- **Clicks belong to what you clicked.** `onRowClick` does not fire for a click
+  that started on a link, button, field or menu item inside a cell, so a delete
+  button no longer also opens the record behind its own confirmation dialog.
+  `onRowDoubleClick` and `onRowContextMenu` follow the same rule.
 - **States** — skeletons on the first load, a thin progress line when refetching
   over data already on screen, an empty result and an error with a retry.
 - **Density** `compact | normal | relaxed`.
-- **Row styling** — `rowClassName` tints a row by record state (a soft-deleted
-  row painted red); `rowProps` adds `data-*`, `title` or a handler of your own.
-  The table's own attributes win, so neither can break selection or expansion.
+- **Row and column styling** — `rowClassName` tints a row by record state (a
+  soft-deleted row painted red); `rowProps` adds `data-*`, `title` or a handler
+  of your own; a column takes `className` and `headerClassName`. The table's own
+  attributes win, so none of them can break selection or expansion.
+- **`sortDescFirst`** starts an amount or date column at the big end, where the
+  ascending first click was a wasted one.
+- **Assistive tech** — `aria-busy` while a refetch replaces the rows,
+  `aria-rowcount` over the whole result set, `aria-sort` only on the columns
+  that sort, and the selection count in a live region.
 - **Load more instead of paging** — pass `onLoadMore` and the pager is replaced
   by a footer inside the table's own scroller, so an endless scroll works from
   the inside (a host cannot bolt a sentinel onto a scroller it does not own).
   `hasMore` defaults to `data.length < total`, `autoLoadMore={false}` waits for
   a click, and `pagination` brings the pager back if you want both. The table
   asks once per batch of rows: a host that answers with nothing new is not
-  asked again.
+  asked again, and a new query starts that count over. The callback is handed
+  the page to fetch — `onLoadMore({ nextPage })` — so a host does not keep a
+  counter of its own; the table cannot bump `query.page` itself, because the
+  pager owns that field.
 - **The pager adapts** — `pageSizeOptions={false}`, or a single option, hides
   the rows-per-page select for a backend that fixes the page size.
 
 Helpers for your own UI: `useTableQuery`, `useSavedViews`, `useColumnLayout`,
 `useRowSelection`, plus the pure functions `toggleSort`, `setFilter`,
-`serializeSort` / `parseSort`.
+`setSearch`, `serializeSort` / `parseSort`.
+
+`useTableQuery` mirrors the query into the address bar without disturbing it:
+it writes only what differs from `initial`, keeps the router's `history.state`
+across its own writes, and takes `serializeFilters` / `parseFilters` for a
+compact URL — worth it on any table whose links get shared, and required for a
+`custom` filter whose value `JSON.stringify` cannot express.
 
 Cells already truncate: `.mz-dt__cell` is `overflow: hidden; text-overflow:
 ellipsis; white-space: nowrap`. Carrying a `className="block truncate"` from a
@@ -757,22 +900,68 @@ shot` renders `playground/shot.html` in headless Chrome at 2x and trims the
 frame to its content, so the picture can follow the kit whenever the look
 changes.
 
+```bash
+npm run test:browser   # the layout-dependent specs, in a real Chrome
+```
+
 `tests/smoke.test.tsx` covers component behaviour and accessibility,
 `tests/css-contract.test.ts` covers the visual layer's contracts (cascade order
 for tones, hover states, isolation from foreign markup, geometry). The second
 file exists because regressions here are cascade regressions: a rule that lands
 later in the bundle and quietly outranks an earlier one.
 
+`tests/data-table.browser.test.tsx` is the third kind. happy-dom has no layout
+engine — `clientWidth` is always 0 — so auto-fit never runs there and the
+ResizeObserver feedback loop that once froze the tab cannot reproduce at all.
+Those specs run in a real Chrome instead, against the real stylesheet, and are
+kept out of `npm test` so the fast suite stays fast. The provider uses the
+Chrome already on the machine (`channel: 'chrome'`), so `npm i` needs no
+browser download; a CI without one runs `npx playwright install chromium`
+once.
+
 Layout: `src/components/*.tsx` for components (markup and API),
 `src/styles/**` for the visual layer (`tokens.css` → `base.css` →
 `components/*` → `tones.css`). JS is built with tsup, CSS with lightningcss
 (`scripts/build-css.mjs`).
+
+### Commits
+
+Conventional commits, because `CHANGELOG.md` is written from the subject lines:
+
+```
+type(scope): subject          # scope optional, subject ≤ 80 chars
+```
+
+`feat` `fix` `docs` `style` `refactor` `perf` `test` `build` `ci` `chore`
+`revert`. `style` is this kit's visual layer — tokens, CSS, look — not
+formatting. A `!` after the type marks a breaking change and needs a
+`BREAKING CHANGE:` footer saying what a consumer does instead.
+
+```bash
+npm run hooks   # git config core.hooksPath .githooks
+```
+
+turns on a zero-dependency `commit-msg` check. It is opt-in: three
+devDependencies and a postinstall step to validate one line of text is a worse
+trade than a script that needs nothing but the Node the repo already builds
+with.
 
 ## Publishing
 
 ```bash
 npm publish --access public
 ```
+
+Before that: move the release's entries out of `## [Unreleased]` in
+`CHANGELOG.md` under the new version and date, and bump `package.json`.
+`prepublishOnly` runs `typecheck`, `test` and `build`, so a broken bundle
+cannot go out — but nothing checks that the changelog was written, and eleven
+releases went out without one. See the gap at 0.2.5 – 0.3.7.
+
+`npm run test:browser` is deliberately *not* in `prepublishOnly`: it needs a
+real Chrome, and a publish that cannot happen on a machine without one is a
+worse failure than the one it guards against. Run it before a release that
+touches the table's layout, sizing or scrolling.
 
 The `@morze` scope has to exist in the npm organisation (or point
 `publishConfig` at a private registry).
