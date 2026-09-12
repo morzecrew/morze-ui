@@ -8,5 +8,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ['tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}'],
+    // The layout-dependent specs need a real engine — see
+    // vitest.browser.config.ts and `npm run test:browser`.
+    exclude: ['**/node_modules/**', 'tests/**/*.browser.test.{ts,tsx}'],
   },
 })
