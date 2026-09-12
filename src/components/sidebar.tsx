@@ -52,6 +52,13 @@ type SidebarProviderProps = React.ComponentProps<'div'> & {
   storageKey?: string | null
   /** Width below which the sidebar becomes an overlay sheet. */
   mobileBreakpoint?: number
+  /**
+   * The key that toggles the panel, with Ctrl or ⌘. `null` turns the shortcut
+   * off — Ctrl/⌘+B is Firefox's bookmarks sidebar and bold in every editor,
+   * and the provider used to take it from the whole document with no way to
+   * decline.
+   */
+  shortcut?: string | null
 }
 
 function SidebarProvider({
@@ -60,6 +67,7 @@ function SidebarProvider({
   onOpenChange,
   storageKey = STORAGE_KEY,
   mobileBreakpoint = 768,
+  shortcut = SHORTCUT,
   className,
   style,
   children,
@@ -98,14 +106,16 @@ function SidebarProvider({
   }, [isMobile, open, setOpen])
 
   React.useEffect(() => {
+    if (!shortcut) return
+    const key = shortcut.toLowerCase()
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() !== SHORTCUT || !(event.metaKey || event.ctrlKey)) return
+      if (event.key.toLowerCase() !== key || !(event.metaKey || event.ctrlKey)) return
       event.preventDefault()
       toggleSidebar()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [toggleSidebar])
+  }, [toggleSidebar, shortcut])
 
   const value = React.useMemo<SidebarContextValue>(
     () => ({

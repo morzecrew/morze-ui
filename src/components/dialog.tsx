@@ -38,10 +38,17 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  size = 'md',
   showCloseButton = true,
   closeLabel = 'Close',
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  /**
+   * How wide the dialog may get: `sm` 24rem, `md` 32 (default), `lg` 44,
+   * `xl` 60, `full` the viewport less its gutter. The width was fixed at
+   * `md`, so anything else meant a `max-width` through `className`.
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   showCloseButton?: boolean
   closeLabel?: string
 }) {
@@ -50,6 +57,7 @@ function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        data-size={size}
         className={cn('mz-panel mz-dialog-content', className)}
         {...props}
       >
