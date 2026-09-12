@@ -124,9 +124,9 @@ and the focus ring:
 too: `style={{ '--mz-tone-rgb': '255, 100, 130' }}` (channels separated by
 commas — the value is substituted into `rgb()`/`rgba()`). Each tone also
 names the label colour on its fill (`--mz-primary-fg` … `--mz-info-fg`, read
-through `--mz-tone-fg`): white on primary and danger, the night's ink on
-accent, success, warning and info — white on the amber fell to 1.7:1. A
-one-off tone sets `--mz-tone-fg` alongside `--mz-tone-rgb`.
+through `--mz-tone-fg`). Every shipped tone uses white; a pale tone of your
+own — a pastel yellow, a mint — sets `--mz-tone-fg` alongside `--mz-tone-rgb`,
+or re-points one `--mz-<tone>-fg` for the whole kit.
 
 ## Shape and type
 

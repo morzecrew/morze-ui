@@ -651,13 +651,10 @@ describe('typography contracts', () => {
 describe('tone foregrounds', () => {
   it('names a label colour for every tone in both themes', () => {
     for (const theme of themeBlocks()) {
+      // The shipped value is white on every tone — one label colour across a
+      // toolbar — and the token is the hook a host with a pale tone re-points.
       for (const tone of ['primary', 'accent', 'success', 'danger', 'warning', 'info']) {
-        expect(theme, tone).toMatch(new RegExp(`--mz-${tone}-fg:#[0-9a-f]{3,6}`))
-      }
-      // White on the emerald, the amber and the sky fell to 1.7–2.1:1 in the
-      // dark theme; those three carry the ink, whatever the theme.
-      for (const tone of ['accent', 'success', 'warning', 'info']) {
-        expect(theme, tone).not.toMatch(new RegExp(`--mz-${tone}-fg:#fff\\b`))
+        expect(theme, tone).toMatch(new RegExp(`--mz-${tone}-fg:#fff\\b`))
       }
     }
   })

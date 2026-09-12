@@ -81,18 +81,20 @@
 
   --mz-primary: rgb(var(--mz-primary-rgb));
 
-  /* The label on each tone's fill. White reads on the violet and the red; on
-     the emerald, the amber and the sky it fell to 1.7–2.1:1 against AA's 4.5,
-     so those carry the night's own ink — a dark literal on a tonal fill, the
-     one place the ramp contract allows one. Every filled control reads the
-     resolved --mz-tone-fg, never a literal, so re-pointing a tone's fill and
-     its label is one edit per tone. */
+  /* The label on each tone's fill. White on every tone the kit ships: the
+     fills are saturated enough that a label reads by weight and hue, and one
+     label colour across a toolbar of buttons, badges and checkmarks matters
+     more than the last point of contrast on the amber (1.7:1 against white in
+     this theme — a decision, recorded in FIXES.md). The threshold is the
+     host's to set: a pale tone — a pastel yellow, a mint — re-points its own
+     -fg to the ink. Every filled control reads the resolved --mz-tone-fg,
+     never a literal, so that is one edit per tone. */
   --mz-primary-fg: #ffffff;
-  --mz-accent-fg: #0a0a12;
-  --mz-success-fg: #0a0a12;
+  --mz-accent-fg: #ffffff;
+  --mz-success-fg: #ffffff;
   --mz-danger-fg: #ffffff;
-  --mz-warning-fg: #0a0a12;
-  --mz-info-fg: #0a0a12;
+  --mz-warning-fg: #ffffff;
+  --mz-info-fg: #ffffff;
   --mz-primary-soft: rgba(var(--mz-primary-rgb), 0.14);
   --mz-primary-glow: rgba(var(--mz-primary-rgb), 0.45);
 
@@ -271,14 +273,14 @@
   --mz-info-rgb: 14, 145, 214;
   --mz-success-rgb: 16, 175, 122;
 
-  /* The same split in light: the deeper primary and danger take white, the
-     three brighter tones take the ink (5.7–7:1). */
+  /* White throughout here too; see the dark block. The light tones are the
+     deeper cut, so the amber lands at 2.9:1 and the rest above 3:1. */
   --mz-primary-fg: #ffffff;
-  --mz-accent-fg: #0a0a12;
-  --mz-success-fg: #0a0a12;
+  --mz-accent-fg: #ffffff;
+  --mz-success-fg: #ffffff;
   --mz-danger-fg: #ffffff;
-  --mz-warning-fg: #0a0a12;
-  --mz-info-fg: #0a0a12;
+  --mz-warning-fg: #ffffff;
+  --mz-info-fg: #ffffff;
 
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);

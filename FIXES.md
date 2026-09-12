@@ -354,12 +354,14 @@ decode. `initial` is compared by value, so an inline object no longer rebuilds
   `aria-sort="none"`, which to assistive tech means "sortable, not sorted yet".
   The attribute is now only on sortable columns.
 - **Labels on tone fills** (V-01): every filled control painted its label
-  `#fff`, and in the dark theme that is 1.7:1 on `warning`, 1.9:1 on `accent`
-  and 2.1:1 on `info`. Each tone now names its label colour (`--mz-primary-fg`
-  … `--mz-info-fg`, read through `--mz-tone-fg`): white on primary and danger,
-  the night's ink on the other four. `danger` keeps white at 2.8:1 dark /
-  4.2:1 light and dark `primary` sits at 3.0:1 — those are palette decisions,
-  left to the review's P1.
+  with a literal `#fff`, so a host with a pale tone had no way to darken the
+  label short of overriding every component. Each tone now names its label
+  colour (`--mz-primary-fg` … `--mz-info-fg`, read through `--mz-tone-fg`)
+  and every filled control reads that. The shipped value stays white on all
+  six tones — a decision: one label colour across a toolbar of buttons,
+  badges and checkmarks outweighs the last point of contrast on the amber,
+  which is 1.7:1 in the dark theme and 2.9:1 in light. A host whose tone is
+  paler than the kit's re-points that tone's `-fg` to the ink.
 - **Two focus rings on `SelectTrigger`** (V-02): it carried `mz-focusable`
   (the outline) on top of its own field glow. The class is gone; the trigger
   focuses the way `Input` does.
