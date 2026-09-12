@@ -111,7 +111,7 @@ export function DataTablePagination({
           {query.page}
           {unknownTotal ? null : ` / ${pages}`}
         </span>
-        <Button
+        <Button type="button"
           variant="secondary"
           size="icon-sm"
           disabled={!canPrevious}
@@ -120,7 +120,7 @@ export function DataTablePagination({
         >
           <ChevronsLeftIcon />
         </Button>
-        <Button
+        <Button type="button"
           variant="secondary"
           size="icon-sm"
           disabled={!canPrevious}
@@ -129,7 +129,7 @@ export function DataTablePagination({
         >
           <ChevronLeftIcon />
         </Button>
-        <Button
+        <Button type="button"
           variant="secondary"
           size="icon-sm"
           disabled={!canNext}
@@ -140,7 +140,7 @@ export function DataTablePagination({
         </Button>
         {/* Nothing to jump to when the last page is unknown. */}
         {unknownTotal ? null : (
-          <Button
+          <Button type="button"
             variant="secondary"
             size="icon-sm"
             disabled={query.page >= pages}

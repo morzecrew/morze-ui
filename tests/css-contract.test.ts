@@ -69,11 +69,11 @@ describe('hover states', () => {
     expect(rule).not.toContain('--mz-face-hover')
   })
 
-  it('keeps the selected label white while hovered', () => {
+  it('keeps the selected label on the tone foreground while hovered', () => {
     // The group hover rules outrank [data-state=on], so the colour is restated
     // at matching specificity — in the light theme it went black otherwise.
     const rules = css.match(/[^{}]*\.mz-toggle\[data-state=on\]:hover[^{]*\{[^}]*\}/g) ?? []
-    const colourRule = rules.find((rule) => rule.includes('color:#fff'))
+    const colourRule = rules.find((rule) => rule.includes('color:var(--mz-tone-fg)'))
     expect(colourRule).toBeDefined()
     expect(colourRule).toContain('.mz-toggle-group--segmented .mz-toggle[data-state=on]:hover')
     expect(colourRule).toContain('.mz-toggle-group--joined .mz-toggle[data-state=on]:hover')
@@ -647,3 +647,55 @@ describe('typography contracts', () => {
   })
 })
 
+
+describe('tone foregrounds', () => {
+  it('names a label colour for every tone in both themes', () => {
+    for (const theme of themeBlocks()) {
+      // The shipped value is white on every tone — one label colour across a
+      // toolbar — and the token is the hook a host with a pale tone re-points.
+      for (const tone of ['primary', 'accent', 'success', 'danger', 'warning', 'info']) {
+        expect(theme, tone).toMatch(new RegExp(`--mz-${tone}-fg:#fff\\b`))
+      }
+    }
+  })
+
+  it('switches the foreground together with the tone', () => {
+    for (const tone of ['accent', 'danger', 'warning', 'info', 'success']) {
+      expect(css, tone).toMatch(
+        new RegExp(`\\[data-tone=${tone}\\]\\{[^}]*--mz-tone-fg:var\\(--mz-${tone}-fg\\)`)
+      )
+    }
+    // The default, and the one variant that re-tones itself.
+    expect(css).toMatch(/--mz-tone-fg:var\(--mz-primary-fg\)/)
+    expect(css).toMatch(/\.mz-btn--destructive\{[^}]*--mz-tone-fg:var\(--mz-danger-fg\)/)
+  })
+
+  it('never paints a label with literal white', () => {
+    // Every filled control reads the tone's foreground. A literal here is how
+    // the amber button ended up with a label nobody could read.
+    expect(css).not.toMatch(/[;{]color:#fff[;}]/)
+    for (const selector of [
+      '.mz-btn--primary{',
+      '.mz-badge--solid{',
+      '.mz-toggle[data-state=on]{',
+      '.mz-tabs-trigger[data-state=active]{',
+      '.mz-tooltip-content{',
+      '.mz-sidebar__menu-button[data-active]{',
+      '.mz-calendar__day[data-selected]{',
+    ]) {
+      const start = css.indexOf(selector)
+      expect(start, selector).toBeGreaterThan(-1)
+      const rule = css.slice(start, css.indexOf('}', start))
+      expect(rule, selector).toContain('color:var(--mz-tone-fg)')
+    }
+  })
+})
+
+describe('field focus', () => {
+  it('gives the select trigger one focus indicator, the same as the input', () => {
+    // The trigger used to carry mz-focusable on top of its own glow, and was
+    // the one control in a form row with two rings.
+    expect(css).toMatch(/\.mz-select-trigger:focus-visible[^{]*\{[^}]*box-shadow/)
+    expect(css).toMatch(/\.mz-select-trigger\{[^}]*outline:none/)
+  })
+})

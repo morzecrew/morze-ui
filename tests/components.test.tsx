@@ -23,6 +23,11 @@ import {
   ChartLegendContent,
   ChartTooltipContent,
   ScrollArea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Table,
   TableBody,
   TableCell,
@@ -416,5 +421,23 @@ describe('Chart', () => {
       </ChartContainer>
     )
     expect(container.querySelector('[data-slot="chart-tooltip"]')).toBeNull()
+  })
+})
+
+describe('SelectTrigger', () => {
+  it('draws one focus indicator: its own field glow, not the outline ring too', () => {
+    render(
+      <Select defaultValue="a">
+        <SelectTrigger aria-label="Pick">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="a">A</SelectItem>
+        </SelectContent>
+      </Select>
+    )
+    const trigger = screen.getByRole('combobox', { name: 'Pick' })
+    expect(trigger).toHaveClass('mz-select-trigger')
+    expect(trigger).not.toHaveClass('mz-focusable')
   })
 })

@@ -64,7 +64,7 @@
 .mz-tabs-trigger > svg { width: 1.15em; height: 1.15em; }
 .mz-tabs-trigger:hover { color: var(--mz-text); }
 .mz-tabs-trigger[data-state='active'] {
-  color: #fff;
+  color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
@@ -200,7 +200,7 @@
 .mz-badge--solid {
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
-  color: #fff;
+  color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
     0 6px 16px -8px rgba(var(--mz-tone-rgb), 0.7),
@@ -297,7 +297,7 @@
   background-image: var(--mz-fill-sheen);
   border-color: var(--mz-convex-hairline);
   box-shadow: inset 0 1px 0 var(--mz-convex-top);
-  color: #fff;
+  color: var(--mz-tone-fg);
 }
 .mz-accordion-content {
   overflow: hidden;
@@ -383,7 +383,7 @@
      the same way: the tone is flat and the light is on the edges. */
   background-image: var(--mz-fill-sheen);
   box-shadow: inset 0 1px 0 var(--mz-convex-top), inset 0 -1px 0 var(--mz-convex-bottom);
-  color: #fff;
+  color: var(--mz-tone-fg);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.02em;

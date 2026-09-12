@@ -75,6 +75,9 @@
   .mz-calendar, .mz-chart
 ) {
   --mz-tone-rgb: var(--mz-primary-rgb);
+  /* The label colour that goes with the fill — see --mz-primary-fg. A tone
+     re-points both, so a filled control never has to know which it wears. */
+  --mz-tone-fg: var(--mz-primary-fg);
 
   /* The toned fill as a plain colour: hover and press just darken it, and
      background-color animates where a gradient could not. */

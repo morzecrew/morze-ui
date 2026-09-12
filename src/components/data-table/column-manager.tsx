@@ -103,7 +103,7 @@ export function ColumnManager<T>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="secondary" size="sm">
+        <Button type="button" variant="secondary" size="sm">
           <ColumnsIcon />
           {labels.columns}
           {hiddenCount > 0 ? <span className="mz-dt__count">{entries.length - hiddenCount}</span> : null}
@@ -112,7 +112,7 @@ export function ColumnManager<T>({
       <PopoverContent align="end" className="mz-dt__columns">
         <div className="mz-dt__columns-head">
           <span>{labels.columns}</span>
-          <Button variant="link" size="xs" onClick={onReset}>
+          <Button type="button" variant="link" size="xs" onClick={onReset}>
             {labels.reset}
           </Button>
         </div>

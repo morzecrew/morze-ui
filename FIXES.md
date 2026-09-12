@@ -243,6 +243,131 @@ host mistake inside the popover.
 
 ---
 
+### DataTable — load-more went quiet after a query change
+
+- **Found in** 0.3.7, reviewing the kit (2026-09 review, D-01).
+- **Status** fixed in `src/components/data-table/data-table.tsx`. **Not released.**
+
+**Symptom.** In load-more mode, change a filter whose first page is as long as
+the rows already on screen — and a first page nearly always is a full one — and
+neither the footer scrolling into view nor the button ever asks for more again.
+
+**Cause.** The batch guard remembered the row count of the last request
+(`askedAt`) and never let go of it: with the new result set at the same length,
+`askedAt === data.length` held and every request was treated as a duplicate.
+
+**Fix.** The guard is reset when the query changes (sort, filters and page size,
+compared by value) and when the row count drops below the count it was armed
+at. The IntersectionObserver is re-subscribed on a query change too, so a footer
+the new result set left in view is reported again.
+
+**Regression test.** `tests/data-table.test.tsx`, "load more across query
+changes": fails on the old code with one call instead of two, and still asserts
+that re-renders under one query ask only once.
+
+---
+
+### DataTable — auto-fit did nothing under a controlled `layout`
+
+- **Found in** 0.3.7, reviewing the kit (D-02).
+- **Status** fixed in `src/components/data-table/use-column-layout.ts`. **Not released.**
+
+**Symptom.** A host that passes `layout` (and echoes `onLayoutChange`) got the
+declared column widths and a dead strip at the right edge; nothing it did
+brought the fit back.
+
+**Cause.** `fitTo` wrote its result into the hook's internal state with
+`persist: false`, and the controlled branch computes the layout from the prop
+alone — it never reads the internal state, and the host was deliberately not
+told. On the uncontrolled branch the same design had a quieter defect: the
+fitted widths sat in the internal layout, so the next user action wrote them
+into `localStorage` and a saved layout depended on the last window it happened
+to be fitted in.
+
+**Fix.** Fitted widths live in their own overlay, laid over whichever layout is
+in force for the columns the fit still governs (not `sized`, not `flex: false`).
+They are never stored and never reported, which is what the original comment
+promised. `fitTo` now has a stable identity — it reads the layout and the column
+map through refs — so the table's ResizeObserver effect no longer re-subscribes
+on every render and the fit-cycle history it keeps survives. `reset()` bumps a
+`fitEpoch` the table watches, because after a reset every column is flexible
+again and nothing about the container would otherwise trigger a fit.
+
+**Regression test.** `tests/data-table.test.tsx`, "auto-fit with a controlled
+layout" (fails on the old code) and "auto-fit inside the table", which supplies
+a scroller width to happy-dom and walks mount → keyboard resize → reset.
+
+---
+
+### DataTable — its buttons submitted a surrounding form
+
+- **Found in** 0.3.7, reviewing the kit (D-03).
+- **Status** fixed across `src/components/data-table/*.tsx`. **Not released.**
+
+**Symptom.** A table inside a `<form>` — a filter form around a list is common —
+submitted that form from the pager arrows, Apply and Reset in a header filter,
+the column manager, the bulk bar, load-more and retry.
+
+**Cause.** Fourteen internal `<Button>`s had no `type`, and a button's default
+type is `submit`. `Button` itself does not set one, matching shadcn.
+
+**Fix.** `type="button"` on every internal use. Whether `Button` should default
+to `type="button"` when it is not slotted is a 1.0 question, recorded in the
+review.
+
+**Regression test.** `tests/data-table.test.tsx`, "inside a form".
+
+---
+
+### DataTable — `useTableQuery` clobbered the router's history state
+
+- **Found in** 0.3.7, reviewing the kit (D-04).
+- **Status** fixed in `src/components/data-table/use-table-query.ts`. **Not released.**
+
+**Symptom.** With a `urlKey`, the back button misbehaved under Next.js App
+Router and React Router, and the address bar changed on mount before the reader
+had touched anything (`?orders.size=10` in the playground).
+
+**Cause.** Every write went through `history.replaceState(null, …)`, which
+throws away the state object those routers keep there (Next.js its tree, React
+Router its index). And `encode` always wrote `size`, so the first write-back
+after mount already differed from the URL.
+
+**Fix.** The state object is passed through untouched. Only what differs from
+the initial query is written, so an untouched table leaves the URL alone and a
+shared link carries choices rather than defaults; a sort the reader cleared is
+written as an empty value, since an absent key stands for the default. Page and
+size from a hand-edited URL are clamped. The write-back skips the commit in
+which the URL is first read, so it cannot strip the parameters it is about to
+decode. `initial` is compared by value, so an inline object no longer rebuilds
+`reset` and the popstate subscription on every render.
+
+**Regression test.** `tests/table-query.test.tsx`, seven cases.
+
+---
+
+### Smaller ones from the same review
+
+- **Date-range filter ids** (D-06): `mz-dt-from` / `mz-dt-to` were fixed strings,
+  so two date filters on a page shared them. Now `React.useId()`.
+- **`aria-sort` on every header** (D-09): a non-sortable column claimed
+  `aria-sort="none"`, which to assistive tech means "sortable, not sorted yet".
+  The attribute is now only on sortable columns.
+- **Labels on tone fills** (V-01): every filled control painted its label
+  with a literal `#fff`, so a host with a pale tone had no way to darken the
+  label short of overriding every component. Each tone now names its label
+  colour (`--mz-primary-fg` … `--mz-info-fg`, read through `--mz-tone-fg`)
+  and every filled control reads that. The shipped value stays white on all
+  six tones — a decision: one label colour across a toolbar of buttons,
+  badges and checkmarks outweighs the last point of contrast on the amber,
+  which is 1.7:1 in the dark theme and 2.9:1 in light. A host whose tone is
+  paler than the kit's re-points that tone's `-fg` to the ink.
+- **Two focus rings on `SelectTrigger`** (V-02): it carried `mz-focusable`
+  (the outline) on top of its own field glow. The class is gone; the trigger
+  focuses the way `Input` does.
+
+---
+
 ## Closed gaps
 
 Not bugs — things the kit did not do, found where a host needed them, and since

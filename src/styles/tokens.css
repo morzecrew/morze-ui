@@ -80,7 +80,21 @@
   --mz-success-rgb: 52, 211, 153;
 
   --mz-primary: rgb(var(--mz-primary-rgb));
+
+  /* The label on each tone's fill. White on every tone the kit ships: the
+     fills are saturated enough that a label reads by weight and hue, and one
+     label colour across a toolbar of buttons, badges and checkmarks matters
+     more than the last point of contrast on the amber (1.7:1 against white in
+     this theme — a decision, recorded in FIXES.md). The threshold is the
+     host's to set: a pale tone — a pastel yellow, a mint — re-points its own
+     -fg to the ink. Every filled control reads the resolved --mz-tone-fg,
+     never a literal, so that is one edit per tone. */
   --mz-primary-fg: #ffffff;
+  --mz-accent-fg: #ffffff;
+  --mz-success-fg: #ffffff;
+  --mz-danger-fg: #ffffff;
+  --mz-warning-fg: #ffffff;
+  --mz-info-fg: #ffffff;
   --mz-primary-soft: rgba(var(--mz-primary-rgb), 0.14);
   --mz-primary-glow: rgba(var(--mz-primary-rgb), 0.45);
 
@@ -258,6 +272,15 @@
   --mz-warning-rgb: 202, 138, 4;
   --mz-info-rgb: 14, 145, 214;
   --mz-success-rgb: 16, 175, 122;
+
+  /* White throughout here too; see the dark block. The light tones are the
+     deeper cut, so the amber lands at 2.9:1 and the rest above 3:1. */
+  --mz-primary-fg: #ffffff;
+  --mz-accent-fg: #ffffff;
+  --mz-success-fg: #ffffff;
+  --mz-danger-fg: #ffffff;
+  --mz-warning-fg: #ffffff;
+  --mz-info-fg: #ffffff;
 
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);
