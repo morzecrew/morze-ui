@@ -27,21 +27,56 @@
   font-size: 13px;
 }
 
+/* The same header the grid draws — see --mz-th-bg. */
 .mz-table__th {
   position: relative;
   padding: 10px 12px;
   text-align: left;
   white-space: nowrap;
   vertical-align: middle;
-  color: var(--mz-text-dim);
+  color: var(--mz-th-color);
   font-family: var(--mz-label-font);
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--mz-th-font-size);
+  font-weight: var(--mz-th-weight);
   letter-spacing: var(--mz-label-tracking);
   text-transform: var(--mz-label-transform);
-  background: var(--mz-well);
-  border-bottom: 1px solid var(--mz-border);
+  background: var(--mz-th-bg);
+  border-bottom: 1px solid var(--mz-border-strong);
+  box-shadow: inset 0 1px 0 var(--mz-glass-edge);
 }
+
+/* A header cell that sorts. `TableHead` gives it the attributes; the grid's
+   own header is built from the same two parts, so the affordance is one
+   thing in both tables. */
+.mz-table__th[data-sortable] { padding: 0; }
+.mz-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-table__sort:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-table__sort-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  opacity: 0.45;
+  transition: opacity var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-table__sort-icon svg { width: 13px; height: 13px; }
+.mz-table__sort-icon:not([data-active]) svg { width: 15px; height: 15px; stroke-width: 2.25; }
+.mz-table__sort-icon[data-active] { opacity: 1; color: rgb(var(--mz-tone-rgb)); }
+.mz-table__sort:hover .mz-table__sort-icon { opacity: 0.9; }
 
 .mz-table__td {
   padding: 10px 12px;
@@ -49,16 +84,18 @@
   border-bottom: 1px solid var(--mz-border);
 }
 
-.mz-table__row { transition: background var(--mz-duration) ease; }
-.mz-table__body .mz-table__row:hover { background: rgba(var(--mz-text-rgb), 0.035); }
-.mz-table__row[data-state='selected'] { background: rgba(var(--mz-tone-rgb), 0.12); }
+/* One row state for both tables — see --mz-row-hover. No transition, for the
+   reason the grid has none: a sticky or pinned cell repaints on a different
+   schedule from a plain one, so a fade arrives across the row in instalments. */
+.mz-table__body .mz-table__row:hover { background: var(--mz-row-hover); }
+.mz-table__row[data-state='selected'] { background: var(--mz-row-selected); }
 
 /* The last rule in the body would draw a line with nothing under it — unless a
    footer follows, where it is the seam between the two. */
 .mz-table__body > .mz-table__row:last-child > .mz-table__td { border-bottom: 0; }
 
 .mz-table__foot {
-  background: var(--mz-well);
+  background: var(--mz-th-bg);
   font-weight: 600;
 }
 .mz-table__foot .mz-table__td { border-bottom: 0; border-top: 1px solid var(--mz-border); }

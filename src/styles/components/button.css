@@ -71,7 +71,7 @@
   color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 3px 10px -4px rgba(var(--mz-tone-rgb), 0.4),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -81,7 +81,7 @@
   transform: scale(var(--mz-hover-scale));
   background-color: var(--mz-fill-hover);
   box-shadow:
-    0 4px 12px -4px rgba(var(--mz-tone-rgb), 0.5),
+    var(--mz-glow-hover),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
@@ -153,13 +153,18 @@
   color: var(--mz-text-dim);
   border-color: transparent;
 }
+/* The flat verb, in full: one wash, a hairline because a button has a shape
+   of its own, and the press dip every other control uses. `Toggle` with no
+   variant lights up from exactly these two tokens — the pair used to be a
+   ghost button and a control that grew a secondary button's face and rim
+   under the cursor, standing side by side. */
 .mz-btn--ghost:hover {
-  background: rgba(var(--mz-text-rgb), 0.06);
+  background: var(--mz-wash-hover);
   color: var(--mz-text);
   border-color: var(--mz-border);
   box-shadow: inset 0 1px 0 var(--mz-face-top);
 }
-.mz-btn--ghost:active { background: rgba(var(--mz-text-rgb), 0.1); }
+.mz-btn--ghost:active { background: var(--mz-wash-press); }
 
 /* ---- Destructive: primary recipe on the danger tone ---- */
 .mz-btn--destructive {
@@ -170,7 +175,7 @@
   color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 3px 10px -4px rgba(var(--mz-tone-rgb), 0.4),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -179,7 +184,7 @@
   transform: scale(var(--mz-hover-scale));
   background-color: var(--mz-fill-hover);
   box-shadow:
-    0 4px 12px -4px rgba(var(--mz-tone-rgb), 0.5),
+    var(--mz-glow-hover),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }

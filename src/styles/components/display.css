@@ -69,7 +69,7 @@
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
   box-shadow:
-    0 8px 24px -10px rgba(var(--mz-tone-rgb), 0.6),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -88,7 +88,7 @@
   color: rgb(var(--mz-tone-rgb));
   border-bottom-color: rgb(var(--mz-tone-rgb));
   background: none;
-  box-shadow: 0 8px 20px -14px rgba(var(--mz-tone-rgb), 0.9);
+  box-shadow: var(--mz-glow-panel);
   text-shadow: none;
 }
 /* Scoped to the filled variant: the line variant's active tab is an underline,
@@ -163,8 +163,8 @@
 }
 .mz-card--interactive { cursor: pointer; }
 .mz-card--interactive:hover {
-  border-color: rgba(var(--mz-primary-rgb), 0.35);
-  box-shadow: 0 24px 60px -28px rgba(var(--mz-primary-rgb), 0.55), inset 0 1px 0 var(--mz-face-top);
+  border-color: rgba(var(--mz-tone-rgb), 0.35);
+  box-shadow: var(--mz-glow-panel), inset 0 1px 0 var(--mz-face-top);
 }
 .mz-card-header {
   display: grid;
@@ -192,8 +192,12 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.4;
+  /* A badge is a label, so a long one is cut with an ellipsis rather than
+     sliced mid-glyph. It only ever triggers where a host has given the badge
+     a width — the default is fit-content. */
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mz-badge > svg { width: 13px; height: 13px; }
 
@@ -203,7 +207,7 @@
   color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 6px 16px -8px rgba(var(--mz-tone-rgb), 0.7),
+    var(--mz-glow-soft),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -236,7 +240,7 @@
      out at about a tenth of the tone anyway. */
   background: color-mix(in srgb, var(--mz-surface), rgb(var(--mz-tone-rgb)) 11%);
   border: 1px solid rgba(var(--mz-tone-rgb), 0.32);
-  box-shadow: 0 10px 30px -20px rgba(var(--mz-tone-rgb), 0.8);
+  box-shadow: var(--mz-glow-panel);
   color: var(--mz-text);
   font-size: 14px;
 }
@@ -268,7 +272,7 @@
   outline: none;
   transition: color var(--mz-duration) ease;
 }
-.mz-accordion-trigger:hover { color: rgb(var(--mz-primary-rgb)); }
+.mz-accordion-trigger:hover { color: rgb(var(--mz-tone-rgb)); }
 .mz-accordion-trigger__icon {
   flex-shrink: 0;
   width: 26px;
@@ -338,6 +342,19 @@
   transition: transform 0.5s var(--mz-ease);
 }
 
+/* Work of unknown length: a slice that travels instead of a bar that fills.
+   No transform transition here — the animation owns the transform, and the
+   500ms tween above would fight it on every keyframe. */
+.mz-progress[data-indeterminate] .mz-progress__indicator {
+  width: 35%;
+  transition: none;
+  animation: mz-progress-slide 1.15s var(--mz-ease) infinite;
+}
+@keyframes mz-progress-slide {
+  0% { transform: translateX(-100%) }
+  100% { transform: translateX(calc(100% / 0.35)) }
+}
+
 /* -------------------------------- Avatar --------------------------------
    The fallback face speaks the button's convex language: the solid tone between
    the same two inset lines, so an initials avatar sits in the UI the way a
@@ -391,6 +408,17 @@
 }
 .mz-avatar--sm .mz-avatar__fallback { font-size: 10px; }
 .mz-avatar--lg .mz-avatar__fallback { font-size: 17px; }
+
+/* The "+N" chip closing a capped stack: an avatar-shaped neutral, not a tone
+   fill — it stands for the people who are not shown, so it must not read as
+   one more of them. */
+.mz-avatar--overflow .mz-avatar__fallback {
+  background-color: var(--mz-face);
+  background-image: none;
+  color: var(--mz-text-dim);
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
 
 /* Overlapping stack. The ring is cut from the surface the group lies on —
    point --mz-avatar-ring somewhere else when it does not sit on a card. */

@@ -64,7 +64,7 @@ describe('hover states', () => {
   it('only highlights an unselected item inside a group', () => {
     // A face plus a border would make it read as its own secondary button.
     const rule = css.match(/\.mz-toggle-group--segmented \.mz-toggle:hover\{[^}]*\}/)?.[0] ?? ''
-    expect(rule).toContain('background:rgba(var(--mz-text-rgb)')
+    expect(rule).toContain('background:var(--mz-wash-hover)')
     expect(rule).not.toContain('border-color')
     expect(rule).not.toContain('--mz-face-hover')
   })
@@ -113,7 +113,11 @@ describe('table rows', () => {
     // Pinned cells must stay opaque; a translucent wash elsewhere would render
     // a different shade and read as the pinned column highlighting on its own.
     const hover = css.match(/\.mz-dt__row:hover>\.mz-dt__td\{[^}]*\}/)?.[0] ?? ''
-    expect(hover).toContain('color-mix(in srgb, var(--mz-surface)')
+    // Through the shared row token now — see the "one header, two tables"
+    // block below — but the value behind it still has to be opaque.
+    expect(hover).toContain('var(--mz-row-hover)')
+    expect(css).toMatch(/--mz-row-hover:color-mix\(in srgb, ?var\(--mz-surface\)/)
+    expect(css).toMatch(/--mz-row-selected:color-mix\(in srgb, ?var\(--mz-surface\)/)
     // No pinned-specific override may reintroduce a second colour.
     expect(css).not.toMatch(/\.mz-dt__row:hover>\.mz-dt__td\[data-pinned\]/)
     expect(css).not.toMatch(/\.mz-dt__row\[data-selected\]>\.mz-dt__td\[data-pinned\]/)
@@ -478,7 +482,10 @@ describe('the glass layer', () => {
   })
 
   it('blurs a table header only where rows or columns pass behind it', () => {
-    expect(css).toMatch(/\.mz-dt__th\{[^}]*background:var\(--mz-glass-well\)/)
+    // --mz-th-bg is the glass well; the indirection is what lets the plain
+    // Table share the header — see the "one header, two tables" block.
+    expect(css).toMatch(/\.mz-dt__th\{[^}]*background:var\(--mz-th-bg\)/)
+    expect(css).toMatch(/--mz-th-bg:var\(--mz-glass-well\)/)
     expect(css).toMatch(/\.mz-dt__table\[data-sticky\] \.mz-dt__th[^{]*\{[^}]*backdrop-filter/)
     expect(css).toMatch(/\.mz-dt__th\[data-pinned\][^{]*\{[^}]*backdrop-filter/)
   })
@@ -697,5 +704,286 @@ describe('field focus', () => {
     // the one control in a form row with two rings.
     expect(css).toMatch(/\.mz-select-trigger:focus-visible[^{]*\{[^}]*box-shadow/)
     expect(css).toMatch(/\.mz-select-trigger\{[^}]*outline:none/)
+  })
+})
+
+/* ==========================================================================
+   P1 — the 2026-09 review's visual normalisation (V-03…V-06, V-10…V-12).
+   The findings were all of one kind: one idea written five to ten ways, which
+   is invisible in a diff and obvious when two controls stand side by side.
+   Each check below pins the single spelling that replaced a set.
+   ========================================================================== */
+
+describe('one glow for every convex fill (V-04)', () => {
+  it('names the three sizes on the toned root, where the tone can still reach them', () => {
+    // Declared beside --mz-fill rather than on :root: a custom property is
+    // substituted where it is declared, so one written at the root would bake
+    // the root's tone in and stop following [data-tone].
+    const tonedBlock = css.match(/:where\([^)]*\)\{--mz-tone-rgb[^}]*\}/)?.[0] ?? ''
+    for (const token of ['--mz-glow:', '--mz-glow-hover:', '--mz-glow-soft:', '--mz-glow-panel:']) {
+      expect(tonedBlock, token).toContain(token)
+    }
+  })
+
+  it('leaves no component drawing a tone drop shadow of its own', () => {
+    // The ten spellings this replaced: -4px/.4, -5px/.7, -6px/.75, -10px/.8,
+    // -8px/.7, -10px/.6, -8px/.7, -10px/.6, -28px/.55, -20px/.8.
+    const bespoke = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].filter(([, selector, body]) => {
+      if (selector!.includes('--mz-tint')) return false // a theme token block
+      // The field focus recipe — a ring plus a soft drop, shared by Input,
+      // Textarea and the select trigger — is a second system on purpose; see
+      // the field-focus block.
+      if (/:focus-visible|\[data-state=open\]/.test(selector!)) return false
+      // A drop shadow: an offset chain ending in a tone colour. A spread-less
+      // `0 0 Npx` glow (the slider range, the progress bar) is a different
+      // thing — it rings the element rather than pooling under it.
+      return /box-shadow:[^;}]*\d+px -\d+px rgba\(var\(--mz-tone-rgb\)/.test(body!)
+    })
+    expect(bespoke.map(([, selector]) => selector)).toEqual([])
+  })
+
+  it('keeps the field focus glow out of the set', () => {
+    // Input and the select trigger share one focus recipe, and it is a ring
+    // plus a soft drop — not the convex glow. It stays spelled out.
+    expect(css).toMatch(/\.mz-input:focus-visible[^{]*\{[^}]*0 0 0 3px rgba\(var\(--mz-tone-rgb\), ?\.22\)/)
+  })
+})
+
+describe('one wash and two durations (V-05)', () => {
+  it('lights every flat control from the same token', () => {
+    // Ghost button, plain toggle, segmented item, menubar and nav triggers,
+    // sidebar item, the icon buttons in a table header, a calendar day: the
+    // set had drifted to six values between 6 and 12% of the text colour.
+    for (const selector of [
+      '.mz-btn--ghost:hover',
+      '.mz-toggle:hover',
+      '.mz-dt__filter:hover',
+      '.mz-dt__expand:hover',
+      '.mz-dt__icon-btn:hover:not(:disabled)',
+      '.mz-sidebar__menu-button:hover',
+      '.mz-calendar__day:hover:not([aria-disabled])',
+      '.mz-dialog-close:hover',
+      '.mz-toast__close:hover',
+    ]) {
+      const rule = css.match(new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\{[^}]*\\}`))?.[0] ?? ''
+      expect(rule, selector).toContain('var(--mz-wash-hover)')
+    }
+  })
+
+  it('runs every transition on one of the two durations', () => {
+    // 0.14 / 0.15 / 0.16 / 0.2 / 0.28s were all in use at once, so two
+    // controls in a row answered the cursor at visibly different speeds.
+    const strays = [...css.matchAll(/transition:[^;{}]*/g)]
+      .map((m) => m[0])
+      .filter((rule) => /\b0?\.(1[0-9]|2[0-7])s\b/.test(rule))
+      // The switch thumb's travel and the progress bar's fill are motion, not
+      // a state change, and are timed to the distance they cover.
+      .filter((rule) => !/transform \.5s|transform var\(--mz-duration\)/.test(rule))
+    expect(strays).toEqual([])
+  })
+
+  it('presses every control to the same depth', () => {
+    // Checkbox and radio used to sink to .94, which beside a button pressing
+    // to .98 read as a different mechanism under the same finger.
+    expect(css).not.toMatch(/:active\{[^}]*scale\(\.94\)/)
+    expect(css).toMatch(/\.mz-checkbox:active\{[^}]*var\(--mz-press-scale\)/)
+    expect(css).toMatch(/\.mz-radio:active\{[^}]*var\(--mz-press-scale\)/)
+    // The slider thumb is the documented exception: it is held, not clicked.
+    expect(css).toMatch(/\.mz-slider__thumb:active\{[^}]*scale\(1\.06\)/)
+  })
+})
+
+describe('the three verbs (V-03)', () => {
+  it('gives the two transparent controls one hover', () => {
+    // `Button ghost` took a 6% wash and the hairline; `Toggle` with no variant
+    // took the raised face and the 24% rim — which is a secondary button's
+    // resting state. Side by side they lit up as two different things.
+    const ghost = css.match(/\.mz-btn--ghost:hover\{[^}]*\}/)?.[0] ?? ''
+    const toggle = css.match(/\.mz-toggle:hover\{[^}]*\}/)?.[0] ?? ''
+    expect(ghost).toContain('background:var(--mz-wash-hover)')
+    expect(toggle).toContain('background-color:var(--mz-wash-hover)')
+    expect(toggle).toContain('border-color:var(--mz-border)')
+    expect(toggle).not.toContain('--mz-face-hover')
+    // The outline variant has a face at rest, so raising it is what its hover
+    // does — the raised verb, kept where it belongs.
+    expect(css).toMatch(/\.mz-toggle--outline:hover\{[^}]*--mz-face-hover/)
+  })
+
+  it('grows a free-standing toggle and never one inside a group', () => {
+    // A button grows on hover and a toggle did not; but an item that swells
+    // inside a segmented bar climbs over the item beside it.
+    expect(css).toMatch(/\.mz-toggle:hover\{[^}]*scale\(var\(--mz-hover-scale\)\)/)
+    const pinned = css.match(
+      /\.mz-toggle-group--segmented \.mz-toggle:hover,\.mz-toggle-group--joined \.mz-toggle:hover\{[^}]*\}/
+    )?.[0] ?? ''
+    expect(pinned).toContain('transform:none')
+  })
+
+  it('gives the switch the hover its family has', () => {
+    // Checkbox and radio picked up a tone rim; the switch, off, did nothing at
+    // all — the one dead-looking control in a column of settings.
+    expect(css).toMatch(/\.mz-switch:hover\{[^}]*border-color:rgba\(var\(--mz-tone-rgb\), ?\.5\)/)
+  })
+
+  it('answers the pointer neutrally in a field row', () => {
+    // The select trigger picked up a 45% tone rim on hover while the Input
+    // beside it went neutral grey. Tone is focus and open, in both.
+    const hover = css.match(/\.mz-select-trigger:hover\{[^}]*\}/)?.[0] ?? ''
+    expect(hover).toContain('--mz-face-hover')
+    expect(hover).not.toContain('--mz-tone-rgb')
+    expect(css).toMatch(/\.mz-select-trigger:focus-visible[^{]*\{[^}]*--mz-tone-rgb/)
+  })
+})
+
+describe('one header and one row, two tables (V-06)', () => {
+  it('reads the same tokens in both', () => {
+    // `.mz-table__th` ran 12px label-cased on --mz-well; `.mz-dt__th` ran 14px
+    // inherited on the frosted well. Two tables on one page looked like two
+    // kits — and the rows lit up at 3.5% against 4.5% of different colours.
+    for (const selector of ['\\.mz-table__th', '\\.mz-dt__th']) {
+      const rule = css.match(new RegExp(`${selector}\\{[^}]*\\}`))?.[0] ?? ''
+      expect(rule, selector).toContain('var(--mz-th-bg)')
+      expect(rule, selector).toContain('var(--mz-th-font-size)')
+      expect(rule, selector).toContain('var(--mz-th-color)')
+    }
+    expect(css).toMatch(/\.mz-table__body \.mz-table__row:hover\{background:var\(--mz-row-hover\)/)
+    expect(css).toMatch(/\.mz-table__row\[data-state=selected\]\{background:var\(--mz-row-selected\)/)
+  })
+
+  it('does not fade a row in either table', () => {
+    // A sticky or pinned cell repaints on a different schedule from a plain
+    // one, so a fade arrives across the row in instalments.
+    expect(css).not.toMatch(/\.mz-table__row\{[^}]*transition/)
+  })
+})
+
+describe('the tone reaches what follows it (V-10)', () => {
+  it('leaves no component pinned to the primary', () => {
+    // Twenty places read --mz-primary-rgb directly — the table's chips and
+    // count, the sidebar badge and sub-item, the active sort arrow, the
+    // resizer, the card and accordion hovers — so `tone` moved everything on
+    // the page except them.
+    const componentRules = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
+      .filter(([, selector]) => !selector!.includes('--mz-tint') && !/^:root|\[data-mz-theme/.test(selector!))
+      // Pointing --mz-tone-rgb at the primary is how a default tone is
+      // declared; it is the reads of the primary, not that one write, that
+      // this is about.
+      .filter(([, , body]) => /--mz-primary-rgb/.test(body!.replace(/--mz-tone-rgb:var\(--mz-primary-rgb\)/g, '')))
+      .map(([, selector]) => selector!.trim())
+    // What may still name it: the focus ring's fallback (it lands on elements
+    // outside every toned root) and the standalone spinner.
+    expect(componentRules).toEqual(['.mz-focusable:focus-visible', '.mz-spinner'])
+  })
+
+  it('gives the four newly toned roots a tone to follow', () => {
+    const tonedRoot = css.match(/:where\(([^)]*)\)\{--mz-tone-rgb/)?.[1] ?? ''
+    for (const selector of ['.mz-dt', '.mz-card', '.mz-sidebar', '.mz-accordion-trigger']) {
+      expect(tonedRoot, selector).toContain(selector)
+    }
+  })
+})
+
+describe('the token surface is what the kit reads (V-11)', () => {
+  it('ships no token nothing uses', () => {
+    // A public token that nothing reads is a promise the kit does not keep:
+    // a host overrides it and nothing moves.
+    for (const dead of [
+      '--mz-bg-rgb',
+      '--mz-surface-rgb',
+      '--mz-elevated-rgb',
+      '--mz-primary-soft',
+      '--mz-primary-glow',
+      '--mz-radius-xl',
+    ]) {
+      expect(css, dead).not.toContain(dead)
+    }
+  })
+
+  it('keeps the ones that are read, including the deliberate aliases', () => {
+    // --mz-face-fill* are aliases kept for a host that re-cut the split faces;
+    // --mz-primary-fg is read through --mz-tone-fg.
+    for (const live of ['--mz-face-fill:', '--mz-primary-fg:', '--mz-tone-fg:']) {
+      expect(css, live).toContain(live)
+    }
+  })
+})
+
+describe('small things (V-12)', () => {
+  it('cuts a long badge with an ellipsis rather than mid-glyph', () => {
+    expect(css).toMatch(/\.mz-badge\{[^}]*text-overflow:ellipsis/)
+  })
+
+  it('does not draw the idle sort stack heavier than the sorted arrow', () => {
+    // stroke-width 3 on a 16px box read as the louder of the two states, and
+    // the loud one is the absence of a sort.
+    expect(css).not.toMatch(/\.mz-dt__sort-icon:not\(\[data-active\]\) svg\{[^}]*stroke-width:3\b/)
+    expect(css).toMatch(/\.mz-dt__sort-icon:not\(\[data-active\]\) svg\{[^}]*stroke-width:2\.25/)
+  })
+})
+
+describe('the table can stick its header (D-05, V-07, V-08)', () => {
+  it('gives the scroller a height to scroll within', () => {
+    const rule = css.match(/\.mz-dt__scroller\{[^}]*\}/)?.[0] ?? ''
+    expect(rule).toContain('max-height:var(--mz-dt-max-h')
+    expect(rule).toContain('height:var(--mz-dt-h')
+    expect(css).toMatch(/\.mz-dt--fill \.mz-dt__scroller\{[^}]*min-height:0/)
+  })
+
+  it('drops its own frame inside something that already has one', () => {
+    const rule = css.match(/\.mz-dt--plain \.mz-dt__scroller\{[^}]*\}/)?.[0] ?? ''
+    expect(rule).toContain('border:0')
+    expect(rule).toContain('box-shadow:none')
+  })
+
+  it('keeps a hidden filter trigger reachable from the keyboard', () => {
+    // opacity, never display: the button stays in the tab order and in the
+    // accessibility tree, and the header does not reflow as the pointer
+    // crosses it.
+    expect(css).toMatch(/\.mz-dt__filter:not\(\[data-active\]\)\{opacity:0/)
+    expect(css).toContain(':focus-within')
+    expect(css).toMatch(/@media \(hover: ?none\)/)
+  })
+
+  it('puts the funnel before the caption on a right-aligned column', () => {
+    // `margin-left: auto` pushed the caption away from the numbers it labels.
+    expect(css).toMatch(/\.mz-dt__th\[data-align=right\] \.mz-dt__filter\{[^}]*order:-1/)
+  })
+})
+
+describe('the aurora is a layer, not a fixed attachment (K-12)', () => {
+  it('carries no background-attachment at all', () => {
+    // `background-attachment: fixed` makes the compositor re-rasterise the
+    // element's background against the viewport on every scroll frame, which
+    // is expensive beside the backdrop-filters the glass layer runs — and iOS
+    // ignores the keyword outright, so there the light scrolled away with the
+    // page. A fixed pseudo-element is one layer that never moves and behaves
+    // the same everywhere.
+    expect(css).not.toContain('background-attachment')
+  })
+
+  it('puts the page on a fixed layer under the content', () => {
+    const layer = css.match(/\.mz-root:before\{[^}]*\}/)?.[0] ?? ''
+    expect(layer).toContain('position:fixed')
+    expect(layer).toContain('z-index:-1')
+    // It covers the viewport, so it has to stay out of hit testing.
+    expect(layer).toContain('pointer-events:none')
+    expect(layer).toContain('var(--mz-halo)')
+    // The colour rides on the layer rather than on .mz-root, and has to: a
+    // z-index:-1 child is painted before its parent's own background, so a
+    // colour left behind on .mz-root would bury the layer.
+    expect(layer).toContain('background-color:var(--mz-bg)')
+    expect(css).not.toMatch(/\.mz-root\{[^}]*background/)
+  })
+
+  it('leaves the sidebar layout something to frost', () => {
+    // The layout keeps painting its aurora on the element. The layer version
+    // needed a stacking context to stay behind its own background — and a
+    // stacking context is a backdrop root in Chrome, so the rail's
+    // `backdrop-filter` lost its backdrop and the 3% grid lines came through
+    // a flat panel. Verified by screenshot; this is the guard.
+    const rule = css.match(/\.mz-sidebar-layout\{[^}]*\}/)?.[0] ?? ''
+    expect(rule).toContain('background-color:var(--mz-bg)')
+    expect(rule).not.toContain('isolation')
+    expect(css).not.toMatch(/\.mz-sidebar-layout:before\{/)
   })
 })

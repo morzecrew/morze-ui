@@ -46,18 +46,39 @@
    Font size and line height are left to the host: this element wraps the
    whole application. */
 .mz-root {
-  background-color: var(--mz-bg);
-  /* One brand glow spilling in from above the viewport — see --mz-halo.
-     Fixed so scrolling does not drag the light source along; engines that
-     ignore fixed attachment (iOS) just let it scroll off, which degrades to
-     the flat page. */
-  background-image: radial-gradient(1100px 520px at 50% -140px, var(--mz-halo), transparent 62%);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
   color: var(--mz-text);
   font-family: var(--mz-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* The page: its colour and the one brand glow spilling in from above the
+   viewport — see --mz-halo.
+
+   A fixed layer rather than `background-attachment: fixed`. That keyword makes
+   the compositor re-rasterise the element's background against the viewport on
+   every scroll frame, which is expensive next to the backdrop-filters the
+   glass layer runs, and iOS ignores it outright — there the light scrolled
+   away with the page. A fixed pseudo-element is one composited layer that
+   never moves, and it behaves the same everywhere.
+
+   The *colour* moved here with the gradient, and that is deliberate rather
+   than tidy: a `z-index: -1` child is painted before its parent's own
+   background, so a colour left on .mz-root would bury this layer. The
+   alternative — making .mz-root a stacking context with `isolation: isolate`
+   — was tried and is worse: a stacking context becomes a backdrop root in
+   Chrome, and the sidebar's `backdrop-filter` then had nothing behind it to
+   frost. The knob stays --mz-bg either way; a host that overrides
+   `background` on .mz-root itself now has to override it here too. */
+.mz-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--mz-bg);
+  background-image: radial-gradient(1100px 520px at 50% -140px, var(--mz-halo), transparent 62%);
+  background-repeat: no-repeat;
 }
 
 /* --------------------------------------------------------------------------
@@ -70,9 +91,9 @@
   .mz-btn, .mz-badge, .mz-toggle, .mz-toggle-group, .mz-checkbox, .mz-radio,
   .mz-switch, .mz-slider, .mz-tabs-list, .mz-progress, .mz-alert, .mz-input,
   .mz-textarea, .mz-select-trigger, .mz-item, .mz-tooltip-content,
-  .mz-accordion-trigger__icon, .mz-sidebar__menu-button, .mz-avatar,
-  .mz-table, .mz-menubar, .mz-navmenu, .mz-scroll-area, .mz-toast,
-  .mz-calendar, .mz-chart
+  .mz-accordion-trigger, .mz-accordion-trigger__icon, .mz-sidebar__menu-button,
+  .mz-avatar, .mz-table, .mz-menubar, .mz-navmenu, .mz-scroll-area, .mz-toast,
+  .mz-calendar, .mz-chart, .mz-dt, .mz-card, .mz-sidebar
 ) {
   --mz-tone-rgb: var(--mz-primary-rgb);
   /* The label colour that goes with the fill — see --mz-primary-fg. A tone
@@ -84,6 +105,28 @@
   --mz-fill: rgb(var(--mz-tone-rgb));
   --mz-fill-hover: color-mix(in srgb, rgb(var(--mz-tone-rgb)) var(--mz-hover-mix), #000);
   --mz-fill-press: color-mix(in srgb, rgb(var(--mz-tone-rgb)) var(--mz-press-mix), #000);
+
+  /* The light a convex fill throws downward. One idea, and it used to be
+     written ten ways — the button at -4px/.4, the checkbox at -5px/.7, the
+     switch at -6px/.75, the toggle and the sidebar at -10px/.8, the badge at
+     -8px/.7, the tab at -10px/.6, the calendar day at -8px/.7, the tooltip at
+     -10px/.6, the card at -28px/.55, the alert at -20px/.8 — so a row of
+     filled controls each sat in a differently sized pool of its own colour.
+     Three sizes now, by how big the lit thing is: a control, a small mark, a
+     floating surface. They are declared here rather than on :root because a
+     custom property is substituted where it is *declared* — one written at
+     the root would bake the root's tone in and stop following [data-tone]. */
+  --mz-glow: 0 3px 10px -4px rgba(var(--mz-tone-rgb), 0.4);
+  --mz-glow-hover: 0 4px 12px -4px rgba(var(--mz-tone-rgb), 0.5);
+  --mz-glow-soft: 0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.6);
+  --mz-glow-panel: 0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.5);
+
+  /* The selected row, shared by `Table` and `DataTable` — see --mz-th-bg. It
+     lives here rather than with --mz-row-hover because it follows the tone,
+     and a custom property is substituted where it is declared. Opaque, not a
+     wash: a pinned cell has to stay opaque, and a translucent value beside an
+     opaque one renders as two different shades of one row. */
+  --mz-row-selected: color-mix(in srgb, var(--mz-surface) 88%, rgb(var(--mz-tone-rgb)));
 }
 
 /* The plain control layer: the hardware runs untinted.

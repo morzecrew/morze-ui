@@ -80,7 +80,7 @@
    on hover is a control a keyboard user never finds. */
 .mz-toast:hover .mz-toast__close,
 .mz-toast__close:focus-visible { opacity: 1; }
-.mz-toast__close:hover { background: rgba(var(--mz-text-rgb), 0.1); }
+.mz-toast__close:hover { background: var(--mz-wash-hover); }
 
 .mz-toast { position: relative; }
 .mz-toast[data-state='open'] { animation: mz-toast-in 0.22s var(--mz-ease); }
