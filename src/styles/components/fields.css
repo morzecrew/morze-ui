@@ -92,6 +92,12 @@
 .mz-input--sm { height: 34px; font-size: 13px; padding: 0 10px; }
 .mz-input--lg { height: 48px; font-size: 15px; padding: 0 14px; }
 
+/* A textarea has no height on the scale, so its size is type and padding —
+   and the minimum height it opens at. Without this it was the one field in a
+   form that could not be told to match its neighbours. */
+.mz-textarea--sm { min-height: 76px; padding: 8px 10px; font-size: 13px; }
+.mz-textarea--lg { min-height: 120px; padding: 12px 14px; font-size: 15px; }
+
 .mz-input[type='file'] {
   align-items: center;
   padding-top: 9px;

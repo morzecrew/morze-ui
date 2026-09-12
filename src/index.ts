@@ -26,6 +26,7 @@ export { Slider } from './components/slider'
 export { Input } from './components/input'
 export type { InputProps } from './components/input'
 export { Textarea } from './components/textarea'
+export type { TextareaProps } from './components/textarea'
 export { Label } from './components/label'
 export { Field, FieldHint, FieldError } from './components/field'
 
@@ -140,6 +141,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/table'
+export type { TableHeadProps } from './components/table'
 
 export { ScrollArea, ScrollBar } from './components/scroll-area'
 
@@ -197,6 +199,16 @@ export type {
 export { Calendar } from './components/calendar'
 export type { CalendarProps, CalendarLabels, DateRange, DateMatcher } from './components/calendar'
 
+export { DatePicker, DateRangePicker } from './components/date-picker'
+export type {
+  DatePickerProps,
+  DateRangePickerProps,
+  DatePickerLabels,
+  DateRangePreset,
+} from './components/date-picker'
+/** The bridge between a `Date` and the `YYYY-MM-DD` a backend speaks. */
+export { toISODate, fromISODate } from './lib/date'
+
 export {
   ChartContainer,
   ChartStyle,
@@ -220,6 +232,7 @@ export {
   SheetOverlay,
   SheetContent,
   SheetHeader,
+  SheetBody,
   SheetFooter,
   SheetTitle,
   SheetDescription,
@@ -275,6 +288,7 @@ export {
   parseSort,
   serializeSort,
   setFilter,
+  setSearch,
   sortStateOf,
   toggleSort,
   emptyQuery,
@@ -290,6 +304,7 @@ export type {
   DataTableFilters,
   DataTableQuery,
   DataTableSort,
+  DateRangePreset as DataTableDateRangePreset,
   EditableDef,
   FilterValue,
   RowAttributes,
@@ -297,6 +312,7 @@ export type {
   SavedView,
   SelectOptionDef,
   SortDir,
+  TextFilterOp,
   UseTableQueryOptions,
   UseSavedViewsOptions,
   DataTableLabels,

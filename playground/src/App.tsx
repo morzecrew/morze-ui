@@ -23,6 +23,8 @@ import {
   CardHeader,
   CardTitle,
   Checkbox,
+  DatePicker,
+  DateRangePicker,
   Dialog,
   DialogClose,
   DialogContent,
@@ -57,6 +59,12 @@ import {
   Skeleton,
   Slider,
   Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tabs,
   TabsContent,
   TabsList,
@@ -268,6 +276,20 @@ function Demo() {
             </Select>
           </Field>
           <Field>
+            <Label>Delivery window</Label>
+            <DateRangePicker
+              locale="en-GB"
+              presets={[
+                { label: 'This week', range: { from: new Date(2026, 8, 7), to: new Date(2026, 8, 13) } },
+                { label: 'This month', range: { from: new Date(2026, 8, 1), to: new Date(2026, 8, 30) } },
+              ]}
+            />
+          </Field>
+          <Field>
+            <Label>Signed on</Label>
+            <DatePicker locale="en-GB" defaultValue={new Date(2026, 8, 12)} size="sm" />
+          </Field>
+          <Field>
             <Label htmlFor="pg-msg">Task</Label>
             <Textarea id="pg-msg" placeholder="Describe the task…" />
           </Field>
@@ -278,6 +300,7 @@ function Demo() {
           <Slider defaultValue={[20, 70]} tone="accent" />
           <Progress value={progress} />
           <Progress value={30} tone="warning" />
+          <Progress indeterminate tone="info" />
           <div className="pg-row">
             <Skeleton style={{ width: 120, height: 12 }} />
             <Skeleton style={{ width: 64, height: 12 }} />
@@ -392,6 +415,13 @@ function Demo() {
               <AvatarFallback>UI</AvatarFallback>
             </Avatar>
           </div>
+          <AvatarGroup max={3}>
+            <Avatar><AvatarFallback>AS</AvatarFallback></Avatar>
+            <Avatar><AvatarFallback data-tone="accent">MT</AvatarFallback></Avatar>
+            <Avatar><AvatarFallback data-tone="info">KV</AvatarFallback></Avatar>
+            <Avatar><AvatarFallback data-tone="warning">DP</AvatarFallback></Avatar>
+            <Avatar><AvatarFallback data-tone="danger">SK</AvatarFallback></Avatar>
+          </AvatarGroup>
           <Accordion type="single" collapsible defaultValue="q1">
             <AccordionItem value="q1">
               <AccordionTrigger>How long does a rollout take?</AccordionTrigger>
@@ -402,6 +432,37 @@ function Demo() {
               <AccordionContent>Yes, we have public contract experience.</AccordionContent>
             </AccordionItem>
           </Accordion>
+        </Section>
+
+        <Section title="Table (hand-laid)">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead sortable sorted="asc" sortLabel="Sort by Item">
+                  Item
+                </TableHead>
+                <TableHead sortable sortLabel="Sort by Qty">Qty</TableHead>
+                <TableHead>Note</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>Controller unit</TableCell>
+                <TableCell>12</TableCell>
+                <TableCell>In stock</TableCell>
+              </TableRow>
+              <TableRow data-state="selected">
+                <TableCell>Sensor array</TableCell>
+                <TableCell>4</TableCell>
+                <TableCell>On order</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Mounting kit</TableCell>
+                <TableCell>30</TableCell>
+                <TableCell>In stock</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </Section>
 
         <Card interactive>

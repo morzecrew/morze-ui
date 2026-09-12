@@ -11,7 +11,29 @@ import { parseSort, serializeSort } from './utils'
    a reload and can be shared as a link.
    -------------------------------------------------------------------------- */
 
-function encode(query: DataTableQuery, base: DataTableQuery, prefix: string) {
+type FilterCodec = {
+  serialize: (filters: DataTableFilters) => string
+  parse: (raw: string) => DataTableFilters
+}
+
+/**
+ * The default filter codec. `JSON.stringify` is verbose in an address bar and
+ * throws outright on a `custom` value carrying a Date, a Map or a cycle — the
+ * shape of a custom filter is the host's business, and that is exactly the
+ * host that needs `serializeFilters`. A throw here would take the whole
+ * write-back effect down, so it degrades to leaving the parameter alone.
+ */
+const jsonCodec: FilterCodec = {
+  serialize: (filters) => JSON.stringify(filters),
+  parse: (raw) => JSON.parse(raw) as DataTableFilters,
+}
+
+function encode(
+  query: DataTableQuery,
+  base: DataTableQuery,
+  prefix: string,
+  codec: FilterCodec
+) {
   const params = new URLSearchParams(window.location.search)
   // `null` removes the key. An empty string is a value in its own right: a
   // sort the reader cleared has to survive a reload as "no sort", where the
@@ -28,20 +50,26 @@ function encode(query: DataTableQuery, base: DataTableQuery, prefix: string) {
   set('sort', sort === serializeSort(base.sort) ? null : sort)
   set('page', query.page > 1 ? String(query.page) : null)
   set('size', query.pageSize === base.pageSize ? null : String(query.pageSize))
-  const filters = JSON.stringify(query.filters)
-  set('f', filters === JSON.stringify(base.filters) ? null : filters)
+  set('q', (query.search ?? '') === (base.search ?? '') ? null : (query.search ?? ''))
+  try {
+    const filters = codec.serialize(query.filters)
+    set('f', filters === codec.serialize(base.filters) ? null : filters)
+  } catch {
+    // An unserialisable `custom` value: the rest of the query still travels.
+  }
   return params
 }
 
-function decode(prefix: string, fallback: DataTableQuery): DataTableQuery {
+function decode(prefix: string, fallback: DataTableQuery, codec: FilterCodec): DataTableQuery {
   const params = new URLSearchParams(window.location.search)
   const get = (key: string) => params.get(prefix + key)
   const rawSort = get('sort')
   const rawFilters = get('f')
+  const rawSearch = get('q')
   let filters: DataTableFilters = fallback.filters
   if (rawFilters !== null) {
     try {
-      filters = JSON.parse(rawFilters) as DataTableFilters
+      filters = codec.parse(rawFilters)
     } catch {
       filters = {}
     }
@@ -52,6 +80,9 @@ function decode(prefix: string, fallback: DataTableQuery): DataTableQuery {
   return {
     sort: rawSort === null ? fallback.sort : parseSort(rawSort),
     filters,
+    // An empty `q` is a value: a search the reader cleared has to survive a
+    // reload as "no search" rather than let an initial one back in.
+    search: rawSearch === null ? fallback.search : rawSearch || undefined,
     page: Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1,
     pageSize: Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) : fallback.pageSize,
   }
@@ -63,13 +94,29 @@ export type UseTableQueryOptions = {
   urlKey?: string | null
   /** `replace` keeps table interactions out of the back-button history. */
   history?: 'replace' | 'push'
+  /**
+   * A compact URL form for the filters, in place of `JSON.stringify`. Worth
+   * reaching for on any table whose links get shared, and required for a
+   * `custom` filter whose value JSON cannot express. Pass both halves.
+   */
+  serializeFilters?: (filters: DataTableFilters) => string
+  parseFilters?: (raw: string) => DataTableFilters
 }
 
 export function useTableQuery({
   initial,
   urlKey = null,
   history = 'replace',
+  serializeFilters,
+  parseFilters,
 }: UseTableQueryOptions = {}) {
+  // Kept in a ref rather than a dependency: a host writes these inline, and a
+  // fresh pair of closures per render would re-run the URL effects every time.
+  const codecRef = React.useRef<FilterCodec>(jsonCodec)
+  codecRef.current =
+    serializeFilters && parseFilters
+      ? { serialize: serializeFilters, parse: parseFilters }
+      : jsonCodec
   // Compared by value: a host writes `initial` inline more often than not, and
   // a fresh object on every render used to remake `base` — and with it `reset`
   // and the popstate subscription — every time.
@@ -90,7 +137,7 @@ export function useTableQuery({
   React.useEffect(() => {
     if (urlKey === null || typeof window === 'undefined') return
     skipWrite.current = true
-    setQuery(decode(urlKey, base))
+    setQuery(decode(urlKey, base, codecRef.current))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey])
 
@@ -100,7 +147,7 @@ export function useTableQuery({
       skipWrite.current = false
       return
     }
-    const params = encode(query, base, urlKey)
+    const params = encode(query, base, urlKey, codecRef.current)
     const search = params.toString()
     const next = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`
     if (next === `${window.location.pathname}${window.location.search}${window.location.hash}`) return
@@ -117,7 +164,7 @@ export function useTableQuery({
   // Back/forward must move the table, not just the address bar.
   React.useEffect(() => {
     if (urlKey === null || typeof window === 'undefined') return
-    const onPop = () => setQuery(decode(urlKey, base))
+    const onPop = () => setQuery(decode(urlKey, base, codecRef.current))
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [urlKey, base])

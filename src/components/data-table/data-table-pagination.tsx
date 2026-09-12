@@ -72,7 +72,10 @@ export function DataTablePagination({
           labels.nothingFound
         ) : (
           <>
-            {from}–{to}
+            {/* All three numbers go through the locale. Only `total` did,
+                so a Russian table read “1–25 из 13 659”: two bare numerals
+                and one grouped one, in the same sentence. */}
+            {from.toLocaleString(locale)}–{to.toLocaleString(locale)}
             {total !== undefined ? (
               <>
                 {' '}
@@ -108,8 +111,8 @@ export function DataTablePagination({
 
       <div className="mz-dt__pagination-nav">
         <span className="mz-dt__pagination-page">
-          {query.page}
-          {unknownTotal ? null : ` / ${pages}`}
+          {query.page.toLocaleString(locale)}
+          {unknownTotal ? null : ` / ${pages.toLocaleString(locale)}`}
         </span>
         <Button type="button"
           variant="secondary"

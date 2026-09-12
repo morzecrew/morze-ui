@@ -15,12 +15,21 @@
   min-height: 100dvh;
   /* The layout paints the page, so it repeats the root's aurora — an opaque
      bg here was hiding it, and the frosted sidebar needs light behind the
-     glass to have anything to frost. Same recipe as .mz-root; --mz-halo:
-     transparent switches both off together. */
+     glass to have anything to frost. --mz-halo: transparent switches this and
+     the root's off together.
+
+     Painted on the element, unlike .mz-root's layer, and deliberately: the
+     sidebar sitting on top of it runs a `backdrop-filter`, which samples
+     whatever is painted behind it. A `z-index: -1` layer only stays behind
+     its own element if that element is a stacking context, and a stacking
+     context is also a backdrop root in Chrome — so the layer version cost the
+     rail its frost and left the 3% grid lines showing through a flat panel.
+     What is dropped here is `background-attachment: fixed` alone, which is
+     the expensive half; the light now scrolls with the layout instead of
+     staying put, which is the degradation that keyword already had on iOS. */
   background-color: var(--mz-bg);
   background-image: radial-gradient(1100px 520px at 50% -140px, var(--mz-halo), transparent 62%);
   background-repeat: no-repeat;
-  background-attachment: fixed;
   color: var(--mz-text);
 }
 
@@ -138,7 +147,7 @@
   background: transparent;
   color: var(--mz-text-dim);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease, border-color var(--mz-duration-fast) ease;
 }
 .mz-sidebar__trigger svg { width: 16px; height: 16px; transition: transform var(--mz-duration) var(--mz-ease); }
 .mz-sidebar__trigger[data-state='collapsed'] svg { transform: rotate(180deg); }
@@ -146,7 +155,7 @@
 .mz-sidebar[data-side='right'] .mz-sidebar__trigger svg { transform: rotate(180deg); }
 .mz-sidebar[data-side='right'] .mz-sidebar__trigger[data-state='collapsed'] svg { transform: none; }
 .mz-sidebar__trigger:hover {
-  background: rgba(var(--mz-text-rgb), 0.08);
+  background: var(--mz-wash-hover);
   border-color: var(--mz-border);
   color: var(--mz-text);
 }
@@ -214,7 +223,7 @@
   color: var(--mz-text-muted);
   white-space: nowrap;
   opacity: 1;
-  transition: opacity 0.16s ease;
+  transition: opacity var(--mz-duration-fast) ease;
 }
 .mz-sidebar__group-action {
   position: absolute;
@@ -229,9 +238,9 @@
   background: transparent;
   color: var(--mz-text-muted);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
-.mz-sidebar__group-action:hover { background: rgba(var(--mz-text-rgb), 0.08); color: var(--mz-text); }
+.mz-sidebar__group-action:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-sidebar__group-action svg { width: 14px; height: 14px; }
 
 /* --------------------------------- Menu --------------------------------- */
@@ -265,7 +274,7 @@
   white-space: nowrap;
   cursor: pointer;
   overflow: hidden;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease, border-color var(--mz-duration-fast) ease;
 }
 .mz-sidebar__menu-button[data-size='sm'] { height: 30px; font-size: 13px; }
 .mz-sidebar__menu-button[data-size='lg'] { height: 46px; }
@@ -278,7 +287,7 @@
 .mz-sidebar__menu-button > span { overflow: hidden; text-overflow: ellipsis; }
 
 .mz-sidebar__menu-button:hover {
-  background: rgba(var(--mz-text-rgb), 0.08);
+  background: var(--mz-wash-hover);
   color: var(--mz-text);
 }
 
@@ -289,7 +298,7 @@
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
   box-shadow:
-    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -314,10 +323,10 @@
   background: transparent;
   color: var(--mz-text-muted);
   cursor: pointer;
-  transition: opacity 0.16s ease, background 0.16s ease, color 0.16s ease;
+  transition: opacity var(--mz-duration-fast) ease, background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
 .mz-sidebar__menu-action svg { width: 14px; height: 14px; }
-.mz-sidebar__menu-action:hover { background: rgba(var(--mz-text-rgb), 0.12); color: var(--mz-text); }
+.mz-sidebar__menu-action:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-sidebar__menu-action[data-hover-only] { opacity: 0; }
 .mz-sidebar__menu-item:hover .mz-sidebar__menu-action[data-hover-only],
 .mz-sidebar__menu-action[data-hover-only]:focus-visible { opacity: 1; }
@@ -330,8 +339,8 @@
   min-width: 20px;
   padding: 1px 6px;
   border-radius: var(--mz-radius-sm);
-  background: rgba(var(--mz-primary-rgb), 0.2);
-  color: rgb(var(--mz-primary-rgb));
+  background: rgba(var(--mz-tone-rgb), 0.2);
+  color: rgb(var(--mz-tone-rgb));
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
@@ -339,7 +348,7 @@
   pointer-events: none;
 }
 .mz-sidebar__menu-button[data-active] ~ .mz-sidebar__menu-badge {
-  background: rgba(255, 255, 255, 0.22);
+  background: color-mix(in srgb, var(--mz-tone-fg) 22%, transparent);
   color: var(--mz-tone-fg);
 }
 
@@ -366,13 +375,13 @@
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
 .mz-sidebar__menu-sub-button[data-size='sm'] { height: 26px; font-size: 12px; }
-.mz-sidebar__menu-sub-button:hover { background: rgba(var(--mz-text-rgb), 0.08); color: var(--mz-text); }
+.mz-sidebar__menu-sub-button:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-sidebar__menu-sub-button[data-active] {
-  color: rgb(var(--mz-primary-rgb));
-  background: rgba(var(--mz-primary-rgb), 0.12);
+  color: rgb(var(--mz-tone-rgb));
+  background: rgba(var(--mz-tone-rgb), 0.12);
 }
 
 /* ---------------------------- Collapsed rail ---------------------------- */

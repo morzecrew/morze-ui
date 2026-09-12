@@ -7,6 +7,32 @@
  * anywhere here would move a day across the date line for half the world.
  */
 
+/**
+ * The wire format for a day: `YYYY-MM-DD`, read off the local calendar.
+ *
+ * `toISOString().slice(0, 10)` is the obvious spelling and the wrong one — it
+ * converts to UTC first, so any evening east of Greenwich, or any morning
+ * west of it, is filed under the neighbouring day. These two are the only
+ * bridge between a `Date` and the string an `<input type="date">` and a
+ * backend exchange.
+ */
+export function toISODate(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+/** The inverse. Anything that is not a calendar day comes back undefined. */
+export function fromISODate(iso: string | undefined | null): Date | undefined {
+  if (!iso) return undefined
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+  if (!match) return undefined
+  const [, y, m, d] = match
+  const date = new Date(Number(y), Number(m) - 1, Number(d))
+  // Rejects 2026-02-31, which the constructor would roll into March.
+  return date.getMonth() === Number(m) - 1 && date.getDate() === Number(d) ? date : undefined
+}
+
 /** Local midnight of the day `date` falls in. */
 export function startOfDay(date: Date): Date {
   const d = new Date(date)

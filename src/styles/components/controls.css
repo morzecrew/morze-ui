@@ -22,10 +22,10 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform 0.15s var(--mz-ease);
+    transform var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-checkbox:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
-.mz-checkbox:active { transform: scale(0.94); }
+.mz-checkbox:active { transform: scale(var(--mz-press-scale)); }
 
 .mz-checkbox[data-state='checked'],
 .mz-checkbox[data-state='indeterminate'] {
@@ -33,7 +33,7 @@
   background-image: var(--mz-fill-sheen);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.7),
+    var(--mz-glow-soft),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
@@ -90,17 +90,17 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform 0.15s var(--mz-ease);
+    transform var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-radio:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
-.mz-radio:active { transform: scale(0.94); }
+.mz-radio:active { transform: scale(var(--mz-press-scale)); }
 
 .mz-radio[data-state='checked'] {
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.7),
+    var(--mz-glow-soft),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
@@ -109,6 +109,13 @@
   display: grid;
   place-content: center;
 }
+/* The same sm/md/lg scale as Checkbox — a radio beside a small checkbox in
+   one list used to be the larger of the two with no way to say otherwise. */
+.mz-radio--sm { width: 15px; height: 15px; }
+.mz-radio--lg { width: 22px; height: 22px; }
+.mz-radio--sm .mz-radio__indicator::after { width: 5px; height: 5px; }
+.mz-radio--lg .mz-radio__indicator::after { width: 8px; height: 8px; }
+
 .mz-radio__indicator::after {
   content: '';
   width: 6px;
@@ -144,8 +151,13 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform 0.15s var(--mz-ease);
+    transform var(--mz-duration-fast) var(--mz-ease);
 }
+/* Checkbox, radio and switch are one family and answer the cursor the same
+   way. The switch was the one that did not: off, it had no hover at all, so
+   the only control in a settings column that looked dead was the one the
+   column is made of. */
+.mz-switch:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
 .mz-switch--sm { --mz-switch-h: 20px; --mz-switch-w: 36px; border-radius: 5px; }
 .mz-switch--lg { --mz-switch-h: 30px; --mz-switch-w: 54px; border-radius: 8px; }
 
@@ -154,7 +166,7 @@
   background-image: var(--mz-fill-sheen);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 4px 12px -6px rgba(var(--mz-tone-rgb), 0.75),
+    var(--mz-glow-soft),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
@@ -208,7 +220,7 @@
     color var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform 0.15s var(--mz-ease);
+    transform var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-toggle > svg { width: 1.15em; height: 1.15em; flex-shrink: 0; pointer-events: none; }
 
@@ -235,8 +247,19 @@
   box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 2px var(--mz-face-bottom);
 }
 
+/* The default toggle is transparent at rest, so it is a flat control and it
+   lights up like one — the same wash and hairline as a ghost button. It used
+   to take the raised face and the 24% rim, which is a secondary button's
+   resting state: two transparent controls side by side lit up as two
+   different things. */
 .mz-toggle:hover {
   color: var(--mz-text);
+  background-color: var(--mz-wash-hover);
+  border-color: var(--mz-border);
+}
+/* The outline variant has a face at rest, so it is raised, and raising is
+   what its hover does. */
+.mz-toggle--outline:hover {
   background-color: var(--mz-face-hover);
   background-image: var(--mz-face-sheen);
   border-color: var(--mz-border-strong);
@@ -248,11 +271,15 @@
   color: var(--mz-tone-fg);
   border-color: var(--mz-convex-hairline);
   box-shadow:
-    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
 }
+/* A free-standing toggle is a button and grows like one. Inside a group it
+   must not: an item that swells under the cursor climbs over the item beside
+   it, which is why the group rules below never scale. */
+.mz-toggle:hover { transform: scale(var(--mz-hover-scale)); }
 .mz-toggle:active { transform: scale(var(--mz-press-scale)); }
 
 /* ----------------------------- ToggleGroup ------------------------------ */
@@ -283,15 +310,21 @@
    highlights: giving it a face and a border would make it look like its own
    secondary button rather than part of one control. */
 .mz-toggle-group--segmented .mz-toggle:hover {
-  background: rgba(var(--mz-text-rgb), 0.08);
+  background: var(--mz-wash-hover);
   color: var(--mz-text);
 }
+/* Items of one control never grow: the swell of a 40px item covers the seam
+   with its neighbour, and in a joined bar it lifts the shared border. The
+   `spaced` appearance is left out — those items stand apart, so each of them
+   is a button in its own right and grows like one. */
+.mz-toggle-group--segmented .mz-toggle:hover,
+.mz-toggle-group--joined .mz-toggle:hover { transform: none; }
 .mz-toggle-group--segmented .mz-toggle[data-state='on'] {
   border-color: var(--mz-convex-hairline);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
   box-shadow:
-    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
@@ -342,7 +375,7 @@
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
   box-shadow:
-    0 6px 16px -10px rgba(var(--mz-tone-rgb), 0.8),
+    var(--mz-glow),
     inset 0 1px 0 var(--mz-convex-top),
     inset 0 -1px 0 var(--mz-convex-bottom);
   text-shadow: var(--mz-convex-text-shadow);
@@ -406,7 +439,7 @@
   cursor: grab;
   transition:
     box-shadow var(--mz-duration) ease,
-    transform 0.15s var(--mz-ease);
+    transform var(--mz-duration-fast) var(--mz-ease);
 }
 /* Hover darkens the cap, the way every other filled surface darkens — via a
    6% shade wash fading in over the face. The halo keeps its size: a ring that
@@ -424,7 +457,10 @@
 .mz-slider__thumb:hover::after { opacity: 1; }
 /* No focus ring while the mouse holds the cap: the offset primary outline is
    a keyboard affordance, and during a drag it read as a frame chasing the
-   cursor. Keyboard nudges never set :active, so the ring stays for them. */
+   cursor. Keyboard nudges never set :active, so the ring stays for them.
+   The one control in the kit that grows under pressure instead of dipping,
+   and deliberately: the thumb is held, not clicked, and a cap that shrinks
+   out from under the finger reads as having slipped. */
 .mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); outline: none; }
 
 /* Hover darkens the toned fill, matching the buttons. */

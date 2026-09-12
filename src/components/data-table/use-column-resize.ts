@@ -97,7 +97,26 @@ export function useColumnResize(options: {
   return { start, autoFit, onKeyDown, resizing, varName }
 }
 
-/** Column ids are author-supplied, so they are sanitised for use in a var name. */
+/**
+ * Column ids are author-supplied, so they are sanitised for use in a custom
+ * property name. The sanitising has to be *injective*, which the old
+ * `replace(/[^a-zA-Z0-9_-]/g, '_')` was not: `_` was both a character it let
+ * through and the character it replaced everything else with, so `a.b` and
+ * `a_b` both came out `a_b`. Two columns with those ids shared one variable
+ * and therefore one width — dragging either resized both, and the pinned
+ * offsets calc()'d off the same value twice.
+ *
+ * `_` is the escape character now, so a literal one doubles; anything else
+ * outside the ident set becomes `_<hex codepoint>_`. Every escape opens with a
+ * single `_` and closes with one, which makes the mapping reversible and so
+ * collision-free by construction.
+ */
 export function cssSafe(id: string) {
-  return id.replace(/[^a-zA-Z0-9_-]/g, '_')
+  let out = ''
+  for (const char of id) {
+    if (char === '_') out += '__'
+    else if (/[a-zA-Z0-9-]/.test(char)) out += char
+    else out += `_${char.codePointAt(0)!.toString(16)}_`
+  }
+  return out
 }

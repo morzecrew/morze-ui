@@ -33,11 +33,15 @@
   height: 18px;
   padding: 0 5px;
   border-radius: var(--mz-radius-sm);
-  background: rgba(var(--mz-primary-rgb), 0.22);
-  color: rgb(var(--mz-primary-rgb));
+  background: rgba(var(--mz-tone-rgb), 0.22);
+  color: rgb(var(--mz-tone-rgb));
   font-size: 11px;
   font-weight: 700;
 }
+
+/* Global search — part of the query, so it sits with the toolbar rather than
+   beside it; see `search` on DataTable. */
+.mz-dt__search { width: min(18rem, 100%); }
 
 .mz-dt__chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .mz-dt__chip {
@@ -46,13 +50,18 @@
   gap: 8px;
   padding: 3px 4px 3px 10px;
   border-radius: var(--mz-radius-sm);
-  background: rgba(var(--mz-primary-rgb), 0.14);
-  border: 1px solid rgba(var(--mz-primary-rgb), 0.3);
+  background: rgba(var(--mz-tone-rgb), 0.14);
+  border: 1px solid rgba(var(--mz-tone-rgb), 0.3);
   color: var(--mz-text);
   font-size: 12px;
+  /* A long value list is truncated in `describeFilter`, but a single long
+     value still has to stop somewhere short of the row's width. */
+  max-width: 22rem;
+  overflow: hidden;
   white-space: nowrap;
 }
-.mz-dt__chip b { font-weight: 600; color: rgb(var(--mz-primary-rgb)); }
+.mz-dt__chip > span { overflow: hidden; text-overflow: ellipsis; }
+.mz-dt__chip b { font-weight: 600; color: rgb(var(--mz-tone-rgb)); }
 .mz-dt__chip button {
   display: grid;
   place-content: center;
@@ -65,15 +74,22 @@
   font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
-.mz-dt__chip button:hover { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
+.mz-dt__chip button:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 
 /* ------------------------------- Scroller ------------------------------- */
 .mz-dt__scroller {
   position: relative;
   overflow: auto;
   max-width: 100%;
+  /* `stickyHeader` is measured against this element, so without a height it
+     never scrolls and the header never sticks — the scroller simply grew with
+     its content. The two variables are set from `maxHeight` / `height`; `fill`
+     below is the third answer, for a table that should take the room its flex
+     parent has. */
+  max-height: var(--mz-dt-max-h, none);
+  height: var(--mz-dt-h, auto);
   border-radius: var(--mz-radius-lg);
   background: var(--mz-surface);
   border: 1px solid var(--mz-border);
@@ -81,6 +97,21 @@
      stack with the th hairline into a double-bright rim. */
   box-shadow: var(--mz-shadow-2);
   overscroll-behavior-x: contain;
+}
+
+/* `fill`: the table is the height of its parent and the scroller takes what
+   the toolbar, chips and pager leave. `min-height: 0` is the part that makes
+   it work — a flex item refuses to shrink below its content without it. */
+.mz-dt--fill { height: 100%; }
+.mz-dt--fill .mz-dt__scroller { flex: 1; min-height: 0; height: auto; }
+
+/* `frame="plain"`: the table is already inside something with a border — a
+   Card, a panel, a page section — and the scroller's own frame doubled it. */
+.mz-dt--plain .mz-dt__scroller {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* The seam between the pinned column and the scrolling body is marked with a
@@ -104,18 +135,23 @@
   font-size: var(--mz-dt-font);
 }
 
+/* Type, colour and fill come from the shared header tokens — see --mz-th-bg.
+   The frosted well is translucent so a sticky header can frost the rows that
+   scroll behind it; in a static table nothing moves back there and the same
+   fill just composites over the surface. */
 .mz-dt__th {
   position: relative;
   height: var(--mz-dt-row-h);
   padding: 0 var(--mz-dt-cell-x);
   text-align: left;
-  font-weight: 600;
-  color: var(--mz-text-dim);
+  font-family: var(--mz-label-font);
+  font-size: var(--mz-th-font-size);
+  font-weight: var(--mz-th-weight);
+  letter-spacing: var(--mz-label-tracking);
+  text-transform: var(--mz-label-transform);
+  color: var(--mz-th-color);
   white-space: nowrap;
-  /* The frosted well: translucent so a sticky header can frost the rows that
-     scroll behind it. In a static table nothing moves back there and the same
-     fill just composites over the surface. */
-  background: var(--mz-glass-well);
+  background: var(--mz-th-bg);
   border-bottom: 1px solid var(--mz-border-strong);
   box-shadow: inset 0 1px 0 var(--mz-glass-edge);
   user-select: none;
@@ -155,24 +191,24 @@
   color: inherit;
   font: inherit;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
-.mz-dt__sort:hover { background: rgba(var(--mz-text-rgb), 0.07); color: var(--mz-text); }
+.mz-dt__sort:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-dt__sort-icon {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
   opacity: 0.45;
-  transition: opacity 0.16s ease, color 0.16s ease;
+  transition: opacity var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
 .mz-dt__sort-icon svg { width: 13px; height: 13px; }
 /* The idle stack is drawn from two chevrons that fill a third of the 24 grid,
    where the sorted arrow fills most of it — at one size the unsorted state
    came out visibly smaller and finer than the sorted one. A larger box and a
    heavier stroke put the two on equal footing. */
-.mz-dt__sort-icon:not([data-active]) svg { width: 16px; height: 16px; stroke-width: 3; }
-.mz-dt__sort-icon[data-active] { opacity: 1; color: rgb(var(--mz-primary-rgb)); }
+.mz-dt__sort-icon:not([data-active]) svg { width: 15px; height: 15px; stroke-width: 2.25; }
+.mz-dt__sort-icon[data-active] { opacity: 1; color: rgb(var(--mz-tone-rgb)); }
 .mz-dt__sort-icon b { font-size: 10px; font-weight: 700; }
 .mz-dt__sort:hover .mz-dt__sort-icon { opacity: 0.9; }
 
@@ -188,21 +224,51 @@
   background: transparent;
   color: var(--mz-text-muted);
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease, border-color var(--mz-duration-fast) ease;
 }
 .mz-dt__filter svg { width: 13px; height: 13px; }
-.mz-dt__filter:hover { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
+.mz-dt__filter:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+
+/* Six identical funnels in a row are noise, not an affordance: the trigger
+   appears under the pointer, under the keyboard, and stays put whenever the
+   column is actually filtering. `filterTrigger="always"` and any engine
+   without hover (touch) get the old, unconditional row back. It keeps its
+   box either way, so a header does not reflow as the pointer crosses it. */
+.mz-dt:not([data-filter-trigger='always']) .mz-dt__filter:not([data-active]) {
+  opacity: 0;
+  transition: opacity var(--mz-duration-fast) ease;
+}
+.mz-dt:not([data-filter-trigger='always']) .mz-dt__th:hover .mz-dt__filter,
+.mz-dt:not([data-filter-trigger='always']) .mz-dt__th:focus-within .mz-dt__filter,
+.mz-dt:not([data-filter-trigger='always']) .mz-dt__filter[data-state='open'],
+.mz-dt:not([data-filter-trigger='always']) .mz-dt__filter:focus-visible {
+  opacity: 1;
+}
+/* Nothing to hover with: the row is unconditional. The selector repeats the
+   hide rule's exactly — at equal specificity it is source order that decides,
+   and a shorter one simply lost. */
+@media (hover: none) {
+  .mz-dt:not([data-filter-trigger='always']) .mz-dt__filter:not([data-active]) {
+    opacity: 1;
+  }
+}
+
+/* A right-aligned column reads from its right edge, and `margin-left: auto`
+   pushed the caption away from the numbers it labels. The funnel goes first
+   and the caption keeps the edge its values are on. */
+.mz-dt__th[data-align='right'] .mz-dt__filter { order: -1; margin: 0 auto 0 0; }
+.mz-dt__th[data-align='center'] .mz-dt__filter { margin: 0; }
 /* A column that is filtering says so in the brand colour, the way the active
    sort arrow does. It used to ask for --mz-fill, which nothing defines on a
    table header: the fill came out transparent and "active" was a white icon —
    invisible on the light theme's white header. */
 .mz-dt__filter[data-active],
 .mz-dt__filter[data-active]:hover {
-  color: rgb(var(--mz-tone-rgb, var(--mz-primary-rgb)));
-  background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.16);
-  border-color: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.45);
+  color: rgb(var(--mz-tone-rgb));
+  background: rgba(var(--mz-tone-rgb), 0.16);
+  border-color: rgba(var(--mz-tone-rgb), 0.45);
 }
-.mz-dt__filter[data-active]:hover { background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.24); }
+.mz-dt__filter[data-active]:hover { background: rgba(var(--mz-tone-rgb), 0.24); }
 /* Solid funnel while it filters: the state survives a monochrome print and a
    colour-blind reader, where the tint alone would not. */
 .mz-dt__filter[data-active] svg { fill: currentColor; }
@@ -228,7 +294,7 @@
   width: 1px;
   height: 60%;
   background: var(--mz-border-strong);
-  transition: background 0.16s ease, height 0.16s ease, top 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, height var(--mz-duration-fast) ease, top var(--mz-duration-fast) ease;
 }
 .mz-dt__resizer:hover::after,
 .mz-dt__resizer:focus-visible::after,
@@ -236,8 +302,8 @@
   top: 0;
   height: 100%;
   width: 2px;
-  background: rgb(var(--mz-primary-rgb));
-  box-shadow: 0 0 8px rgba(var(--mz-primary-rgb), 0.6);
+  background: rgb(var(--mz-tone-rgb));
+  box-shadow: 0 0 8px rgba(var(--mz-tone-rgb), 0.6);
 }
 
 /* --------------------------------- Rows --------------------------------- */
@@ -249,10 +315,10 @@
    fades to a different shade, which looks like the pinned column highlighting
    separately. One colour for every cell keeps the row a single object. */
 .mz-dt__row:hover > .mz-dt__td {
-  background-color: color-mix(in srgb, var(--mz-surface) 95.5%, rgb(var(--mz-text-rgb)));
+  background-color: var(--mz-row-hover);
 }
 .mz-dt__row[data-selected] > .mz-dt__td {
-  background-color: color-mix(in srgb, var(--mz-surface) 88%, rgb(var(--mz-primary-rgb)));
+  background-color: var(--mz-row-selected);
 }
 .mz-dt__row[data-clickable] { cursor: pointer; }
 
@@ -277,6 +343,26 @@
 .mz-dt__td[data-align='right'] .mz-dt__cell { text-align: right; }
 
 .mz-dt__editor { min-width: 0; }
+/* A rejected save used to live in a `title` attribute, which is to say
+   nowhere: no screen reader announces it on its own and a pointer has to rest
+   on the cell for a second to find it. The message is rendered, announced and
+   the same for both editors. */
+.mz-dt__editor-wrap { position: relative; }
+.mz-dt__editor-error {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 6;
+  max-width: 18rem;
+  padding: 5px 8px;
+  border-radius: var(--mz-radius-sm);
+  background: color-mix(in srgb, var(--mz-surface), rgb(var(--mz-danger-rgb)) 14%);
+  border: 1px solid rgba(var(--mz-danger-rgb), 0.4);
+  box-shadow: var(--mz-shadow-2);
+  color: rgb(var(--mz-danger-rgb));
+  font-size: 12px;
+  white-space: normal;
+}
 
 /* Pinned columns ride above the scrolling body and carry their own surface. */
 .mz-dt__th[data-pinned],
@@ -300,14 +386,38 @@
   background: transparent;
   color: var(--mz-text-dim);
   cursor: pointer;
-  transition: background 0.16s ease, transform 0.2s var(--mz-ease), color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, transform 0.2s var(--mz-ease), color var(--mz-duration-fast) ease;
 }
 .mz-dt__expand svg { width: 13px; height: 13px; }
-.mz-dt__expand:hover { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
-.mz-dt__expand[data-open] { transform: rotate(90deg); color: rgb(var(--mz-primary-rgb)); }
+.mz-dt__expand:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-dt__expand[data-open] { transform: rotate(90deg); color: rgb(var(--mz-tone-rgb)); }
 
 .mz-dt__row--expanded > .mz-dt__td { background: var(--mz-bg-2); }
 .mz-dt__td--expanded { padding: 14px var(--mz-dt-cell-x); white-space: normal; }
+
+/* ------------------------------- Summary -------------------------------- */
+/* Totals under the body. Sticky for the same reason the header is: on a
+   scroller with a height the one line a reader keeps glancing back at is the
+   one that adds up, and it is the first thing to scroll away. */
+.mz-dt__tf {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  height: var(--mz-dt-row-h);
+  padding: 0 var(--mz-dt-cell-x);
+  background: var(--mz-th-bg);
+  -webkit-backdrop-filter: var(--mz-glass-filter);
+  backdrop-filter: var(--mz-glass-filter);
+  border-top: 1px solid var(--mz-border-strong);
+  font-weight: var(--mz-th-weight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.mz-dt__tf[data-align='right'] { text-align: right; }
+.mz-dt__tf[data-align='center'] { text-align: center; }
+.mz-dt__tf[data-pinned] { z-index: 3; }
+.mz-dt__tf--control,
+.mz-dt__tf--filler { padding: 0; }
 
 /* ------------------------------- Feedback ------------------------------- */
 .mz-dt__state {
@@ -343,7 +453,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgb(var(--mz-primary-rgb)),
+    rgb(var(--mz-tone-rgb)),
     transparent
   );
   background-size: 40% 100%;
@@ -409,6 +519,10 @@
   max-height: var(--radix-popper-available-height, 60vh);
 }
 
+/* Wide enough for a month grid — a date filter cannot be squeezed into the
+   column a text one fits in. */
+.mz-dt__filter-panel--wide { width: auto; }
+
 .mz-dt__filter-body {
   /* `min-height: 0` or the body refuses to shrink below its content and the
      overflow lands on the panel instead. */
@@ -423,7 +537,27 @@
 }
 .mz-dt__filter-options { display: flex; flex-direction: column; gap: 8px; max-height: 13rem; overflow: auto; }
 .mz-dt__filter-option { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.mz-dt__filter-stack { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+/* The operator row above a text filter: `contains` is not what a backend
+   always means by a text match, and a host that offers `equals` had no way to
+   say so. One option is no choice, so the row only appears from two. */
+.mz-dt__filter-ops { display: flex; gap: 4px; }
+.mz-dt__filter-ops .mz-toggle { flex: 1; }
+.mz-dt__filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--mz-text-muted);
+}
+.mz-dt__filter-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.mz-dt__filter-empty { padding: 6px 2px; font-size: 12px; color: var(--mz-text-muted); }
 .mz-dt__filter-range { display: flex; align-items: center; gap: 8px; }
+/* The unit a number range is in, as a suffix inside the field's row rather
+   than a legend above it: `1 000 – 5 000 ₽` is the whole of the constraint. */
+.mz-dt__filter-unit { flex-shrink: 0; font-size: 12px; color: var(--mz-text-muted); }
+.mz-dt__filter-field { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; }
 .mz-dt__filter-range--stacked { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; }
 .mz-dt__filter-dash { color: var(--mz-text-muted); }
 .mz-dt__filter-actions {
@@ -463,15 +597,15 @@
   border-radius: var(--mz-radius-sm);
   font-size: 13px;
   cursor: grab;
-  transition: background 0.16s ease, opacity 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, opacity var(--mz-duration-fast) ease;
 }
-.mz-dt__columns-item:hover { background: rgba(var(--mz-text-rgb), 0.06); }
+.mz-dt__columns-item:hover { background: var(--mz-wash-hover); }
 .mz-dt__columns-item[data-dragging] { opacity: 0.45; cursor: grabbing; }
 /* Where the dragged column lands — it takes this row's place. Only rows that
    accept the drop get it, so an invalid target says so by staying plain. */
 .mz-dt__columns-item[data-drop] {
-  background: rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.16);
-  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.5);
+  background: rgba(var(--mz-tone-rgb), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.5);
 }
 .mz-dt__columns-grip { display: grid; place-content: center; color: var(--mz-text-muted); }
 .mz-dt__columns-grip svg { width: 14px; height: 14px; }
@@ -490,12 +624,12 @@
   font-size: 12px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }
 .mz-dt__icon-btn svg { width: 13px; height: 13px; }
-.mz-dt__icon-btn:hover:not(:disabled) { background: rgba(var(--mz-text-rgb), 0.1); color: var(--mz-text); }
+.mz-dt__icon-btn:hover:not(:disabled) { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-dt__icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.mz-dt__icon-btn[data-active] { color: rgb(var(--mz-primary-rgb)); }
+.mz-dt__icon-btn[data-active] { color: rgb(var(--mz-tone-rgb)); }
 
 /* The needle points at the edge the column is pinned to, so the three states
    of the pin button differ by more than a colour the unpinned one cannot show. */

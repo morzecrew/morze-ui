@@ -3,7 +3,6 @@ import {
   Badge,
   Button,
   DataTable,
-  Input,
   useTableQuery,
   type DataTableColumn,
   type RowSelectionState,
@@ -44,10 +43,26 @@ const ALL: Order[] = Array.from({ length: 137 }, (_, i) => ({
 function useOrders(query: ReturnType<typeof useTableQuery>['query']) {
   return useMemo(() => {
     let rows = [...ALL]
+    // The search box is part of the query now, so the stand-in backend has to
+    // answer it like any other constraint.
+    const needle = query.search?.trim().toLowerCase()
+    if (needle) {
+      rows = rows.filter((row) =>
+        [row.number, row.client, row.manager, row.comment].some((field) =>
+          field.toLowerCase().includes(needle)
+        )
+      )
+    }
     for (const [id, filter] of Object.entries(query.filters)) {
       rows = rows.filter((row) => {
         const value = (row as unknown as Record<string, unknown>)[id]
-        if (filter.type === 'text') return String(value).toLowerCase().includes(filter.value.toLowerCase())
+        if (filter.type === 'text') {
+          const haystack = String(value).toLowerCase()
+          const term = filter.value.toLowerCase()
+          if (filter.op === 'equals') return haystack === term
+          if (filter.op === 'startsWith') return haystack.startsWith(term)
+          return haystack.includes(term)
+        }
         if (filter.type === 'select') return filter.value.includes(String(value))
         if (filter.type === 'number-range') {
           const n = Number(value)
@@ -82,7 +97,6 @@ export default function TableDemo() {
   })
   const { rows, total } = useOrders(query)
   const [selection, setSelection] = useState<RowSelectionState>({ keys: [], allMatching: false })
-  const [search, setSearch] = useState('')
   const [edits, setEdits] = useState<Record<string, string>>({})
 
   const columns: DataTableColumn<Order>[] = [
@@ -90,12 +104,17 @@ export default function TableDemo() {
       id: 'number', header: '#', label: 'Number', width: 120, minWidth: 90,
       sortable: true, pinned: 'left', hideable: false,
       cell: (row) => <b>{row.number}</b>,
-      filter: { type: 'text', placeholder: 'ORD-…' },
+      filter: { type: 'text', placeholder: 'ORD-…', ops: ['contains', 'equals', 'startsWith'] },
     },
     {
       id: 'client', header: 'Client', width: 200, sortable: true,
       accessor: (row) => row.client,
-      filter: { type: 'select', options: CLIENTS.map((c) => ({ value: c, label: c })) },
+      footer: () => `${new Set(rows.map((row) => row.client)).size} on this page`,
+      filter: {
+        type: 'select',
+        searchable: true,
+        options: CLIENTS.map((c) => ({ value: c, label: c })),
+      },
     },
     {
       id: 'manager', header: 'Manager', width: 150, sortable: true,
@@ -113,6 +132,7 @@ export default function TableDemo() {
     },
     {
       id: 'status', header: 'Status', width: 140,
+      headerTitle: 'Where the order sits in the pipeline',
       cell: (row) => (
         <Badge variant="soft" tone={STATUS[row.status].tone}>
           {STATUS[row.status].label}
@@ -120,18 +140,31 @@ export default function TableDemo() {
       ),
       filter: {
         type: 'select',
+        multiple: false,
         options: Object.entries(STATUS).map(([value, s]) => ({ value, label: s.label })),
       },
     },
     {
       id: 'sum', header: 'Total', width: 150, align: 'right', sortable: true,
+      // Biggest first: the ascending click on an amount column is a wasted one.
+      sortDescFirst: true,
       accessor: (row) => row.sum.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }),
-      filter: { type: 'number-range', step: 10_000 },
+      footer: (page) =>
+        page
+          .reduce((total, row) => total + row.sum, 0)
+          .toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }),
+      filter: { type: 'number-range', step: 10_000, unit: '$' },
     },
     {
-      id: 'date', header: 'Date', width: 130, sortable: true,
+      id: 'date', header: 'Date', width: 130, sortable: true, sortDescFirst: true,
       accessor: (row) => new Date(row.date).toLocaleDateString('en-GB'),
-      filter: { type: 'date-range' },
+      filter: {
+        type: 'date-range',
+        presets: [
+          { label: 'This year', from: '2026-01-01', to: '2026-12-31' },
+          { label: 'H1', from: '2026-01-01', to: '2026-06-30' },
+        ],
+      },
     },
     {
       id: 'comment', header: 'Comment', width: 320,
@@ -155,6 +188,10 @@ export default function TableDemo() {
       query={query}
       onQueryChange={setQuery}
       persistKey="playground.orders"
+      // The header only sticks once the scroller has a height to scroll in.
+      maxHeight={520}
+      search={{ placeholder: 'Search orders…' }}
+      summary
       selection={selection}
       onSelectionChange={setSelection}
       rowProps={(row) => ({ 'data-status': row.status })}
@@ -170,15 +207,6 @@ export default function TableDemo() {
           <div style={{ color: 'var(--mz-text-dim)' }}>{row.comment}</div>
         </div>
       )}
-      toolbar={
-        <Input
-          inputSize="sm"
-          placeholder="Search orders…"
-          value={search}
-          style={{ width: 240 }}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      }
       caption="Orders"
     />
   )
