@@ -150,3 +150,24 @@ export const SaveIcon = icon(
     <path d="M8 4v5h7M8 21v-6h8v6" />
   </>
 )
+/**
+ * Two column edges with the content pushing out to meet them: "let this
+ * column find its own width again". Drawn wide rather than tall so it does
+ * not read as the vertical resize handle it sits beside in the list.
+ */
+export const AutoWidthIcon = icon(
+  <>
+    <path d="M3 5v14M21 5v14" />
+    {/* The shaft matters at 13px: two loose chevrons between two bars read as
+        three unrelated marks, and joining them into one double-headed arrow
+        is what makes the glyph say "span". */}
+    <path d="M7 12h10" />
+    <path d="m10 9-3 3 3 3M14 9l3 3-3 3" />
+  </>
+)
+export const CalendarIcon = icon(
+  <>
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </>
+)
