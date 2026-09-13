@@ -309,6 +309,8 @@ The full list lives in `dist/morze-ui-tokens.css`.
 | `Label` `Field` `Select` | `ScrollArea` | `Table` `Chart` | `Sheet` `Toast` |
 | `Calendar` `DatePicker` | | | |
 | `DateRangePicker` `DataTable` | | | |
+| `Combobox` `MultiSelect` | `Collapsible` | `Empty` `Kbd` | `Command` `ContextMenu` |
+| `NumberInput` | | | |
 
 The API mirrors shadcn/ui: same names, same sub-component composition,
 `asChild`, a `data-slot` on every part — so examples from the shadcn docs work
@@ -374,6 +376,57 @@ What this kit adds on top:
     presets={[{ label: 'This month', range: { from: start, to: end } }]}
   />
   ```
+- `Combobox` / `MultiSelect` — a searchable list on the same trigger, with
+  `options` for a list you hold and `loadOptions` for one the backend filters.
+  The async side debounces, waits for `minChars`, keeps the labels of values
+  whose option the current answer no longer contains, and ignores an older
+  request that answers after a newer one. The multi-select collapses its chips
+  into "+N", takes All / None over what the search has narrowed to, and drops
+  the last chip on Backspace in an empty box.
+
+  ```tsx
+  <Combobox options={statuses} value={status} onChange={setStatus} />
+
+  <MultiSelect
+    value={clientIds} onChange={setClientIds}
+    loadOptions={async (q) => (await searchClients(q)).map(toOption)}
+    minChars={2} maxChips={2} labels={combobox}
+  />
+  ```
+- `Command` / `CommandDialog` — the ⌘K palette. `CommandDialog` binds the
+  shortcut itself (`shortcut="k"` by default, `null` to own it), filters on
+  each item's `value` plus its `keywords`, hides a group whose items have all
+  been filtered away, and runs the highlighted item on Enter through its own
+  click — so an item wrapped in a link behaves like the link it is.
+
+  ```tsx
+  <CommandDialog>
+    <CommandInput placeholder="Type a command…" />
+    <CommandList>
+      <CommandEmpty>Nothing matches</CommandEmpty>
+      <CommandGroup heading="Orders">
+        <CommandItem value="New order" keywords={['create']} onSelect={run}>
+          New order <CommandShortcut>⌘N</CommandShortcut>
+        </CommandItem>
+      </CommandGroup>
+    </CommandList>
+  </CommandDialog>
+  ```
+- `ContextMenu` — the right-click menu, with the same parts and the same trim
+  as `DropdownMenu`. `DataTable`'s `onRowContextMenu` finally has somewhere to
+  go.
+- `Collapsible` — one fold on its own, animating on the accordion's own curve.
+- `NumberInput` — a text field that knows it holds a number: `inputMode`,
+  `role="spinbutton"` with its bounds, arrow keys (Shift for ten), steppers off
+  the tab order, a `unit` inside the field, and a parser that takes a comma for
+  a decimal point. Not `<input type="number">`, which spins under the scroll
+  wheel, refuses that comma, and reports an empty string for anything it
+  dislikes — so a host cannot tell "0,5" from "".
+- `Empty` — the centred stack every list needs when it has nothing to show:
+  `Empty`, `EmptyMedia`, `EmptyTitle`, `EmptyDescription`, `EmptyActions`.
+- `Kbd` / `KbdSequence` — a key drawn as one. `keys={['mod', 'k']}` prints ⌘K
+  on Apple hardware and Ctrl+K everywhere else, and reads the platform only
+  after mount, so the server's markup and the client's first render agree.
 - `Card` — `interactive` adds the hover state; combined with `onClick` the card
   also gets `role="button"`, `tabIndex` and Enter/Space activation.
 - `Spinner` — `label` (default `Loading`) is announced by screen readers;
@@ -749,6 +802,19 @@ What it does:
 - **Row selection** — Shift selects a range, the header checkbox takes the page,
   and the floating bar can escalate to "all N matching" (in that mode a bulk
   action must travel with the query, not with a list of ids).
+- **A thousand rows** — `virtualize` draws only the rows in view plus a margin,
+  so both the browser's layout and React's re-render are bounded by the
+  viewport instead of by the result set. It needs the scroller to have a
+  height, assumes the row height the density gives (`{ rowHeight, overscan }`
+  overrides it), and steps aside while a detail panel is open — an expanded row
+  is a row of a height the arithmetic does not know. Rows are *not* memoised
+  instead: a column's `cell` is a fresh closure on every render of the host, so
+  a memoised row re-renders anyway; drawing fewer of them is the fix that works.
+- **Right to left** — the pins, the seam, the resize handle and the alignment
+  are written as inline start and end, so an Arabic or Hebrew table pins its
+  first column against the reader's own first edge and a drag towards the left
+  widens a column rather than shrinking it. `pinned: 'left'` keeps its name and
+  means "the start".
 - **Columns** — visibility, order (drag and drop plus arrows for the keyboard)
   and pinning; all of it saved to `localStorage` under `persistKey`, stamped
   with a schema version so a future release drops a payload it cannot read
@@ -759,6 +825,14 @@ What it does:
   whose header is a node rather than text is listed by position: “#3”.
   `columnManager={false}` drops the button for a layout the host fixes or
   drives itself; the layout props keep working without it.
+
+  Past eight columns the list grows a search box, and show-all / hide-all act
+  on whatever the search has narrowed to. Dragging is off while the list is
+  filtered — a drop lands beside the row above it *in the table*, which in a
+  filtered list is not the row above it on screen — and the arrows stay, since
+  they name the neighbour they move past. The grip is also the touch handle:
+  touch never fires a `dragstart`, so reordering used to be mouse-only on the
+  device most likely to be reading a table sideways.
 - **Expandable rows** — uncontrolled by default, or driven from outside with
   `expanded` / `onExpandedChange` / `defaultExpanded`. `expandOnRowClick` opens
   a row from anywhere on it, and the header carries an expand-all control.
@@ -771,6 +845,17 @@ What it does:
   that started on a link, button, field or menu item inside a cell, so a delete
   button no longer also opens the record behind its own confirmation dialog.
   `onRowDoubleClick` and `onRowContextMenu` follow the same rule.
+- **A keyboard, at two depths.** A clickable row is a tab stop and answers
+  Enter — always, since it changes nothing else. `keyboard` goes further and
+  makes the body a grid: one roving tab stop over the cells, arrows to move it,
+  `Home`/`End` for the row and Ctrl with them for the table, `PageUp`/`PageDown`
+  by ten rows, Space to tick a row, Enter or `F2` to open an editable cell and
+  Escape to leave it — which puts the focus back in the cell it came from,
+  rather than at the top of the page. Enter on a cell with no editor does what
+  a click on it does. It is opt-in because it changes the table's role from
+  `table` to `grid`, and a table that is only read is not a grid. Controls
+  inside cells stay tabbable either way: a host's action buttons keep answering
+  Tab exactly as before.
 - **States** — skeletons on the first load, a thin progress line when refetching
   over data already on screen, an empty result and an error with a retry.
 - **Density** `compact | normal | relaxed`.
@@ -781,8 +866,9 @@ What it does:
 - **`sortDescFirst`** starts an amount or date column at the big end, where the
   ascending first click was a wasted one.
 - **Assistive tech** — `aria-busy` while a refetch replaces the rows,
-  `aria-rowcount` over the whole result set, `aria-sort` only on the columns
-  that sort, and the selection count in a live region.
+  `aria-rowcount` over the whole result set with `aria-rowindex` counting from
+  the top of it rather than from the top of the page, `aria-sort` only on the
+  columns that sort, and the selection count in a live region.
 - **Load more instead of paging** — pass `onLoadMore` and the pager is replaced
   by a footer inside the table's own scroller, so an endless scroll works from
   the inside (a host cannot bolt a sentinel onto a scroller it does not own).
@@ -863,7 +949,17 @@ import { dataTable as ru, calendar, common } from '@morze/ui/locales/ru'
 
 `common` carries the strings the rest of the kit takes as individual props
 (`close`, `loading`, `more`, `sidebarNavigation`, `sidebarSections`,
-`toggleSidebar`), and `calendar` the four the month grid needs.
+`toggleSidebar`), `calendar` the four the month grid needs, and `combobox` /
+`datePicker` the handful their own fields draw — the search box's placeholder,
+the empty and failed lines, the clear button:
+
+```tsx
+import { combobox, datePicker } from '@morze/ui/locales/ru'
+
+<Combobox labels={combobox} loadOptions={searchClients} />
+<DatePicker labels={datePicker} locale="ru-RU" />
+```
+
 A bundle is plain data — no React, no styles — so it is safe to import from a
 server component. `@morze/ui/locales/en` is the same shape for English, and
 `MorzeLocale` types a language of your own.
@@ -874,6 +970,16 @@ server component. `@morze/ui/locales/en` is the same shape for English, and
 - Focus is drawn with an `outline` rather than a shadow, so it never fights the
   convex layers; width and offset are `--mz-ring-width` / `--mz-ring-offset`.
 - `@media (prefers-reduced-motion: reduce)` disables animation and the growth.
+- **A control that is off but needs to say why**: use `aria-disabled` rather
+  than `disabled`. A natively disabled control dispatches no mouse events at
+  all, so a tooltip over it never opens — which is the one moment a reader most
+  wants one. `aria-disabled` keeps the control in the tab order and under the
+  pointer, dims it the same 50% with a `not-allowed` cursor, and `Button`
+  refuses the click itself (the surrounding form is not submitted and a click
+  handler on the row behind it does not run either). `disabled` keeps
+  `pointer-events: none`, and deliberately: that is what lets the hit test
+  reach a wrapper, so the older trick of putting the tooltip on a span around
+  the button still works.
 - Classes are prefixed with `mz-` and variables with `--mz-`, so the kit does
   not collide with application styles (Tailwind included). The base layer has no
   descendant selectors: your own markup inside a `Card` or `Dialog` keeps its

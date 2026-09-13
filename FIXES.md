@@ -677,6 +677,240 @@ component — and `MorzeLocale` types a language of your own. `tests/locales.tes
 asserts a bundle covers every key and leaves nothing in English, which is what
 stops the drift the copy-pasted block had.
 
+The bundles also carry `combobox` and `datePicker` now. Both fields draw a
+handful of strings of their own — a search placeholder, the empty and failed
+lines, a clear button — and both shipped with English defaults and no entry in
+the bundle, which put a Russian host back to hand-carrying strings for exactly
+the two newest components. `MorzeLocale` gained the two keys, so a host that
+types its own language against it is told about them by the compiler.
+
+### Combobox and MultiSelect (K-11)
+
+`Select` takes a static list and has no search in it, so anything longer than
+a screen — warehouses, counterparties, articles — was somebody's own widget:
+eis-frontend pushed an async multiselect through the table's `custom` filter,
+which is the escape hatch working exactly as intended and also a sign that the
+thing being escaped to should have been in the kit.
+
+Both fields are the select trigger's recipe over the menu's rows, so a
+combobox in a form row is the same object as the select beside it and its list
+is the list every dropdown already draws — `.mz-item` with its own
+`data-highlighted`, which is also why the pointer and the arrow keys share one
+highlight instead of lighting up two rows at once.
+
+What the async half has to get right, and did not get right in any of the
+hand-rolled versions this replaces:
+
+- **Out-of-order answers.** Two keystrokes can be in flight at once and the
+  slower, older request can land last. Every request takes a ticket and only
+  the newest one may write, so the answer to `a` can no longer replace the
+  answer to `ab`. `tests/components.test.tsx` holds both promises open and
+  resolves them in the wrong order.
+- **A closure per render.** `loadOptions={(q) => …}` is a new function on every
+  render; depending on it directly fires a request per render for as long as
+  the list is open. It is held in a ref and the effect keys on the query.
+- **The label of a value that is not in the list.** An async list holds
+  whatever the last query answered, so a chip for something picked two queries
+  ago has nothing to read its label from and prints as a raw id. Every option
+  the field has seen is kept in a dictionary; a value it has never seen prints
+  as itself.
+- **Asking too early and too often.** `minChars` gates the first request and
+  says so in the panel; the debounce is skipped for the empty query the opening
+  list asks, so opening the list is not a quarter-second of nothing.
+
+The multi-select keeps the list open while several are ticked, collapses its
+chips into "+N" past `maxChips`, offers All / None over *what the search has
+narrowed to*, and drops the last chip on Backspace in an empty box. The chips
+in the trigger carry no × of their own: the trigger is a button, a button
+cannot contain one, and the one × that does exist sits over the field — the
+same arrangement, and the same reason, as the date field's.
+
+The trigger is the `combobox` role and the box inside the panel is a searchbox
+driving the list through `aria-activedescendant`, so the focus stays in the
+text while the highlight moves through the options, and there is exactly one
+combobox in the accessibility tree rather than the two that the shadcn
+trigger-plus-cmdk pairing produces.
+
+### DataTable — a keyboard for the grid (G-01)
+
+A clickable row could not be reached from the keyboard at all, and an editable
+cell opened on a double click alone. For anyone not using a pointer the table
+was readable and nothing else — in an ERP, where the table *is* the
+application, that is most of the application.
+
+It lands in two halves because only one of them is free:
+
+- **A clickable row is a tab stop and answers Enter.** Always on: it adds a
+  `tabIndex` and a key handler to rows that already answer a click, and
+  changes nothing for a row that does not. Enter pressed on a control inside
+  the row stays the control's, the same rule the click follows (G-02).
+- **`keyboard` makes the body a grid.** One roving tab stop over the cells,
+  arrows to move it, `Home`/`End` for the row and Ctrl with them for the whole
+  table, `PageUp`/`PageDown` by ten rows, Space to tick a row, Enter or `F2` to
+  open an editable cell. Escape out of an editor puts the focus back in the
+  cell it came from — but only if the reader is still inside that cell, since
+  a save triggered by clicking another cell has already moved the focus there
+  and pulling it back would undo the click that caused the save.
+
+The second half is opt-in because it sets `role="grid"`, and that changes how
+a screen reader announces the whole table. A table that is only read is a
+table, and silently promoting every existing one to a grid would change what
+every existing host's users hear.
+
+Two limits, on purpose. The controls inside cells stay tabbable, so a host's
+action buttons keep answering Tab exactly as they did — a strict single-tab-stop
+grid would have to take Tab away from content the table does not own. And the
+header row stays out of the roving order: its sort and filter controls are
+already tab stops of their own.
+
+The roving stop follows whatever actually takes focus, not only the arrows, so
+clicking a cell — or tabbing into a button inside one — leaves the grid where
+the reader is. The position is clamped on the way out rather than on the way
+in: a page change or a hidden column can leave it outside the table, and a tab
+stop no cell carries is a grid that Tab cannot enter at all.
+
+Rows also carry `aria-rowindex` now, counted from the top of the result set.
+`aria-rowcount` had been added on its own (G-09), which tells a reader there
+are 13 659 rows while the page underneath is numbered 1 to 25 — so someone on
+page 3 was told they were at the top of the table.
+
+### DataTable — a thousand rows cost a thousand rows (G-06)
+
+Every row was laid out by the browser and re-rendered by React on any change
+of state — a tick of a checkbox re-rendered every cell of every row. At the
+100×10 the pager hands over that is free; in a load-more list at 1 000+ it is
+the whole frame budget, and the list only grows.
+
+`virtualize` draws the rows in view plus a margin. Two decisions are worth
+recording:
+
+**No `@tanstack/react-virtual`.** The 2026-09 spec called for it as an optional
+peer, and an optional peer needs a dynamic import and a fallback path for the
+version where it is missing — for arithmetic that is four lines when the rows
+are a known height. The kit has no date library behind its Calendar for the
+same reason. What the dependency would have bought is variable row heights,
+and that is exactly what the fallback below gives up instead.
+
+**Uniform heights, and a fallback when they are not.** The window is
+`scrollTop` over the row height, so an expanded detail panel — a row of a
+height nothing has measured — would put every row after it in the wrong place.
+While any row is expanded the table draws in full and the window is given up;
+it comes back when the panels close. The alternative, measuring each rendered
+row with a ResizeObserver, is how this file's very first entry begins.
+
+**Not memoisation.** Wrapping the row in `React.memo` is the obvious other
+answer and it does nothing here: `column.cell` is an arrow function written
+inline by the host, so every render of the host hands the row a new prop and
+the memo compares unequal. Hosts could be told to memoise their columns, which
+is a rule nobody keeps. Drawing fewer rows needs no cooperation.
+
+The grid keyboard (G-01) composes with it: an arrow into a row that has not
+been drawn scrolls it into the window first and takes the focus once it is
+there. `tests/data-table.browser.test.tsx` has all three — the window, the
+keyboard across it, and the expanded-row fallback — because happy-dom reports
+`clientHeight: 0` and would "virtualise" every table down to nothing.
+
+### DataTable — the column list for a table with thirty columns (G-10)
+
+The list had no search, no way to hide or show everything at once, and its
+reordering was mouse-only: HTML5 drag and drop never fires a `dragstart` for a
+touch, which left the drag broken on the device most likely to be reading a
+wide table.
+
+The search box appears past eight columns — below that the list is quicker to
+read than to search. Show-all and hide-all act on what the search narrowed to,
+which is what a reader who has just typed a word means by "all", and they go
+through one new `setHidden(ids)` on `useColumnLayout` rather than a loop over
+`toggleHidden`: every call in such a loop reads the same `layout` prop, which a
+controlled host has not re-rendered yet, so all but the last would be lost.
+
+Dragging is off while the list is filtered. A drop lands beside the row above
+it *in the table*, and in a filtered list that is not the row above it on
+screen — the arrows stay, because they name the neighbour they move past.
+
+Touch reordering hangs off the grip alone, with `touch-action: none` on it, so
+a finger anywhere else on the row still scrolls the list. The move and release
+listeners go on the document rather than on the grip: pointer capture is the
+tidier way to hold them and it is also the one an engine can refuse, and
+without it a finger that has left the grip stops reporting to it — the drag
+would die under the reader's thumb.
+
+### The table in an RTL page (G-13)
+
+Pins, the pinned seam, the resize handle, the inline editor's message and the
+loading bar were all written in `left` and `right`, so an Arabic or Hebrew
+table pinned its first column against the far edge and drew its seam on the
+wrong side. All of them are inline start and end now. `pinned: 'left'` keeps
+its name — it is the API's word for "first" — and resolves to the start.
+
+Two things do not follow from the CSS and had to be done by hand:
+
+- **`scrollLeft` counts downwards from zero in an RTL scroller** (Chrome and
+  Firefox both). The edge shadows read it as a distance from the start now, or
+  the table declared itself scrolled to the far end the moment it was drawn.
+  The attributes are named for it: `data-scrolled-start` / `data-scrolled-end`.
+- **The resize handle sits on the column's inline end**, which is its left edge
+  here, so a drag towards the left is what widens the column. The pointer delta
+  and the arrow keys both reverse off `getComputedStyle(root).direction`.
+
+`box-shadow` has no logical form, so the seam's hairline is the one place with
+an explicit `[dir='rtl']` rule.
+
+### A control that is off cannot say why (K-07)
+
+`<Tooltip>` over a disabled button never opened. The kit's shared disabled
+contract carries `pointer-events: none`, and `.mz-btn[aria-disabled='true']`
+carried it too — but the deeper reason is the platform's: a natively disabled
+control dispatches no mouse events at all, so nothing hung on it can hear a
+pointer. The moment a reader most wants to know why a button is off is the
+moment the explanation is unreachable.
+
+Both halves of the answer are now in place:
+
+- `disabled` keeps `pointer-events: none`, deliberately. With it the hit test
+  falls through to whatever wraps the button, which is what lets the older
+  trick — putting the tooltip's trigger on a `span` around it — work at all.
+- `aria-disabled` is the other way to say no: the control keeps its place in
+  the tab order and under the pointer, announces itself as unavailable, wears
+  the same 50% and a `not-allowed` cursor, and `Button` refuses the activation
+  itself — `preventDefault`, because a click on a submit button is a form
+  submission before it is a handler, and `stopPropagation`, because a row or a
+  card around it must not take the click the button has just declined.
+
+The browser spec is the one that matters here, and it is in
+`tests/data-table.browser.test.tsx`: happy-dom applies no stylesheet, so it
+will happily "hover" an element that is `pointer-events: none` in every real
+engine.
+
+### The composites hosts were still writing by hand (K-11)
+
+`Command` / `CommandDialog`, `ContextMenu`, `Collapsible`, `NumberInput`,
+`Empty`, `Kbd` — with `DatePicker`, `Combobox` and `MultiSelect` already
+shipped, this closes K-11.
+
+Three of them are thin: `ContextMenu` is the dropdown's parts under a
+right-click, `Collapsible` is one accordion item without the set, `Empty` is
+the centred stack `DataTable` already drew for itself. `Kbd` carries the one
+piece of logic nobody gets right twice — the same shortcut is ⌘K on a Mac and
+Ctrl+K everywhere else — and reads the platform only after mount, because a
+server has no platform to read and guessing one there shows a Mac user "Ctrl"
+until the page hydrates.
+
+`NumberInput` is not `<input type="number">`, which is the reason it exists:
+that control spins its value away under a scroll wheel, refuses a comma where
+a comma is the decimal separator, hands back an empty string for anything it
+dislikes — so a host cannot tell "0,5" from "" — and draws spinners nothing can
+style. This is a text field that knows it holds a number: `inputMode="decimal"`,
+`role="spinbutton"` with its bounds, arrows (Shift for ten), steppers kept off
+the tab order, a `unit` inside the field, and bounds applied on blur rather
+than under the caret, where clamping "1" on its way to "12" fights the typing.
+
+`Command` reads which items are on screen from the DOM rather than from a
+registry of children — the list is what the reader sees, so the list is the
+source of truth for where the arrows can go and whether there is anything
+left — and runs the highlighted item through its own `click()`, so an item a
+host wrapped in a link behaves like the link it is.
+
 ---
 
 ## Known gaps

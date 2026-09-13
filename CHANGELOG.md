@@ -12,21 +12,75 @@ between 0.2.0 and 0.3.7 the package went out eleven times, with real API
 changes among them, and the only record left is six commits that say
 `bump x.y.z`.
 
-## [Unreleased]
+## [0.5.0] — 2026-09-13
 
-### Fixed
+The P2 half of the 2026-09 review (`docs/review-2026-09.md`), which closes it:
+every finding in that document is now either shipped or recorded as a decision.
+Every entry below has a longer write-up in `FIXES.md` under the finding's id.
 
-- **Two column ids that differ only by punctuation shared one width** (G-12).
-  `cssSafe` let `_` through *and* used it as the replacement for everything
-  else, so `a.b` and `a_b` both became `a_b`: one custom property, one width,
-  and dragging either column resized both. The escaping is injective now.
-- **The first-load placeholder had no table under it** (G-14). It was one cell
-  spanning the full width with a single bar in it, which announced a list and
-  then jumped into a grid the moment the rows arrived. It draws a cell per
-  column, pinned columns included.
+### Added
+
+- **`Combobox` and `MultiSelect`** (K-11) — a searchable list on the select
+  trigger's own recipe, with `options` for a list you hold and `loadOptions`
+  for one the backend filters. `Select` had no search in it, so every list
+  longer than a screen was somebody's own widget; eis-frontend pushed an async
+  multiselect through the table's `custom` filter. The async side debounces,
+  gates on `minChars`, keeps the labels of values the current answer no longer
+  contains, and ignores an older request that answers after a newer one. The
+  multi-select collapses its chips into "+N", takes All / None over what the
+  search has narrowed to, and drops the last chip on Backspace in an empty box.
+- **DataTable — a keyboard** (G-01). A clickable row is now a tab stop and
+  answers Enter; that half is always on. `keyboard` goes further and makes the
+  body a grid: one roving tab stop over the cells, arrows to move it,
+  `Home`/`End` and Ctrl with them, `PageUp`/`PageDown` by ten rows, Space to
+  tick a row, Enter or `F2` to open an editable cell, and Escape to leave one —
+  back into the cell it came from. It is opt-in because it sets `role="grid"`,
+  which changes how a screen reader announces the whole table; controls inside
+  cells stay tabbable either way.
+- **DataTable — `aria-rowindex`** on every row, counted from the top of the
+  result set. `aria-rowcount` on its own says "13 659 rows" over a page
+  numbered 1–25, so a reader on page 3 was told they were at the top.
+- **Locale bundles — `combobox` and `datePicker`**. Both fields draw strings of
+  their own and had no entry in `ru` / `en`, which left a Russian host
+  hand-carrying labels for the two newest components. `MorzeLocale` carries the
+  two keys, so a host typing its own language against it is told about them.
+- **DataTable — `virtualize`** (G-06). Only the rows in view are drawn, plus a
+  margin, so a thousand-row list costs the browser and React what a screenful
+  costs. It needs a scroller height, assumes the density's row height
+  (`{ rowHeight, overscan }` overrides), and steps aside while a detail panel is
+  open. Rows are not memoised: a column's `cell` is a fresh closure per render
+  of the host, so a memoised row re-renders anyway.
+- **DataTable — a searchable column list** (G-10). Past eight columns the
+  Columns popover grows a search box, and show-all / hide-all act on what the
+  search narrowed to. The grip is now the touch handle for reordering — touch
+  never fires a `dragstart`, so the drag was mouse-only until now — and
+  `useColumnLayout` gained `setHidden(ids)` for the bulk write a loop over
+  `toggleHidden` cannot do under a controlled `layout`.
+- **`Command` / `CommandDialog`** (K-11) — the ⌘K palette: its own shortcut,
+  filtering over each item's `value` and `keywords`, groups that hide when
+  empty, Enter running the highlighted item through its own click.
+- **`ContextMenu`** (K-11) — the right-click menu, same parts and trim as
+  `DropdownMenu`; `onRowContextMenu` finally has somewhere to go.
+- **`Collapsible`, `NumberInput`, `Empty`, `Kbd` / `KbdSequence`** (K-11). The
+  number field is a text input that knows it holds a number — `inputMode`,
+  `role="spinbutton"`, arrows, steppers off the tab order, a `unit`, and a
+  parser that takes a comma for a decimal point. `KbdSequence keys={['mod','k']}`
+  prints ⌘K on Apple hardware and Ctrl+K elsewhere, after mount, so hydration
+  stays quiet.
 
 ### Changed
 
+- **A control can be off and still explain itself** (K-07). `aria-disabled` no
+  longer carries `pointer-events: none`, so a tooltip over a button that is off
+  finally opens; `Button` refuses the click, the submit and the bubbling
+  itself. `disabled` is unchanged and keeps `pointer-events: none` — that is
+  what lets a tooltip on a wrapper around the button work.
+- **The table is written in inline start and end** (G-13). Pins, the pinned
+  seam, the resize handle, the inline editor's message and `align: 'right'`
+  now follow the writing direction, and the resize drag and its arrow keys
+  reverse with it. `pinned: 'left'` keeps its name and means the start. The
+  scroller's own attributes are renamed with it: `data-scrolled-left` /
+  `data-scrolled-right` are now `data-scrolled-start` / `data-scrolled-end`.
 - **The page aurora is a fixed layer rather than `background-attachment:
   fixed`** (K-12). The keyword makes the compositor re-rasterise the
   background against the viewport on every scroll frame, which is expensive
@@ -40,6 +94,17 @@ changes among them, and the only record left is six commits that say
 
   A host that overrode `background` on `.mz-root` itself now has to override
   it on `.mz-root::before`; `--mz-bg` is unaffected and remains the knob.
+
+### Fixed
+
+- **Two column ids that differ only by punctuation shared one width** (G-12).
+  `cssSafe` let `_` through *and* used it as the replacement for everything
+  else, so `a.b` and `a_b` both became `a_b`: one custom property, one width,
+  and dragging either column resized both. The escaping is injective now.
+- **The first-load placeholder had no table under it** (G-14). It was one cell
+  spanning the full width with a single bar in it, which announced a list and
+  then jumped into a grid the moment the rows arrived. It draws a cell per
+  column, pinned columns included.
 
 ## [0.4.0] — 2026-09-12
 
