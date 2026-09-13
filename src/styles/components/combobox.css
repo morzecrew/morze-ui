@@ -27,8 +27,14 @@
   overflow: hidden;
 }
 /* A chip gives up its own width before the row overflows: three long names
-   read better clipped than one name and a "+2" that never appears. */
-.mz-combobox__chip { min-width: 0; overflow: hidden; }
+   read better clipped than one name and a "+2" that never appears. The "+2"
+   itself never gives up any: it is two characters, and a clipped one says
+   there is more without saying how much more. */
+/* `flex-shrink` against `.mz-badge`, which pins it at 0: without this the row
+   cannot give way at all, so the overflow falls off the end — and the end is
+   where the counter is. */
+.mz-combobox__chip { flex-shrink: 1; min-width: 0; overflow: hidden; }
+.mz-combobox__more { flex-shrink: 0; }
 
 /* The × sits over the field rather than inside the trigger — the date field's
    twin, and for the same reason: a button cannot contain a button, and

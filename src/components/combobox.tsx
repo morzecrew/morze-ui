@@ -723,7 +723,7 @@ function MultiSelect({
                 </Badge>
               ))}
               {rest > 0 ? (
-                <Badge variant="outline" className="mz-combobox__chip">
+                <Badge variant="outline" className="mz-combobox__more">
                   {labels.andMore(rest)}
                 </Badge>
               ) : null}

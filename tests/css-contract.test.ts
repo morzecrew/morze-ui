@@ -1008,6 +1008,17 @@ describe('the searchable field (K-11)', () => {
     expect(at('.mz-item[data-highlighted]')).toBeGreaterThan(-1)
   })
 
+  it('lets a chip give way before the counter does', () => {
+    // `.mz-badge` pins `flex-shrink: 0`, so without an override here the chip
+    // row cannot give way at all: the overflow falls off the end, and the end
+    // is where the "+2" is. A clipped counter says there is more without
+    // saying how much.
+    const chip = css.match(/\.mz-combobox__chip\{([^}]*)\}/)?.[1] ?? ''
+    expect(chip).toContain('flex-shrink:1')
+    const more = css.match(/\.mz-combobox__more\{([^}]*)\}/)?.[1] ?? ''
+    expect(more).toContain('flex-shrink:0')
+  })
+
   it('keeps the clear button clear of the chevron', () => {
     // Both sit at the right edge of the trigger, and the × used to be put
     // where the date field puts it — on top of the chevron the select trigger
