@@ -39,7 +39,9 @@ import {
 } from './utils'
 import { cssSafe, useColumnResize } from './use-column-resize'
 import { useColumnLayout } from './use-column-layout'
+import { useGridKeyboard } from './use-grid-keyboard'
 import { useRowSelection } from './use-row-selection'
+import { useVirtualRows, type VirtualizeOption } from './use-virtual-rows'
 
 export type DataTableProps<T> = {
   columns: DataTableColumn<T>[]
@@ -152,7 +154,7 @@ export type DataTableProps<T> = {
    * in full for as long as one is open: an expanded row is a row of its own
    * height, and this arithmetic has one height to work with.
    */
-  virtualize?: boolean | { rowHeight?: number; overscan?: number }
+  virtualize?: VirtualizeOption
   /**
    * Grid keyboard navigation: the arrows move one roving focus from cell to
    * cell, Enter or F2 opens an editable cell, Enter elsewhere activates the
@@ -566,238 +568,39 @@ export function DataTable<T>({
   const colSpan = visible.length + 1 + (selectable ? 1 : 0) + (renderExpanded ? 1 : 0)
   const selectionCount = rows.allMatching ? total : rows.count
 
-  /* -------------------------- Virtual rows (G-06) -------------------------
-     Every row was laid out and every cell re-rendered on any change of state,
-     so a thousand-row load-more list spent its time on rows nobody was
-     looking at. Memoising the rows would not have fixed it: a column's `cell`
-     is a fresh closure on every render of the host, so a memoised row is a
-     row that re-renders anyway. Drawing fewer of them does fix it.
-
-     Uniform heights and no react-virtual: the kit carries no date library
-     behind its Calendar either, and a fixed row height is arithmetic, not a
-     dependency. The cost of that choice is the expanded-row fallback below. */
-  const virtualOptions = virtualize === true ? {} : virtualize || null
-  const overscan = virtualOptions?.overscan ?? OVERSCAN
-  const theadRef = React.useRef<HTMLTableSectionElement>(null)
-  const [measuredRow, setMeasuredRow] = React.useState(0)
-  // `||` and not `??`: an unmeasured row is 0, which is not an answer.
-  const rowHeight = virtualOptions?.rowHeight || measuredRow || DENSITY_ROW_HEIGHT[density]
-  const virtualOn = Boolean(virtualOptions) && expanded.size === 0 && data.length > 0
-  const [range, setRange] = React.useState({ start: 0, end: INITIAL_VIRTUAL_ROWS })
-
-  // Measured from a row the table actually drew, so a host whose rows are
-  // taller than the density says still gets the arithmetic it needs. The
-  // density's own figure stands in for a DOM without layout.
-  React.useEffect(() => {
-    if (!virtualOptions || virtualOptions.rowHeight) return
-    const drawn = rootRef.current?.querySelector<HTMLElement>('.mz-dt__row')?.offsetHeight ?? 0
-    if (drawn > 0 && drawn !== measuredRow) setMeasuredRow(drawn)
-    // `virtualOptions` is a fresh object on every render when `virtualize` is
-    // `true`, so it stays out of the list.
-  }, [virtualOn, density, measuredRow, data.length])
-
-  React.useEffect(() => {
-    const scroller = scrollerRef.current
-    if (!virtualOn || !scroller) return
-    const update = () => {
-      // The header is sticky but still occupies its place in the flow, so the
-      // rows begin one header below the top of the scrollable content.
-      const head = theadRef.current?.offsetHeight ?? 0
-      const top = Math.max(0, scroller.scrollTop - head)
-      const start = Math.max(0, Math.floor(top / rowHeight) - overscan)
-      const end = Math.min(
-        data.length,
-        Math.ceil((top + scroller.clientHeight) / rowHeight) + overscan
-      )
-      // Nothing but the window is written from here, and only when it really
-      // moved: a fresh object per scroll frame is what once fed the scroller's
-      // own observer into a render loop (FIXES.md).
-      setRange((current) =>
-        current.start === start && current.end === end ? current : { start, end }
-      )
-    }
-    update()
-    scroller.addEventListener('scroll', update, { passive: true })
-    const observer = new ResizeObserver(update)
-    observer.observe(scroller)
-    return () => {
-      scroller.removeEventListener('scroll', update)
-      observer.disconnect()
-    }
-  }, [virtualOn, rowHeight, overscan, data.length])
-
-  const firstRow = virtualOn ? Math.min(range.start, Math.max(0, data.length - 1)) : 0
-  const rowsInView = virtualOn ? data.slice(firstRow, Math.max(range.end, firstRow)) : data
-  const padTop = firstRow * rowHeight
-  const padBottom = Math.max(0, (data.length - firstRow - rowsInView.length) * rowHeight)
-
-  /* ------------------------- Grid keyboard (G-01) -------------------------
-     A clickable row could not be reached from the keyboard at all, and an
-     editable cell opened on a double click alone: for anyone not using a
-     pointer the table was readable and nothing else.
-
-     Two halves, and only the larger one is opt-in. Without `keyboard`, a
-     clickable row is a tab stop of its own and answers Enter — no change of
-     role, so it is always on. With it, the body becomes a grid: one roving
-     tab stop over the cells, arrows to move it, Enter or F2 to edit, Enter to
-     activate the row, Space to tick it. */
-  const gridColumns = React.useMemo(
-    () => [
-      ...(selectable ? [{ kind: 'select' as const }] : []),
-      ...(renderExpanded ? [{ kind: 'expand' as const }] : []),
-      ...visible.map((column) => ({ kind: 'column' as const, column })),
-    ],
-    [selectable, renderExpanded, visible]
-  )
-  const controlCount = (selectable ? 1 : 0) + (renderExpanded ? 1 : 0)
-  const [focus, setFocus] = React.useState({ row: 0, col: 0 })
-  // Clamped on the way out rather than on the way in: a page change, a hidden
-  // column or a shorter result set can leave the stored position outside the
-  // table, and a tab stop no cell carries is a grid Tab cannot enter at all.
-  const focusRow = Math.max(0, Math.min(focus.row, data.length - 1))
-  const focusCol = Math.max(0, Math.min(focus.col, gridColumns.length - 1))
-
-  /** Set while the grid is waiting for a virtualised row to be drawn. */
-  const pendingFocus = React.useRef(false)
-
-  const cellAt = (row: number, col: number) =>
-    rootRef.current?.querySelector<HTMLElement>(
-      `td[data-grid-row="${row}"][data-grid-col="${col}"]`
-    ) ?? null
-
-  const moveFocus = (row: number, col: number) => {
-    const next = {
-      row: Math.max(0, Math.min(data.length - 1, row)),
-      col: Math.max(0, Math.min(gridColumns.length - 1, col)),
-    }
-    setFocus(next)
-    // Focused straight away rather than after the state lands: a cell at
-    // tabIndex -1 still takes focus from script, and waiting a commit for it
-    // would drop every keystroke held down in between.
-    const cell = cellAt(next.row, next.col)
-    if (cell) return cell.focus()
-    // Virtualised, and the row has not been drawn yet. Scrolling it into the
-    // window is what draws it; the effect below hands it the focus once it is
-    // there, which is the only part that cannot happen in this call.
-    pendingFocus.current = true
-    const scroller = scrollerRef.current
-    if (!scroller) return
-    const head = theadRef.current?.offsetHeight ?? 0
-    scroller.scrollTop = Math.max(0, head + next.row * rowHeight - scroller.clientHeight / 2)
-  }
-
-  React.useEffect(() => {
-    if (!pendingFocus.current) return
-    const cell = cellAt(focusRow, focusCol)
-    if (!cell) return
-    pendingFocus.current = false
-    cell.focus()
+  /* The window over the rows (G-06) and the grid keyboard (G-01) are each a
+     concern of their own, and each was a page of this component before it was
+     a file: `use-virtual-rows.ts` and `use-grid-keyboard.ts` carry the whole
+     of both, including why they are shaped the way they are. They meet here
+     because the keyboard has to be able to walk into a row the window has not
+     drawn yet — it scrolls by the same row height, measured once. */
+  const { theadRef, rowHeight, firstRow, rowsInView, padTop, padBottom } = useVirtualRows({
+    virtualize,
+    data,
+    density,
+    expandedCount: expanded.size,
+    rootRef,
+    scrollerRef,
   })
 
-  /** The column an Enter in this cell would open an editor for, if any. */
-  const editorAt = (row: T, col: number) => {
-    const entry = gridColumns[col]
-    if (entry?.kind !== 'column') return undefined
-    const def = entry.column.editable
-    return def && (def.canEdit?.(row) ?? true) ? entry.column : undefined
-  }
-
-  /** Closes the editor and gives the cell its focus back. */
-  const finishEditing = (row: number, col: number) => {
-    setEditing(null)
-    if (!keyboard) return
-    const cell = cellAt(row, col)
-    // Only while the reader is still inside the cell: a save caused by
-    // clicking another cell has already moved focus there, and pulling it
-    // back here would undo the click that caused the save.
-    if (cell && cell.contains(document.activeElement)) cell.focus()
-  }
-
-  const onGridKeyDown = (event: React.KeyboardEvent) => {
-    if (!keyboard) return
-    const cell = event.target as HTMLElement
-    // The cell itself only: inside it the keys belong to whatever has focus —
-    // the editor's Enter saves, a menu's arrows walk its own items.
-    if (cell.dataset?.gridCol === undefined) return
-    const row = Number(cell.dataset.gridRow)
-    const col = Number(cell.dataset.gridCol)
-    const record = data[row]
-    if (record === undefined) return
-
-    switch (event.key) {
-      case 'ArrowRight':
-        event.preventDefault()
-        return moveFocus(row, col + 1)
-      case 'ArrowLeft':
-        event.preventDefault()
-        return moveFocus(row, col - 1)
-      case 'ArrowDown':
-        event.preventDefault()
-        return moveFocus(row + 1, col)
-      case 'ArrowUp':
-        event.preventDefault()
-        return moveFocus(row - 1, col)
-      case 'Home':
-        event.preventDefault()
-        return moveFocus(event.ctrlKey ? 0 : row, 0)
-      case 'End':
-        event.preventDefault()
-        return moveFocus(event.ctrlKey ? data.length - 1 : row, gridColumns.length - 1)
-      case 'PageDown':
-        event.preventDefault()
-        return moveFocus(row + GRID_PAGE, col)
-      case 'PageUp':
-        event.preventDefault()
-        return moveFocus(row - GRID_PAGE, col)
-      case ' ': {
-        if (!selectable) return
-        // Or the scroller answers the space bar by jumping a screen, which is
-        // the one thing a reader ticking rows never means by it.
-        event.preventDefault()
-        return rows.toggle(rowKey(record), { shiftKey: event.shiftKey })
-      }
-      case 'F2':
-      case 'Enter': {
-        const editable = editorAt(record, col)
-        if (editable) {
-          event.preventDefault()
-          return setEditing({ key: rowKey(record), col: editable.id })
-        }
-        // F2 means "edit this cell" and nothing else; Enter falls through to
-        // the row, which is what a click on the same cell would have done.
-        if (event.key === 'F2' || !rowActivates) return
-        event.preventDefault()
-        onRowClick?.(record)
-        if (expandOnRowClick && renderExpanded) toggleExpanded(rowKey(record))
-        return
-      }
-      default:
-        return
-    }
-  }
-
-  /* The roving tab stop follows whatever actually took focus, so a click into
-     a cell — or a Tab into a control inside one — leaves the grid where the
-     reader is rather than where the arrow keys last left it. */
-  const onGridFocus = (event: React.FocusEvent) => {
-    if (!keyboard) return
-    const cell = (event.target as HTMLElement).closest?.('td[data-grid-col]')
-    if (!cell) return
-    const row = Number((cell as HTMLElement).dataset.gridRow)
-    const col = Number((cell as HTMLElement).dataset.gridCol)
-    setFocus((current) => (current.row === row && current.col === col ? current : { row, col }))
-  }
-
-  /** Grid attributes for one body cell — nothing at all when the grid is off. */
-  const gridCell = (row: number, col: number) =>
-    keyboard
-      ? {
-          role: 'gridcell',
-          tabIndex: row === focusRow && col === focusCol ? 0 : -1,
-          'data-grid-row': row,
-          'data-grid-col': col,
-        }
-      : undefined
+  const { gridProps, gridCell, finishEditing, controlCount } = useGridKeyboard({
+    keyboard,
+    data,
+    rowKey,
+    visible,
+    selectable,
+    expandable: Boolean(renderExpanded),
+    rootRef,
+    scrollerRef,
+    theadRef,
+    rowHeight,
+    rowActivates,
+    onRowClick,
+    expandOnRowClick,
+    toggleExpanded,
+    toggleSelection: rows.toggle,
+    setEditing,
+  })
 
   /**
    * Which row of the whole result set this is, counting the header as row 1.
@@ -1099,12 +902,7 @@ export function DataTable<T>({
         <table
           className="mz-dt__table"
           data-sticky={stickyHeader || undefined}
-          // `grid` is what tells a screen reader the arrow keys do something
-          // here; on a reading table they belong to the page's own scroll, so
-          // the role only arrives with the keyboard that justifies it.
-          role={keyboard ? 'grid' : undefined}
-          onKeyDown={keyboard ? onGridKeyDown : undefined}
-          onFocus={keyboard ? onGridFocus : undefined}
+          {...gridProps}
           // A refetch on a populated table changes nothing a screen reader can
           // see; `aria-busy` is what says the rows underneath are being
           // replaced. `aria-rowcount` counts the header with the rows, and is
