@@ -43,10 +43,17 @@
 }
 
 .mz-btn:disabled,
-.mz-btn[data-disabled],
-.mz-btn[aria-disabled='true'] {
+.mz-btn[data-disabled] {
   pointer-events: none;
   opacity: 0.5;
+}
+/* `aria-disabled` keeps the pointer: this is the button that has to be able to
+   carry a tooltip saying why it is off, and `pointer-events: none` here was
+   what stopped one opening (K-07). The refusal is the component's — see the
+   note over `Button` — and the shared contract in base.css says the rest. */
+.mz-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ---- Sizes ----

@@ -171,13 +171,26 @@
   outline-offset: var(--mz-ring-offset);
 }
 
-/* Shared disabled contract. */
+/* Shared disabled contract. `pointer-events: none` is deliberate and load
+   bearing: a natively disabled control dispatches no mouse events of its own,
+   and letting the hit test fall through to whatever wraps it is what allows a
+   tooltip on that wrapper to explain why the control is off (K-07). */
 [class^='mz-']:disabled,
 [class*=' mz-']:disabled,
 [class^='mz-'][data-disabled],
 [class*=' mz-'][data-disabled] {
   pointer-events: none;
   opacity: 0.5;
+}
+
+/* The other way to say no. `aria-disabled` leaves the control on the pointer's
+   map and in the tab order — so a tooltip over it opens, and a reader can
+   find out why it is off — and the component refuses the activation itself.
+   Same 50%, and the cursor says it before the click does. */
+[class^='mz-'][aria-disabled='true'],
+[class*=' mz-'][aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Popper surfaces (dialog, menu, popover, select). Frosted, not opaque: the
