@@ -60,6 +60,34 @@ type ButtonProps = React.ComponentProps<'button'> &
  * component refuses the activation instead of the browser. Hover it, focus it,
  * read why. What it cannot do is act.
  */
+function refusal({
+  asChild,
+  off,
+  ariaDisabled,
+}: {
+  asChild: boolean
+  off: boolean
+  ariaDisabled: ButtonProps['aria-disabled']
+}) {
+  const soft = !off && (ariaDisabled === true || ariaDisabled === 'true')
+  return {
+    // A slotted element may not support `disabled` (a link, for one), so the
+    // state is also expressed through aria, which the CSS honours.
+    disabled: asChild ? undefined : off,
+    'aria-disabled': soft || (asChild && off) ? true : undefined,
+    soft,
+  }
+}
+
+/** What a soft-disabled control answers a click with. `preventDefault`,
+    because a click on a submit button is a form submission before it is ever a
+    handler; `stopPropagation`, because a row or a card around it must not take
+    the click the button has just declined. */
+const refuse = (event: React.MouseEvent) => {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
 function Button({
   className,
   variant = 'primary',
@@ -74,8 +102,7 @@ function Button({
   ...props
 }: ButtonProps) {
   const Comp = asChild ? Slot.Root : 'button'
-  const isDisabled = disabled || loading
-  const softDisabled = !isDisabled && (ariaDisabled === true || ariaDisabled === 'true')
+  const { soft, ...state } = refusal({ asChild, off: disabled || loading, ariaDisabled })
 
   const decorate = (label: React.ReactNode) => (
     <>
@@ -109,23 +136,9 @@ function Button({
       data-tone={tone}
       data-loading={loading || undefined}
       className={cn(buttonVariants({ variant, size }), className)}
-      // A slotted element may not support `disabled` (a link, for one), so the
-      // state is also expressed through aria, which the CSS honours.
-      disabled={asChild ? undefined : isDisabled}
-      aria-disabled={(asChild && isDisabled) || softDisabled ? true : undefined}
+      {...state}
       aria-busy={loading || undefined}
-      // The refusal itself. `preventDefault` because a click on a submit
-      // button is a form submission before it is ever a handler, and
-      // `stopPropagation` because a row or a card around it must not take the
-      // click the button has just declined.
-      onClick={
-        softDisabled
-          ? (event) => {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-          : onClick
-      }
+      onClick={soft ? refuse : onClick}
       {...props}
     >
       {content}
