@@ -37,6 +37,23 @@ export type VirtualRows<T> = {
   padBottom: number
 }
 
+/** The rows the scroller can actually show right now, plus the overscan. */
+function windowOf(
+  scroller: HTMLDivElement,
+  headHeight: number,
+  rowHeight: number,
+  overscan: number,
+  count: number
+) {
+  // The header is sticky but still occupies its place in the flow, so the
+  // rows begin one header below the top of the scrollable content.
+  const top = Math.max(0, scroller.scrollTop - headHeight)
+  return {
+    start: Math.max(0, Math.floor(top / rowHeight) - overscan),
+    end: Math.min(count, Math.ceil((top + scroller.clientHeight) / rowHeight) + overscan),
+  }
+}
+
 export function useVirtualRows<T>({
   virtualize,
   data,
@@ -55,10 +72,11 @@ export function useVirtualRows<T>({
 }): VirtualRows<T> {
   const options = virtualize === true ? {} : virtualize || null
   const overscan = options?.overscan ?? OVERSCAN
+  const fixedHeight = options?.rowHeight
   const theadRef = React.useRef<HTMLTableSectionElement>(null)
   const [measuredRow, setMeasuredRow] = React.useState(0)
   // `||` and not `??`: an unmeasured row is 0, which is not an answer.
-  const rowHeight = options?.rowHeight || measuredRow || DENSITY_ROW_HEIGHT[density]
+  const rowHeight = fixedHeight || measuredRow || DENSITY_ROW_HEIGHT[density]
   // An open detail panel is a row of a height this arithmetic does not know,
   // so the window is given up rather than left to drift.
   const virtualOn = Boolean(options) && expandedCount === 0 && data.length > 0
@@ -67,7 +85,6 @@ export function useVirtualRows<T>({
   // Measured from a row the table actually drew, so a host whose rows are
   // taller than the density says still gets the arithmetic it needs. The
   // density's own figure stands in for a DOM without layout.
-  const fixedHeight = options?.rowHeight
   React.useEffect(() => {
     if (!virtualOn || fixedHeight) return
     const drawn = rootRef.current?.querySelector<HTMLElement>('.mz-dt__row')?.offsetHeight ?? 0
@@ -78,20 +95,18 @@ export function useVirtualRows<T>({
     const scroller = scrollerRef.current
     if (!virtualOn || !scroller) return
     const update = () => {
-      // The header is sticky but still occupies its place in the flow, so the
-      // rows begin one header below the top of the scrollable content.
-      const head = theadRef.current?.offsetHeight ?? 0
-      const top = Math.max(0, scroller.scrollTop - head)
-      const start = Math.max(0, Math.floor(top / rowHeight) - overscan)
-      const end = Math.min(
-        data.length,
-        Math.ceil((top + scroller.clientHeight) / rowHeight) + overscan
+      const next = windowOf(
+        scroller,
+        theadRef.current?.offsetHeight ?? 0,
+        rowHeight,
+        overscan,
+        data.length
       )
       // Nothing but the window is written from here, and only when it really
       // moved: a fresh object per scroll frame is what once fed the scroller's
       // own observer into a render loop (FIXES.md).
       setRange((current) =>
-        current.start === start && current.end === end ? current : { start, end }
+        current.start === next.start && current.end === next.end ? current : next
       )
     }
     update()
