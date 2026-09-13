@@ -8,6 +8,8 @@
  */
 import type { DataTableLabels } from '../components/data-table/labels'
 import type { CalendarLabels } from '../components/calendar'
+import type { ComboboxLabels } from '../components/combobox'
+import type { DatePickerLabels } from '../components/date-picker'
 import type { MorzeCommonLabels, MorzeLocale } from './types'
 
 export const dataTable: DataTableLabels = {
@@ -36,6 +38,10 @@ export const dataTable: DataTableLabels = {
   no: 'Нет',
 
   columns: 'Колонки',
+  searchColumns: 'Найти колонку…',
+  noColumns: 'Такой колонки нет',
+  showAllColumns: 'Показать все',
+  hideAllColumns: 'Скрыть все',
   moveUp: (column) => `Переместить «${column}» выше`,
   moveDown: (column) => `Переместить «${column}» ниже`,
   pinning: (column, side) => `Закрепление колонки «${column}»: ${side}`,
@@ -87,6 +93,27 @@ export const calendar: CalendarLabels = {
   weekNumber: 'Неделя',
 }
 
+export const combobox: ComboboxLabels = {
+  placeholder: 'Выберите…',
+  search: 'Поиск…',
+  empty: 'Ничего не подходит',
+  loading: 'Загрузка',
+  failed: 'Не удалось загрузить список',
+  clear: 'Очистить',
+  selectAll: 'Все',
+  clearAll: 'Ничего',
+  // A "+3" is the same three characters in both languages; it is here so the
+  // bundle stays complete, not because it differs.
+  andMore: (count) => `+${count}`,
+  typeMore: (count) => `Введите не менее ${count} символов`,
+}
+
+export const datePicker: DatePickerLabels = {
+  placeholder: 'Выберите дату',
+  clear: 'Очистить',
+  open: 'Открыть календарь',
+}
+
 export const common: MorzeCommonLabels = {
   close: 'Закрыть',
   loading: 'Загрузка',
@@ -96,5 +123,5 @@ export const common: MorzeCommonLabels = {
   toggleSidebar: 'Свернуть или развернуть меню',
 }
 
-export const ru: MorzeLocale = { dataTable, calendar, common }
+export const ru: MorzeLocale = { dataTable, calendar, combobox, datePicker, common }
 export default ru

@@ -23,6 +23,22 @@ import {
   CardHeader,
   CardTitle,
   Checkbox,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Combobox,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   DatePicker,
   DateRangePicker,
   Dialog,
@@ -40,11 +56,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  Empty,
+  EmptyActions,
+  EmptyDescription,
+  EmptyMedia,
+  EmptyTitle,
   Field,
   FieldHint,
   Input,
   Label,
+  Kbd,
+  KbdSequence,
   MorzeThemeProvider,
+  MultiSelect,
+  NumberInput,
   Progress,
   RadioGroup,
   RadioGroupItem,
@@ -112,11 +137,53 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
+/** A client list that lives on a server slow enough to be visible. */
+const clients = [
+  { value: 'c1', label: 'Aurora Logistics', hint: 'Moscow · ₽ 1 240 000' },
+  { value: 'c2', label: 'Baltic Freight', hint: 'Kaliningrad · ₽ 86 000' },
+  { value: 'c3', label: 'Cedar Works', hint: 'Kazan · ₽ 412 000' },
+  { value: 'c4', label: 'Delta Pipe', hint: 'Perm · ₽ 3 100 000' },
+  { value: 'c5', label: 'Everline', hint: 'Sochi · ₽ 74 500' },
+]
+const searchClients = async (query: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 400))
+  const needle = query.toLocaleLowerCase()
+  return clients.filter((client) => client.label.toLocaleLowerCase().includes(needle))
+}
+
+const tagOptions = [
+  { value: 'urgent', label: 'Urgent' },
+  { value: 'paid', label: 'Paid' },
+  { value: 'export', label: 'Export' },
+  { value: 'hold', label: 'On hold' },
+  { value: 'vip', label: 'VIP' },
+]
+
 function Demo() {
   const [progress] = useState(64)
+  const [palette, setPalette] = useState(false)
 
   return (
     <div className="pg">
+      <CommandDialog open={palette} onOpenChange={setPalette}>
+        <CommandInput placeholder="Type a command…" aria-label="Command" />
+        <CommandList>
+          <CommandEmpty>Nothing matches</CommandEmpty>
+          <CommandGroup heading="Orders">
+            <CommandItem value="New order">
+              New order <CommandShortcut>⌘N</CommandShortcut>
+            </CommandItem>
+            <CommandItem value="Open order" keywords={['find', 'search']}>
+              Open order
+            </CommandItem>
+          </CommandGroup>
+          <CommandGroup heading="Settings">
+            <CommandItem value="Theme">Switch theme</CommandItem>
+            <CommandItem value="Profile">Profile</CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+
       <div className="pg__bar">
         <div className="pg__brand">
           <h1>Morze UI</h1>
@@ -290,6 +357,31 @@ function Demo() {
             <DatePicker locale="en-GB" defaultValue={new Date(2026, 8, 12)} size="sm" />
           </Field>
           <Field>
+            <Label>Client</Label>
+            {/* The async half: a list the backend filters, two characters
+                before it is asked anything, and a label that survives the
+                query that found it going away. */}
+            <Combobox
+              placeholder="Find a client…"
+              minChars={2}
+              loadOptions={searchClients}
+            />
+          </Field>
+          <Field>
+            <Label htmlFor="pg-qty">Quantity</Label>
+            <NumberInput id="pg-qty" defaultValue={12} min={0} max={999} unit="pcs" />
+          </Field>
+          <Field>
+            <Label>Tags</Label>
+            <MultiSelect
+              options={tagOptions}
+              defaultValue={['urgent', 'paid']}
+              placeholder="Any tag"
+              maxChips={2}
+            />
+            <FieldHint>Backspace on the empty box drops the last one.</FieldHint>
+          </Field>
+          <Field>
             <Label htmlFor="pg-msg">Task</Label>
             <Textarea id="pg-msg" placeholder="Describe the task…" />
           </Field>
@@ -373,7 +465,64 @@ function Demo() {
               </TooltipTrigger>
               <TooltipContent>Hover and here it is</TooltipContent>
             </Tooltip>
+
+            {/* The palette opens on its own shortcut too — this button is for
+                anyone who has not learnt it yet. */}
+            <Button variant="secondary" onClick={() => setPalette(true)}>
+              Command <KbdSequence keys={['mod', 'k']} />
+            </Button>
+
+            {/* A button that is off, with the reason on it: `aria-disabled`
+                keeps the pointer, so the tooltip opens (K-07). */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button aria-disabled>Publish</Button>
+              </TooltipTrigger>
+              <TooltipContent>Fill in the title first</TooltipContent>
+            </Tooltip>
+
+            <ContextMenu>
+              <ContextMenuTrigger asChild>
+                <Button variant="outline">Right-click me</Button>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem>Open</ContextMenuItem>
+                <ContextMenuItem>Duplicate</ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem variant="destructive">Delete</ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           </div>
+
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm">
+                Advanced settings
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <p style={{ margin: '8px 0 0', color: 'var(--mz-text-dim)', fontSize: 13 }}>
+                Everything that is usually folded away lives here. Press{' '}
+                <Kbd>Esc</Kbd> to leave it alone.
+              </p>
+            </CollapsibleContent>
+          </Collapsible>
+
+          <Empty>
+            <EmptyMedia>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M3 7h18v12H3zM3 7l3-4h12l3 4" />
+              </svg>
+            </EmptyMedia>
+            <EmptyTitle>No orders yet</EmptyTitle>
+            <EmptyDescription>They appear here as soon as the first one arrives.</EmptyDescription>
+            <EmptyActions>
+              <Button size="sm">New order</Button>
+              <Button size="sm" variant="secondary">
+                Import
+              </Button>
+            </EmptyActions>
+          </Empty>
 
           <Alert tone="accent">
             <AlertTitle>Request sent</AlertTitle>

@@ -6,6 +6,7 @@
 @import './components/controls.css';
 @import './components/fields.css';
 @import './components/overlays.css';
+@import './components/combobox.css';
 @import './components/display.css';
 @import './components/data-table.css';
 @import './components/table.css';

@@ -321,6 +321,64 @@
   to { height: 0 }
 }
 
+/* ------------------------------ Collapsible ------------------------------ */
+/* One fold on its own. The same variable, the same curve and the same two
+   durations as the accordion's, so two folds on one page open alike. */
+.mz-collapsible-content { overflow: hidden; }
+.mz-collapsible-content[data-state='open'] { animation: mz-collapsible-down 0.24s var(--mz-ease); }
+.mz-collapsible-content[data-state='closed'] { animation: mz-collapsible-up 0.2s var(--mz-ease); }
+
+@keyframes mz-collapsible-down {
+  from { height: 0 }
+  to { height: var(--radix-collapsible-content-height) }
+}
+@keyframes mz-collapsible-up {
+  from { height: var(--radix-collapsible-content-height) }
+  to { height: 0 }
+}
+
+/* ---------------------------------- Kbd --------------------------------- */
+/* A key, drawn as a key: the well the inputs sit in, one size down, with the
+   cap's own top edge so it reads as something that can be pressed. */
+.mz-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1px solid var(--mz-border-strong);
+  border-radius: var(--mz-radius-sm);
+  background-color: var(--mz-face);
+  box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 1px var(--mz-face-bottom);
+  color: var(--mz-text-dim);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.mz-kbd-row { display: inline-flex; align-items: center; gap: 3px; }
+
+/* --------------------------------- Empty -------------------------------- */
+/* The centred stack every list needs when it has nothing to show. The table
+   draws its own (`.mz-dt__state`) to the same measurements. */
+.mz-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 20px;
+  color: var(--mz-text-muted);
+  text-align: center;
+}
+.mz-empty__media { display: grid; place-content: center; color: var(--mz-text-muted); }
+.mz-empty__media svg { width: 30px; height: 30px; opacity: 0.6; }
+.mz-empty__title { margin: 0; font-size: 15px; font-weight: 600; color: var(--mz-text); }
+.mz-empty__description { margin: 0; max-width: 42ch; font-size: 14px; }
+.mz-empty__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
 /* ------------------------------- Progress ------------------------------- */
 .mz-progress {
   position: relative;

@@ -43,6 +43,20 @@ export {
   SelectValue,
 } from './components/select'
 
+export { Combobox, MultiSelect } from './components/combobox'
+export type {
+  ComboboxProps,
+  MultiSelectProps,
+  ComboboxOption,
+  ComboboxLabels,
+} from './components/combobox'
+
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './components/collapsible'
+export { NumberInput } from './components/number-input'
+export type { NumberInputProps } from './components/number-input'
+export { Kbd, KbdSequence } from './components/kbd'
+export { Empty, EmptyMedia, EmptyTitle, EmptyDescription, EmptyActions } from './components/empty'
+
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs'
 export type { TabsListProps } from './components/tabs'
 
@@ -106,6 +120,37 @@ export {
 } from './components/dropdown-menu'
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip'
+
+export {
+  ContextMenu,
+  ContextMenuPortal,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuLabel,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from './components/context-menu'
+
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from './components/command'
+export type { CommandDialogProps, CommandFilter } from './components/command'
 
 export {
   AlertDialog,

@@ -31,6 +31,11 @@ export type DataTableLabels = {
   no: string
 
   columns: string
+  /** The box over a long column list, and the answer when it matches nothing. */
+  searchColumns: string
+  noColumns: string
+  showAllColumns: string
+  hideAllColumns: string
   moveUp: (column: string) => string
   moveDown: (column: string) => string
   pinning: (column: string, side: string) => string
@@ -104,6 +109,10 @@ export const defaultDataTableLabels: DataTableLabels = {
   no: 'No',
 
   columns: 'Columns',
+  searchColumns: 'Find a column…',
+  noColumns: 'No such column',
+  showAllColumns: 'Show all',
+  hideAllColumns: 'Hide all',
   moveUp: (column) => `Move “${column}” up`,
   moveDown: (column) => `Move “${column}” down`,
   pinning: (column, side) => `Pinning for “${column}”: ${side}`,

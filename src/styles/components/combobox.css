@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Combobox · MultiSelect — a searchable list behind a field.
+   The trigger is the select trigger's recipe (`.mz-select-trigger`) and the
+   rows are the menu's (`.mz-item`), so a combobox in a form row is the same
+   object as the select beside it and its list is the list every dropdown in
+   the kit already draws. Only what sits inside the trigger differs.
+   ========================================================================== */
+
+.mz-combobox { position: relative; display: flex; width: 100%; min-width: 0; }
+.mz-combobox__trigger { gap: 8px; }
+/* The value has to be allowed to shrink, or the flex row keeps it at its
+   content width and the chevron is pushed off the end of the field. */
+.mz-combobox__value {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mz-combobox__trigger[data-placeholder] .mz-combobox__value { color: var(--mz-text-muted); }
+
+.mz-combobox__chips {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+/* A chip gives up its own width before the row overflows: three long names
+   read better clipped than one name and a "+2" that never appears. */
+.mz-combobox__chip { min-width: 0; overflow: hidden; }
+
+/* The × sits over the field rather than inside the trigger — the date field's
+   twin, and for the same reason: a button cannot contain a button, and
+   nesting one made every clear click also open the list it had just emptied. */
+.mz-combobox__clear {
+  position: absolute;
+  top: 50%;
+  right: 30px;
+  translate: 0 -50%;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-muted);
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-combobox__clear:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-combobox__clear svg { width: 13px; height: 13px; }
+/* Room for the × and the chevron both, so a long value does not run under them. */
+.mz-combobox:has(.mz-combobox__clear) .mz-combobox__trigger { padding-right: 56px; }
+
+/* As wide as the field it belongs to, not the 18rem a popover defaults to. */
+.mz-combobox__panel {
+  width: var(--radix-popover-trigger-width);
+  min-width: 12rem;
+  padding: 6px;
+}
+.mz-combobox__body { display: flex; flex-direction: column; gap: 6px; }
+
+.mz-combobox__search { position: relative; display: flex; }
+.mz-combobox__search .mz-input { padding-right: 30px; }
+/* Chrome draws its own × inside a `type=search` box. Here it lands on top of
+   the spinner and is the one piece of native chrome in a panel the kit draws
+   end to end — and the field already has a × of its own, outside the list. */
+.mz-combobox__search .mz-input::-webkit-search-cancel-button { display: none; }
+.mz-combobox__spinner {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  translate: 0 -50%;
+  color: var(--mz-text-muted);
+}
+.mz-combobox__spinner svg { width: 14px; height: 14px; }
+
+.mz-combobox__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.mz-combobox__list {
+  max-height: min(280px, var(--radix-popover-content-available-height, 280px));
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+/* The list itself takes focus only when there is no search box above it to
+   take it; the highlighted row is what says where the keyboard is, so a ring
+   around the whole list would be a second answer to the same question. */
+.mz-combobox__list:focus-visible { outline: none; }
+/* Keeps the row the arrow keys just reached clear of the rounded edge. */
+.mz-combobox__option { scroll-margin: 4px; }
+.mz-combobox__text { display: flex; flex-direction: column; min-width: 0; }
+.mz-combobox__label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mz-combobox__hint {
+  font-size: 12px;
+  color: var(--mz-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Empty, failed, still-typing: one line where the list would be, so the panel
+   never collapses to nothing and leaves the reader wondering. */
+.mz-combobox__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 10px;
+  font-size: 13px;
+  color: var(--mz-text-muted);
+  text-align: center;
+}
