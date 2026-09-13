@@ -29,3 +29,8 @@ body { background: var(--mz-bg); font-family: var(--mz-font-sans); }
 .shot__dialog-close { position: absolute; top: 14px; right: 14px; }
 .shot__panel-wrap { position: relative; }
 .shot__check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mz-text); }
+/* Two fields sharing a line, for the pair that is narrower than the column. */
+.shot__pair { align-items: flex-end; gap: 12px; flex-wrap: nowrap; }
+.shot__pair > * { flex: 1; min-width: 0; }
+/* The number is a short field and the chips need the room. */
+.shot__pair > :first-child { flex: 0 0 32%; }

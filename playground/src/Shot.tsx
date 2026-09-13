@@ -19,11 +19,21 @@ import {
   CardHeader,
   CardTitle,
   Checkbox,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandShortcut,
   Field,
   FieldHint,
   Input,
+  Kbd,
+  KbdSequence,
   Label,
   MorzeThemeProvider,
+  MultiSelect,
+  NumberInput,
   Progress,
   RadioGroup,
   RadioGroupItem,
@@ -131,9 +141,12 @@ export default function Shot() {
             <span className="mz-tooltip-content shot__panel" style={{ width: 'auto' }}>
               Hover and here it is
             </span>
+            <KbdSequence keys={['mod', 'k']} />
+            <Kbd>Esc</Kbd>
           </div>
           <Progress value={64} />
           <Progress value={38} tone="accent" />
+
         </div>
 
         <div className="shot__col">
@@ -158,9 +171,27 @@ export default function Shot() {
               </SelectContent>
             </Select>
           </Field>
+          <div className="shot__row shot__pair">
+            <Field>
+              <Label htmlFor="shot-qty">Quantity</Label>
+              <NumberInput id="shot-qty" defaultValue={12} min={0} unit="pcs" />
+            </Field>
+            <Field>
+              <Label>Tags</Label>
+              <MultiSelect
+                options={[
+                  { value: 'urgent', label: 'Urgent' },
+                  { value: 'paid', label: 'Paid' },
+                  { value: 'export', label: 'Export' },
+                ]}
+                defaultValue={['urgent', 'paid']}
+                maxChips={1}
+              />
+            </Field>
+          </div>
           <Field>
             <Label htmlFor="shot-task">Task</Label>
-            <Textarea id="shot-task" rows={3} placeholder="Describe the task…" />
+            <Textarea id="shot-task" rows={2} placeholder="Describe the task…" />
           </Field>
           <div className="shot__row">
             <label className="shot__check">
@@ -300,6 +331,22 @@ export default function Shot() {
               <Label htmlFor="shot-width">Width</Label>
               <Input id="shot-width" defaultValue="320px" />
             </Field>
+          </div>
+
+          {/* The palette is a real `Command`; only the dialog around it is
+              borrowed, for the same reason as the three panels above. */}
+          <div className="mz-panel mz-command-dialog shot__panel">
+            <Command>
+              <CommandInput placeholder="Type a command…" aria-label="Command" />
+              <CommandList>
+                <CommandGroup heading="Orders">
+                  <CommandItem value="New order">
+                    New order <CommandShortcut>⌘N</CommandShortcut>
+                  </CommandItem>
+                  <CommandItem value="Open order">Open order</CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
           </div>
 
         </div>
