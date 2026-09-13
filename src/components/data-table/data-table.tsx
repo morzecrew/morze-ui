@@ -200,6 +200,14 @@ const GRID_PAGE = 10
  * inline start and end, so an Arabic or Hebrew table pins its first column
  * against the reader's own first edge instead of against the Latin one.
  */
+/** The height of the rows a virtual window is not drawing, as one blank row. */
+const spacerRow = (height: number, colSpan: number) =>
+  height > 0 ? (
+    <tr aria-hidden="true" style={{ height }}>
+      <td colSpan={colSpan} style={{ height, padding: 0, border: 0 }} />
+    </tr>
+  ) : null
+
 const pinStyle = (pinned: 'left' | 'right' | undefined, offset: string | undefined) =>
   pinned
     ? ({ [pinned === 'left' ? 'insetInlineStart' : 'insetInlineEnd']: offset } as React.CSSProperties)
@@ -983,11 +991,7 @@ export function DataTable<T>({
             {/* The rows that are not drawn are still there as height, so the
                 scrollbar, the load-more sentinel and the reader's sense of how
                 long the list is all stay honest. */}
-            {padTop > 0 ? (
-              <tr aria-hidden="true" style={{ height: padTop }}>
-                <td colSpan={colSpan} style={{ height: padTop, padding: 0, border: 0 }} />
-              </tr>
-            ) : null}
+            {spacerRow(padTop, colSpan)}
             {loading && data.length === 0
               ? Array.from({ length: Math.min(query.pageSize, 8) }, (_, index) => (
                   <tr key={`skeleton-${index}`} className="mz-dt__row" aria-hidden="true">
@@ -1137,11 +1141,7 @@ export function DataTable<T>({
                     </React.Fragment>
                   )
                 })}
-            {padBottom > 0 ? (
-              <tr aria-hidden="true" style={{ height: padBottom }}>
-                <td colSpan={colSpan} style={{ height: padBottom, padding: 0, border: 0 }} />
-              </tr>
-            ) : null}
+            {spacerRow(padBottom, colSpan)}
           </tbody>
 
           {showSummary && data.length > 0 ? (

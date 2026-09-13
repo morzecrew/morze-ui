@@ -60,32 +60,56 @@ function encode(
   return params
 }
 
+/** A hand-edited or truncated URL must not put the table on page -4. */
+function countFrom(raw: string | null, whenMissing: number, whenInvalid: number) {
+  const value = Number(raw ?? whenMissing)
+  return Number.isFinite(value) && value >= 1 ? Math.floor(value) : whenInvalid
+}
+
+/** A filter string the codec cannot read is no filter, not a broken table. */
+function filtersFrom(raw: string | null, fallback: DataTableFilters, codec: FilterCodec) {
+  if (raw === null) return fallback
+  try {
+    return codec.parse(raw)
+  } catch {
+    return {}
+  }
+}
+
 function decode(prefix: string, fallback: DataTableQuery, codec: FilterCodec): DataTableQuery {
   const params = new URLSearchParams(window.location.search)
   const get = (key: string) => params.get(prefix + key)
   const rawSort = get('sort')
-  const rawFilters = get('f')
   const rawSearch = get('q')
-  let filters: DataTableFilters = fallback.filters
-  if (rawFilters !== null) {
-    try {
-      filters = codec.parse(rawFilters)
-    } catch {
-      filters = {}
-    }
-  }
-  // A hand-edited or truncated URL must not put the table on page -4.
-  const page = Number(get('page') ?? fallback.page)
-  const pageSize = Number(get('size') ?? fallback.pageSize)
   return {
     sort: rawSort === null ? fallback.sort : parseSort(rawSort),
-    filters,
+    filters: filtersFrom(get('f'), fallback.filters, codec),
     // An empty `q` is a value: a search the reader cleared has to survive a
     // reload as "no search" rather than let an initial one back in.
     search: rawSearch === null ? fallback.search : rawSearch || undefined,
-    page: Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1,
-    pageSize: Number.isFinite(pageSize) && pageSize > 0 ? Math.floor(pageSize) : fallback.pageSize,
+    page: countFrom(get('page'), fallback.page, 1),
+    pageSize: countFrom(get('size'), fallback.pageSize, fallback.pageSize),
   }
+}
+
+/**
+ * Writes the query into the address bar, and nothing else into it. The state
+ * object stays the router's: Next.js keeps its tree there and React Router
+ * its index, and replacing it with null broke their back button for every
+ * table with a `urlKey`.
+ */
+function writeUrl(
+  query: DataTableQuery,
+  base: DataTableQuery,
+  prefix: string,
+  codec: FilterCodec,
+  history: 'replace' | 'push'
+) {
+  const search = encode(query, base, prefix, codec).toString()
+  const { pathname, hash } = window.location
+  const next = `${pathname}${search ? `?${search}` : ''}${hash}`
+  if (next === `${pathname}${window.location.search}${hash}`) return
+  window.history[history === 'push' ? 'pushState' : 'replaceState'](window.history.state, '', next)
 }
 
 export type UseTableQueryOptions = {
@@ -147,18 +171,7 @@ export function useTableQuery({
       skipWrite.current = false
       return
     }
-    const params = encode(query, base, urlKey, codecRef.current)
-    const search = params.toString()
-    const next = `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`
-    if (next === `${window.location.pathname}${window.location.search}${window.location.hash}`) return
-    // The state object stays the router's: Next.js keeps its tree there and
-    // React Router its index, and replacing it with null broke their back
-    // button for every table with a urlKey.
-    window.history[history === 'push' ? 'pushState' : 'replaceState'](
-      window.history.state,
-      '',
-      next
-    )
+    writeUrl(query, base, urlKey, codecRef.current, history)
   }, [query, base, urlKey, history])
 
   // Back/forward must move the table, not just the address bar.

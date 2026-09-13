@@ -1647,17 +1647,7 @@ describe('keyboard (G-01)', () => {
   it('leaves Enter to the control it was pressed on', async () => {
     const onRowClick = vi.fn()
     const user = userEvent.setup()
-    render(
-      <DataTable
-        columns={clickable}
-        data={rows}
-        rowKey={(r) => r.id}
-        total={2}
-        query={emptyQuery}
-        onQueryChange={vi.fn()}
-        onRowClick={onRowClick}
-      />
-    )
+    table({ columns: clickable, onRowClick })
     screen.getByRole('button', { name: 'Open First' }).focus()
     await user.keyboard('{Enter}')
     // The button's own Enter, exactly as its click is its own (G-02).
@@ -1707,17 +1697,7 @@ describe('keyboard (G-01)', () => {
       { id: 'sum', header: 'Total', accessor: (r) => r.sum },
     ]
     const user = userEvent.setup()
-    render(
-      <DataTable
-        columns={editable}
-        data={rows}
-        rowKey={(r) => r.id}
-        total={2}
-        keyboard
-        query={emptyQuery}
-        onQueryChange={vi.fn()}
-      />
-    )
+    table({ columns: editable, keyboard: true })
     const cell = screen.getAllByRole('gridcell')[0]!
     cell.focus()
     await user.keyboard('{F2}')
