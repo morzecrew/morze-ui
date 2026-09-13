@@ -1,4 +1,10 @@
-import type { DataTableFilters, DataTableQuery, DataTableSort, FilterValue } from './types'
+import type {
+  DataTableFilters,
+  DataTableQuery,
+  DataTableSort,
+  FilterValue,
+  SortDir,
+} from './types'
 
 /** A filter that carries no constraint should never reach the backend. */
 export function isFilterActive(value: FilterValue | undefined): value is FilterValue {
@@ -49,20 +55,38 @@ export function setFilter(
  * Click cycles asc → desc → off. With `additive` (shift-click) the column joins
  * the existing sort instead of replacing it, which is how multi-sort is
  * expressed to the backend as an ordered list.
+ *
+ * `descFirst` turns the cycle around for the columns where the interesting
+ * end is the top one — amounts, dates, counts — so the first click lands on
+ * what the reader wanted instead of on the oldest and smallest rows.
  */
 export function toggleSort(
   query: DataTableQuery,
   id: string,
-  additive = false
+  additive = false,
+  descFirst = false
 ): DataTableQuery {
   const existing = query.sort.find((s) => s.id === id)
   const next: DataTableSort[] = additive ? query.sort.filter((s) => s.id !== id) : []
+  const first: SortDir = descFirst ? 'desc' : 'asc'
 
-  if (!existing) next.push({ id, dir: 'asc' })
-  else if (existing.dir === 'asc') next.push({ id, dir: 'desc' })
+  if (!existing) next.push({ id, dir: first })
+  else if (existing.dir === first) next.push({ id, dir: first === 'asc' ? 'desc' : 'asc' })
   // a third click drops the column from the sort entirely
 
   return { ...query, sort: next, page: 1 }
+}
+
+/**
+ * Free-text search across the row. Like a filter change it invalidates the
+ * offset, which is the whole reason it belongs in the query rather than in a
+ * piece of state beside it: a host holding its own search box had to remember
+ * to reset the page, and mostly did not.
+ */
+export function setSearch(query: DataTableQuery, value: string): DataTableQuery {
+  const search = value.trim() ? value : undefined
+  if (search === query.search) return query
+  return { ...query, search, page: 1 }
 }
 
 export function sortStateOf(query: DataTableQuery, id: string) {

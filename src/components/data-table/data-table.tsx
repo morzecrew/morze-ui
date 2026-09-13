@@ -9,10 +9,12 @@ import {
   ArrowUpIcon,
   ChevronRightIcon,
   InboxIcon,
+  SearchIcon,
   SortIcon,
 } from '../../lib/icons'
 import { Button } from '../button'
 import { Checkbox } from '../checkbox'
+import { Input } from '../input'
 import { Skeleton } from '../skeleton'
 import { CellEditor } from './cell-editor'
 import { ColumnFilter, FilterChip } from './column-filter'
@@ -27,10 +29,19 @@ import type {
   RowSelectionState,
 } from './types'
 import { resolveLabels, type DataTableLabels } from './labels'
-import { activeFilters, serializeSort, setFilter, sortStateOf, toggleSort } from './utils'
+import {
+  activeFilters,
+  serializeSort,
+  setFilter,
+  setSearch,
+  sortStateOf,
+  toggleSort,
+} from './utils'
 import { cssSafe, useColumnResize } from './use-column-resize'
 import { useColumnLayout } from './use-column-layout'
+import { useGridKeyboard } from './use-grid-keyboard'
 import { useRowSelection } from './use-row-selection'
+import { useVirtualRows, type VirtualizeOption } from './use-virtual-rows'
 
 export type DataTableProps<T> = {
   columns: DataTableColumn<T>[]
@@ -51,7 +62,21 @@ export type DataTableProps<T> = {
   bulkActions?: (selection: RowSelectionState) => React.ReactNode
 
   renderExpanded?: (row: T) => React.ReactNode
+  /** Controlled expansion. Pair with `onExpandedChange`. */
+  expanded?: string[]
+  onExpandedChange?: (keys: string[]) => void
+  defaultExpanded?: string[]
+  /** A click anywhere on the row opens it, not only the chevron. */
+  expandOnRowClick?: boolean
+  /**
+   * Fires for a click on the row itself. A click that started on a link,
+   * button, field or menu item inside a cell is that control's, not the
+   * row's — every host used to have to `stopPropagation` in every action cell
+   * to stop a delete button also opening the record behind the dialog.
+   */
   onRowClick?: (row: T) => void
+  onRowDoubleClick?: (row: T) => void
+  onRowContextMenu?: (row: T, event: React.MouseEvent) => void
   /** Per-row class name — tinting a row by record state, marking it stale. */
   rowClassName?: (row: T, context: { rowIndex: number }) => string | undefined
   /**
@@ -81,7 +106,66 @@ export type DataTableProps<T> = {
    */
   autoFit?: boolean
   density?: 'compact' | 'normal' | 'relaxed'
+  /**
+   * Sticks the header while the body scrolls. It needs the scroller to have a
+   * height to scroll within — `maxHeight`, `height` or `fill` — since without
+   * one the scroller grows with its content and never scrolls at all.
+   */
   stickyHeader?: boolean
+  /** Caps the scroller; this is what makes `stickyHeader` work. */
+  maxHeight?: number | string
+  /** Fixes the scroller's height instead of capping it. */
+  height?: number | string
+  /**
+   * Takes the height of a flex parent: the table fills it and the scroller
+   * takes what the toolbar, chips and pager leave over.
+   */
+  fill?: boolean
+  /**
+   * `card` (default) frames the scroller with a border, a radius and a
+   * shadow; `plain` drops all three, for a table already inside a Card or a
+   * panel, where the two frames doubled up.
+   */
+  frame?: 'card' | 'plain'
+  /**
+   * Built-in search box in the toolbar. Its value lives in `query.search`, so
+   * it resets the page, reaches the URL through `useTableQuery`, and arrives
+   * at the backend in the same request as everything else.
+   */
+  search?: boolean | { placeholder?: string; debounce?: number }
+  /**
+   * `hover` (default) shows a column's filter button under the pointer, under
+   * the keyboard, and always while that column is filtering; `always` keeps
+   * every trigger on screen. A row of six identical funnels is noise.
+   */
+  filterTrigger?: 'always' | 'hover'
+  /** Totals row under the body, built from each column's `footer`. */
+  summary?: boolean
+  /**
+   * Renders only the rows in view, plus a margin. A list that has grown past
+   * a thousand rows costs a browser real time to lay out and React real time
+   * to re-render on every tick of selection or editing; with this on, both
+   * are bounded by what is on screen instead of by what was fetched.
+   *
+   * It needs the scroller to have a height (`maxHeight`, `height`, `fill`) —
+   * without one there is no "in view" and every row is drawn, which is also
+   * exactly what happens, so nothing breaks — and it assumes the rows are the
+   * height the density gives them. A table with a detail panel open renders
+   * in full for as long as one is open: an expanded row is a row of its own
+   * height, and this arithmetic has one height to work with.
+   */
+  virtualize?: VirtualizeOption
+  /**
+   * Grid keyboard navigation: the arrows move one roving focus from cell to
+   * cell, Enter or F2 opens an editable cell, Enter elsewhere activates the
+   * row the way a click does, and Space ticks it. Off by default because it
+   * changes the table's role from `table` to `grid`, which changes how a
+   * screen reader announces the whole thing — a reading table is not a grid.
+   *
+   * The cell is the grid's tab stop, but the controls inside cells stay
+   * tabbable: a host's action buttons keep answering Tab exactly as before.
+   */
+  keyboard?: boolean
   emptyState?: React.ReactNode
   /** `false` — or a single option — hides the rows-per-page select. */
   pageSizeOptions?: number[] | false
@@ -92,7 +176,7 @@ export type DataTableProps<T> = {
    * puts a footer inside the table's own scroller — the element an infinite
    * scroll needs to watch, which a host cannot add from the outside.
    */
-  onLoadMore?: () => void
+  onLoadMore?: (context: { nextPage: number }) => void
   /** Whether anything is left to load. Defaults to `data.length < total`. */
   hasMore?: boolean
   /** `false` waits for a click instead of loading as the footer scrolls in. */
@@ -107,6 +191,33 @@ export type DataTableProps<T> = {
 
 const SELECT_WIDTH = 44
 const EXPAND_WIDTH = 40
+/** Rows a PageUp/PageDown jumps inside the grid. */
+const GRID_PAGE = 10
+
+/**
+ * Where a pinned cell sticks (G-13). `left` and `right` are the names the
+ * column API has always used, and they stay — but they are written as the
+ * inline start and end, so an Arabic or Hebrew table pins its first column
+ * against the reader's own first edge instead of against the Latin one.
+ */
+/** The height of the rows a virtual window is not drawing, as one blank row. */
+const spacerRow = (height: number, colSpan: number) =>
+  height > 0 ? (
+    <tr aria-hidden="true" style={{ height }}>
+      <td colSpan={colSpan} style={{ height, padding: 0, border: 0 }} />
+    </tr>
+  ) : null
+
+const pinStyle = (pinned: 'left' | 'right' | undefined, offset: string | undefined) =>
+  pinned
+    ? ({ [pinned === 'left' ? 'insetInlineStart' : 'insetInlineEnd']: offset } as React.CSSProperties)
+    : undefined
+/** What a row is tall, per density — the fallback where layout cannot be read. */
+const DENSITY_ROW_HEIGHT = { compact: 36, normal: 44, relaxed: 56 } as const
+/** Rows drawn above and below the viewport, so a scroll never shows a gap. */
+const OVERSCAN = 6
+/** The window's first guess, before the scroller has been measured. */
+const INITIAL_VIRTUAL_ROWS = 30
 /** How long a fitted width keeps blocking a re-fit to that same width. */
 const FIT_CYCLE_MS = 250
 
@@ -124,7 +235,13 @@ export function DataTable<T>({
   onSelectionChange,
   bulkActions,
   renderExpanded,
+  expanded: controlledExpanded,
+  onExpandedChange,
+  defaultExpanded,
+  expandOnRowClick = false,
   onRowClick,
+  onRowDoubleClick,
+  onRowContextMenu,
   rowClassName,
   rowProps,
   layout: controlledLayout,
@@ -135,6 +252,15 @@ export function DataTable<T>({
   autoFit = true,
   density = 'normal',
   stickyHeader = true,
+  maxHeight,
+  height,
+  fill = false,
+  frame = 'card',
+  search = false,
+  filterTrigger = 'hover',
+  summary = false,
+  virtualize = false,
+  keyboard = false,
   emptyState,
   pageSizeOptions,
   pagination,
@@ -150,8 +276,19 @@ export function DataTable<T>({
   const rootRef = React.useRef<HTMLDivElement>(null)
   const scrollerRef = React.useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = React.useState({ left: false, right: false })
-  const [expanded, setExpanded] = React.useState<Set<string>>(new Set())
   const [editing, setEditing] = React.useState<{ key: string; col: string } | null>(null)
+
+  /* ----------------------------- Expansion -----------------------------
+     Controlled when `expanded` is given, so a host can open a row from
+     elsewhere on the page, restore what was open after a refetch, or drive
+     "expand all" itself. Uncontrolled it behaves exactly as before. */
+  const [internalExpanded, setInternalExpanded] = React.useState<string[]>(defaultExpanded ?? [])
+  const expandedKeys = controlledExpanded ?? internalExpanded
+  const expanded = React.useMemo(() => new Set(expandedKeys), [expandedKeys])
+  const commitExpanded = (next: string[]) => {
+    if (controlledExpanded === undefined) setInternalExpanded(next)
+    onExpandedChange?.(next)
+  }
 
   const {
     layout,
@@ -160,9 +297,11 @@ export function DataTable<T>({
     minWidthOf,
     setWidth,
     toggleHidden,
+    setHidden,
     setPinned,
     moveTo,
     reset,
+    unsize,
     fitTo,
     fitEpoch,
   } = useColumnLayout({ columns, persistKey, layout: controlledLayout, onLayoutChange })
@@ -222,8 +361,12 @@ export function DataTable<T>({
     if (!scroller) return
     const update = () => {
       const max = scroller.scrollWidth - scroller.clientWidth
-      const left = scroller.scrollLeft > 1
-      const right = scroller.scrollLeft < max - 1
+      // Distance from the inline start, not from the left: an RTL scroller
+      // counts the same journey downwards from zero, so a raw `scrollLeft`
+      // reads as "already at the far end" the moment the table is drawn.
+      const from = Math.abs(scroller.scrollLeft)
+      const left = from > 1
+      const right = from < max - 1
       // A fresh object here would be a new state on every observer tick, and any
       // cell whose content reflows during that render feeds the observer again —
       // the two then re-render each other until the tab locks up.
@@ -259,7 +402,7 @@ export function DataTable<T>({
   // already on screen — the first page nearly always is a full one — left
   // `askedAt` equal to `data.length`: neither the footer scrolling into view
   // nor the button ever asked again.
-  const queryKey = `${serializeSort(query.sort)}\u0000${filtersKey(query.filters)}\u0000${query.pageSize}`
+  const queryKey = `${serializeSort(query.sort)}\u0000${filtersKey(query.filters)}\u0000${query.pageSize}\u0000${query.search ?? ''}`
   React.useEffect(() => {
     askedAt.current = -1
   }, [queryKey])
@@ -274,10 +417,16 @@ export function DataTable<T>({
   const showLoadMore = canLoadMore && !error && data.length > 0
   const showPager = pagination ?? !onLoadMore
 
+  // The page the host should ask for next. The table cannot increment
+  // `query.page` itself — that would make the pager and the infinite scroll
+  // fight over the same field — so the number is handed over instead of left
+  // for every host to keep a counter for.
+  const nextPage = query.pageSize > 0 ? Math.floor(data.length / query.pageSize) + 1 : query.page + 1
+
   const askForMore = () => {
     if (askedAt.current === data.length) return
     askedAt.current = data.length
-    onLoadMoreRef.current?.()
+    onLoadMoreRef.current?.({ nextPage })
   }
 
   React.useEffect(() => {
@@ -348,17 +497,126 @@ export function DataTable<T>({
   }
 
   const toggleExpanded = (key: string) =>
-    setExpanded((current) => {
-      const next = new Set(current)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
+    commitExpanded(
+      expanded.has(key) ? expandedKeys.filter((k) => k !== key) : [...expandedKeys, key]
+    )
+
+  // "Everything on this page", not "everything the filter matches": the table
+  // only ever holds the rows it was given, and a key it has never seen cannot
+  // be opened.
+  const allPageExpanded = pageKeys.length > 0 && pageKeys.every((key) => expanded.has(key))
+  const toggleExpandedAll = () =>
+    commitExpanded(
+      allPageExpanded
+        ? expandedKeys.filter((key) => !pageKeys.includes(key))
+        : [...new Set([...expandedKeys, ...pageKeys])]
+    )
+
+  /* ------------------------------- Search -------------------------------
+     Typed locally and pushed into the query on a timer: the value is part of
+     `query`, and committing per keystroke would be one request per letter.
+     The draft follows the query whenever the query moves on its own — a
+     Reset, the back button, a saved view — but not while the reader is
+     mid-word, which is what the pending timer stands for. */
+  const searchConfig = search === true ? {} : search === false ? null : search
+  const searchDebounce = searchConfig?.debounce ?? 300
+  const [searchDraft, setSearchDraft] = React.useState(query.search ?? '')
+  const searchTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Both are read at fire time rather than closed over, so a filter applied
+  // while the timer runs is not rolled back by it and a fresh callback does
+  // not have to restart the timer. Kept current after the commit, like the
+  // load-more ref above: a render React later discards must not leave a ref
+  // pointing into it.
+  const queryChangeRef = React.useRef(onQueryChange)
+  const queryRef = React.useRef(query)
+  React.useEffect(() => {
+    queryChangeRef.current = onQueryChange
+    queryRef.current = query
+  })
+  React.useEffect(() => {
+    // Not while the reader is mid-word: a pending timer is what says so.
+    if (searchTimer.current) return
+    setSearchDraft(query.search ?? '')
+  }, [query.search])
+  React.useEffect(() => () => {
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+  }, [])
+  const onSearchInput = (value: string) => {
+    setSearchDraft(value)
+    if (searchTimer.current) clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => {
+      searchTimer.current = null
+      queryChangeRef.current(setSearch(queryRef.current, value))
+    }, searchDebounce)
+  }
+
+  /* A click that started on a control inside a cell belongs to that control.
+     Without this the row handler fired too: opening a record behind the
+     confirmation dialog its own delete button had just raised, following a
+     link and navigating somewhere else at once, toggling a checkbox and
+     opening the row it selects. Every host worked around it by calling
+     `stopPropagation` in every action cell, and forgetting one was the bug.
+     `label` is in the list because clicking one activates the control it
+     names. Scoped to the row the handler is on, so a portalled menu — which
+     is a descendant of `document.body`, not of the row — is still ignored. */
+  const rowActivates = Boolean(onRowClick) || (expandOnRowClick && Boolean(renderExpanded))
+  const fromInteractive = (event: React.MouseEvent) => {
+    const target = event.target as Element | null
+    if (!target?.closest) return false
+    const control = target.closest(
+      'a[href], button, input, select, textarea, label, [role="button"],' +
+        ' [role="menuitem"], [role="checkbox"], [role="radio"], [role="link"],' +
+        ' [role="switch"], [role="tab"], [contenteditable="true"]'
+    )
+    return Boolean(control && event.currentTarget.contains(control))
+  }
 
   const fillerIndex = visible.length - rightPinned.length
   // +1 for the filler column, so full-width rows really span the table.
   const colSpan = visible.length + 1 + (selectable ? 1 : 0) + (renderExpanded ? 1 : 0)
   const selectionCount = rows.allMatching ? total : rows.count
+
+  /* The window over the rows (G-06) and the grid keyboard (G-01) are each a
+     concern of their own, and each was a page of this component before it was
+     a file: `use-virtual-rows.ts` and `use-grid-keyboard.ts` carry the whole
+     of both, including why they are shaped the way they are. They meet here
+     because the keyboard has to be able to walk into a row the window has not
+     drawn yet — it scrolls by the same row height, measured once. */
+  const { theadRef, rowHeight, firstRow, rowsInView, padTop, padBottom } = useVirtualRows({
+    virtualize,
+    data,
+    density,
+    expandedCount: expanded.size,
+    rootRef,
+    scrollerRef,
+  })
+
+  const { gridProps, gridCell, finishEditing, controlCount } = useGridKeyboard({
+    keyboard,
+    data,
+    rowKey,
+    visible,
+    selectable,
+    expandable: Boolean(renderExpanded),
+    rootRef,
+    scrollerRef,
+    theadRef,
+    rowHeight,
+    rowActivates,
+    onRowClick,
+    expandOnRowClick,
+    toggleExpanded,
+    toggleSelection: rows.toggle,
+    setEditing,
+  })
+
+  /**
+   * Which row of the whole result set this is, counting the header as row 1.
+   * `aria-rowcount` without it says "13 659 rows" over a page numbered 1–25,
+   * and a reader on page 3 is told they are at the top of the table.
+   */
+  const rowIndexOf = (rowIndex: number) =>
+    total === undefined ? undefined : (query.page - 1) * query.pageSize + rowIndex + 2
 
   /* Cells are rendered through helpers so the filler column can be spliced in
      between the scrolling columns and the right-pinned group. */
@@ -385,7 +643,7 @@ export function DataTable<T>({
                             : 'none'
                         : undefined
                     }
-                    className="mz-dt__th"
+                    className={cn('mz-dt__th', column.headerClassName)}
                     style={
                       pinned
                         ? ({ [pinned]: offsets.get(column.id) } as React.CSSProperties)
@@ -397,9 +655,16 @@ export function DataTable<T>({
                         <button
                           type="button"
                           className="mz-dt__sort mz-focusable"
-                          title={labels.sortBy(label)}
+                          // A column's own hint wins over the generic one, on
+                          // sortable columns too: `title` was taken by the
+                          // sort hint there, so `headerTitle` silently did
+                          // nothing on exactly the columns readers ask about.
+                          title={column.headerTitle ?? labels.sortBy(label)}
+                          aria-description={column.headerTitle ? labels.sortBy(label) : undefined}
                           onClick={(event) =>
-                            onQueryChange(toggleSort(query, column.id, event.shiftKey))
+                            onQueryChange(
+                              toggleSort(query, column.id, event.shiftKey, column.sortDescFirst)
+                            )
                           }
                         >
                           <span className="mz-dt__th-label">{column.header}</span>
@@ -426,6 +691,7 @@ export function DataTable<T>({
                           def={column.filter}
                           value={query.filters[column.id]}
                           labels={labelsProp}
+                          locale={locale}
                           onApply={(value) => onQueryChange(setFilter(query, column.id, value))}
                         />
                       ) : null}
@@ -448,27 +714,38 @@ export function DataTable<T>({
                 )
               })
 
-  const renderBodyCells = (row: T, rowIndex: number, list: DataTableColumn<T>[]) => {
+  const renderBodyCells = (
+    row: T,
+    rowIndex: number,
+    list: DataTableColumn<T>[],
+    /** Where this slice starts in the grid's own column numbering. */
+    offset: number
+  ) => {
     const key = rowKey(row)
-    return list.map((column) => {
+    return list.map((column, index) => {
                           const pinned = layout.pinned[column.id]
+                          // `canEdit` is the row-level veto: a closed period, a
+                          // locked record. A cell it refuses is an ordinary cell,
+                          // down to the caret it does not show.
+                          const editableHere =
+                            column.editable && (column.editable.canEdit?.(row) ?? true)
+                              ? column.editable
+                              : undefined
                           const isEditing = editing?.key === key && editing.col === column.id
+                          const gridCol = offset + index
                           return (
                             <td
                               key={column.id}
+                              {...gridCell(rowIndex, gridCol)}
                               data-col={column.id}
                               data-pinned={pinned}
                               data-pin-edge={pinEdgeOf(column.id)}
                               data-align={column.align}
-                              data-editable={column.editable ? true : undefined}
-                              className="mz-dt__td"
-                              style={
-                                pinned
-                                  ? ({ [pinned]: offsets.get(column.id) } as React.CSSProperties)
-                                  : undefined
-                              }
+                              data-editable={editableHere ? true : undefined}
+                              className={cn('mz-dt__td', column.className)}
+                              style={pinStyle(pinned, offsets.get(column.id))}
                               onDoubleClick={
-                                column.editable
+                                editableHere
                                   ? (event) => {
                                       event.stopPropagation()
                                       setEditing({ key, col: column.id })
@@ -476,11 +753,12 @@ export function DataTable<T>({
                                   : undefined
                               }
                             >
-                              {isEditing && column.editable ? (
+                              {isEditing && editableHere ? (
                                 <CellEditor
                                   row={row}
-                                  def={column.editable}
-                                  onDone={() => setEditing(null)}
+                                  def={editableHere}
+                                  labels={labelsProp}
+                                  onDone={() => finishEditing(rowIndex, gridCol)}
                                 />
                               ) : (
                                 <div className="mz-dt__cell">
@@ -494,20 +772,91 @@ export function DataTable<T>({
                         })
   }
 
+  /* The first-load placeholder. Built from the same three slices as every
+     other row, so it has the table's real columns under it: it used to be one
+     cell spanning the whole width with a single bar in it, which announced a
+     list rather than a table and then jumped into a grid the moment the rows
+     arrived. Widths vary per cell so the block reads as text of different
+     lengths rather than a barcode. */
+  const renderSkeletonCells = (list: DataTableColumn<T>[], rowIndex: number) =>
+    list.map((column, columnIndex) => {
+      const pinned = layout.pinned[column.id]
+      return (
+        <td
+          key={column.id}
+          data-col={column.id}
+          data-pinned={pinned}
+          data-pin-edge={pinEdgeOf(column.id)}
+          data-align={column.align}
+          className={cn('mz-dt__td', column.className)}
+          style={pinStyle(pinned, offsets.get(column.id))}
+        >
+          <Skeleton style={{ height: 12, width: `${45 + ((rowIndex * 17 + columnIndex * 29) % 45)}%` }} />
+        </td>
+      )
+    })
+
+  /* The totals row. Built from the same three slices as the header and the
+     body so the filler column lands in the same place, which is what keeps
+     the pinned groups aligned across all three. */
+  const renderSummaryCells = (list: DataTableColumn<T>[]) =>
+    list.map((column) => {
+      const pinned = layout.pinned[column.id]
+      return (
+        <td
+          key={column.id}
+          data-col={column.id}
+          data-pinned={pinned}
+          data-pin-edge={pinEdgeOf(column.id)}
+          data-align={column.align}
+          className={cn('mz-dt__tf', column.className)}
+          style={pinStyle(pinned, offsets.get(column.id))}
+        >
+          {column.footer?.(data)}
+        </td>
+      )
+    })
+
+  const showSummary = summary && columns.some((column) => column.footer)
+
   return (
     <div
       ref={rootRef}
       data-slot="data-table"
       data-density={density}
-      className={cn('mz-dt', className)}
-      style={widthVars}
+      data-filter-trigger={filterTrigger}
+      className={cn('mz-dt', fill && 'mz-dt--fill', frame === 'plain' && 'mz-dt--plain', className)}
+      style={
+        {
+          ...widthVars,
+          ...(maxHeight === undefined
+            ? null
+            : { '--mz-dt-max-h': typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }),
+          ...(height === undefined
+            ? null
+            : { '--mz-dt-h': typeof height === 'number' ? `${height}px` : height }),
+        } as React.CSSProperties
+      }
     >
       {(() => {
         const showManager = columnManager && columns.some((c) => c.hideable !== false)
-        if (!toolbar && chips.length === 0 && !showManager) return null
+        if (!toolbar && !searchConfig && chips.length === 0 && !showManager) return null
         return (
           <div className="mz-dt__toolbar">
-            <div className="mz-dt__toolbar-main">{toolbar}</div>
+            <div className="mz-dt__toolbar-main">
+              {searchConfig ? (
+                <Input
+                  type="search"
+                  inputSize="sm"
+                  className="mz-dt__search"
+                  aria-label={labels.search}
+                  placeholder={searchConfig.placeholder ?? labels.search}
+                  value={searchDraft}
+                  onChange={(event) => onSearchInput(event.target.value)}
+                />
+              ) : null}
+              {toolbar}
+            </div>
             {showManager && (
               <div className="mz-dt__toolbar-side">
                 <ColumnManager
@@ -515,8 +864,10 @@ export function DataTable<T>({
                   layout={layout}
                   labels={labelsProp}
                   onToggleHidden={toggleHidden}
+                  onSetHidden={setHidden}
                   onSetPinned={setPinned}
                   onMoveTo={moveTo}
+                  onUnsize={unsize}
                   onReset={reset}
                 />
               </div>
@@ -533,7 +884,7 @@ export function DataTable<T>({
               label={
                 <>
                   <b>{labelOf(id)}</b>
-                  {describeFilter(value, columnById.get(id)?.filter, labels)}
+                  {describeFilter(value, columnById.get(id)?.filter, labels, locale)}
                 </>
               }
               clearLabel={labels.clearFilter}
@@ -553,10 +904,20 @@ export function DataTable<T>({
       <div
         ref={scrollerRef}
         className="mz-dt__scroller"
-        data-scrolled-left={scrolled.left || undefined}
-        data-scrolled-right={scrolled.right || undefined}
+        data-scrolled-start={scrolled.left || undefined}
+        data-scrolled-end={scrolled.right || undefined}
       >
-        <table className="mz-dt__table" data-sticky={stickyHeader || undefined}>
+        <table
+          className="mz-dt__table"
+          data-sticky={stickyHeader || undefined}
+          {...gridProps}
+          // A refetch on a populated table changes nothing a screen reader can
+          // see; `aria-busy` is what says the rows underneath are being
+          // replaced. `aria-rowcount` counts the header with the rows, and is
+          // the only way to say "row 30 of 13 659" when 25 of them are here.
+          aria-busy={loading || undefined}
+          aria-rowcount={total === undefined ? undefined : total + 1}
+        >
           {caption ? <caption className="mz-sr-only">{caption}</caption> : null}
           {/* A trailing auto-width column absorbs whatever space is left over.
               Without it `table-layout: fixed` spreads the slack across every
@@ -579,14 +940,14 @@ export function DataTable<T>({
             ))}
           </colgroup>
 
-          <thead>
-            <tr>
+          <thead ref={theadRef}>
+            <tr aria-rowindex={total === undefined ? undefined : 1}>
               {selectable ? (
                 <th
                   className="mz-dt__th mz-dt__th--control"
                   data-pinned="left"
                   data-pin-edge={renderExpanded ? undefined : controlPinEdge}
-                  style={{ left: 0 }}
+                  style={pinStyle('left', '0px')}
                 >
                   <Checkbox
                     size="sm"
@@ -601,8 +962,21 @@ export function DataTable<T>({
                   className="mz-dt__th mz-dt__th--control"
                   data-pinned="left"
                   data-pin-edge={controlPinEdge}
-                  style={{ left: selectable ? SELECT_WIDTH : 0 }}
+                  style={pinStyle('left', selectable ? `${SELECT_WIDTH}px` : '0px')}
                 >
+                  <button
+                    type="button"
+                    className="mz-dt__expand mz-focusable"
+                    data-open={allPageExpanded || undefined}
+                    // No aria-expanded: that names a disclosure for one
+                    // region, and this control governs every row on the page.
+                    aria-label={allPageExpanded ? labels.collapseAll : labels.expandAll}
+                    title={allPageExpanded ? labels.collapseAll : labels.expandAll}
+                    disabled={pageKeys.length === 0}
+                    onClick={toggleExpandedAll}
+                  >
+                    <ChevronRightIcon />
+                  </button>
                   <span className="mz-sr-only">{labels.details}</span>
                 </th>
               ) : null}
@@ -614,15 +988,36 @@ export function DataTable<T>({
           </thead>
 
           <tbody>
+            {/* The rows that are not drawn are still there as height, so the
+                scrollbar, the load-more sentinel and the reader's sense of how
+                long the list is all stay honest. */}
+            {spacerRow(padTop, colSpan)}
             {loading && data.length === 0
               ? Array.from({ length: Math.min(query.pageSize, 8) }, (_, index) => (
-                  <tr key={`skeleton-${index}`} className="mz-dt__row">
-                    <td className="mz-dt__td" colSpan={colSpan}>
-                      <Skeleton style={{ height: 14, width: `${60 + ((index * 13) % 35)}%` }} />
-                    </td>
+                  <tr key={`skeleton-${index}`} className="mz-dt__row" aria-hidden="true">
+                    {selectable ? (
+                      <td
+                        className="mz-dt__td mz-dt__td--control"
+                        data-pinned="left"
+                        data-pin-edge={renderExpanded ? undefined : controlPinEdge}
+                        style={pinStyle('left', '0px')}
+                      />
+                    ) : null}
+                    {renderExpanded ? (
+                      <td
+                        className="mz-dt__td mz-dt__td--control"
+                        data-pinned="left"
+                        data-pin-edge={controlPinEdge}
+                        style={pinStyle('left', selectable ? `${SELECT_WIDTH}px` : '0px')}
+                      />
+                    ) : null}
+                    {renderSkeletonCells(visible.slice(0, fillerIndex), index)}
+                    <td className="mz-dt__td mz-dt__td--filler" />
+                    {renderSkeletonCells(visible.slice(fillerIndex), index)}
                   </tr>
                 ))
-              : data.map((row, rowIndex) => {
+              : rowsInView.map((row, indexInView) => {
+                  const rowIndex = firstRow + indexInView
                   const key = rowKey(row)
                   const isOpen = expanded.has(key)
                   const context = { rowIndex }
@@ -633,23 +1028,62 @@ export function DataTable<T>({
                       <tr
                         {...hostProps}
                         className={cn('mz-dt__row', hostClass, hostProps?.className)}
+                        aria-rowindex={rowIndexOf(rowIndex)}
                         data-selected={rows.selected.has(key) || rows.allMatching || undefined}
-                        data-clickable={onRowClick ? true : undefined}
+                        data-clickable={rowActivates ? true : undefined}
+                        // A row that answers a click answers Enter too, and
+                        // has to be reachable to be given one. In the grid the
+                        // cells carry the focus instead, so the row does not
+                        // also become a tab stop of its own.
+                        tabIndex={rowActivates && !keyboard ? 0 : undefined}
+                        onKeyDown={
+                          rowActivates && !keyboard
+                            ? (event) => {
+                                // The row itself only: Enter inside a cell
+                                // belongs to the control that has focus there.
+                                if (event.key !== 'Enter' || event.target !== event.currentTarget)
+                                  return
+                                event.preventDefault()
+                                onRowClick?.(row)
+                                if (expandOnRowClick && renderExpanded) toggleExpanded(key)
+                              }
+                            : undefined
+                        }
                         onClick={
-                          onRowClick || hostProps?.onClick
+                          rowActivates || hostProps?.onClick
                             ? (event) => {
                                 hostProps?.onClick?.(event)
+                                if (fromInteractive(event)) return
                                 onRowClick?.(row)
+                                if (expandOnRowClick && renderExpanded) toggleExpanded(key)
+                              }
+                            : undefined
+                        }
+                        onDoubleClick={
+                          onRowDoubleClick || hostProps?.onDoubleClick
+                            ? (event) => {
+                                hostProps?.onDoubleClick?.(event)
+                                if (fromInteractive(event)) return
+                                onRowDoubleClick?.(row)
+                              }
+                            : undefined
+                        }
+                        onContextMenu={
+                          onRowContextMenu || hostProps?.onContextMenu
+                            ? (event) => {
+                                hostProps?.onContextMenu?.(event)
+                                onRowContextMenu?.(row, event)
                               }
                             : undefined
                         }
                       >
                         {selectable ? (
                           <td
+                            {...gridCell(rowIndex, 0)}
                             className="mz-dt__td mz-dt__td--control"
                             data-pinned="left"
                             data-pin-edge={renderExpanded ? undefined : controlPinEdge}
-                            style={{ left: 0 }}
+                            style={pinStyle('left', '0px')}
                             onClick={(event) => event.stopPropagation()}
                           >
                             <Checkbox
@@ -665,10 +1099,11 @@ export function DataTable<T>({
 
                         {renderExpanded ? (
                           <td
+                            {...gridCell(rowIndex, selectable ? 1 : 0)}
                             className="mz-dt__td mz-dt__td--control"
                             data-pinned="left"
                             data-pin-edge={controlPinEdge}
-                            style={{ left: selectable ? SELECT_WIDTH : 0 }}
+                            style={pinStyle('left', selectable ? `${SELECT_WIDTH}px` : '0px')}
                             onClick={(event) => event.stopPropagation()}
                           >
                             <button
@@ -684,9 +1119,14 @@ export function DataTable<T>({
                           </td>
                         ) : null}
 
-                        {renderBodyCells(row, rowIndex, visible.slice(0, fillerIndex))}
+                        {renderBodyCells(row, rowIndex, visible.slice(0, fillerIndex), controlCount)}
                         <td className="mz-dt__td mz-dt__td--filler" aria-hidden="true" />
-                        {renderBodyCells(row, rowIndex, visible.slice(fillerIndex))}
+                        {renderBodyCells(
+                          row,
+                          rowIndex,
+                          visible.slice(fillerIndex),
+                          controlCount + fillerIndex
+                        )}
                       </tr>
 
                       {isOpen && renderExpanded ? (
@@ -701,7 +1141,32 @@ export function DataTable<T>({
                     </React.Fragment>
                   )
                 })}
+            {spacerRow(padBottom, colSpan)}
           </tbody>
+
+          {showSummary && data.length > 0 ? (
+            <tfoot>
+              <tr className="mz-dt__row mz-dt__row--summary" aria-label={labels.summary}>
+                {selectable ? (
+                  <td
+                    className="mz-dt__tf mz-dt__tf--control"
+                    data-pinned="left"
+                    style={pinStyle('left', '0px')}
+                  />
+                ) : null}
+                {renderExpanded ? (
+                  <td
+                    className="mz-dt__tf mz-dt__tf--control"
+                    data-pinned="left"
+                    style={pinStyle('left', selectable ? `${SELECT_WIDTH}px` : '0px')}
+                  />
+                ) : null}
+                {renderSummaryCells(visible.slice(0, fillerIndex))}
+                <td className="mz-dt__tf mz-dt__tf--filler" aria-hidden="true" />
+                {renderSummaryCells(visible.slice(fillerIndex))}
+              </tr>
+            </tfoot>
+          ) : null}
         </table>
 
         {!loading && !error && data.length === 0 ? (
@@ -766,7 +1231,10 @@ export function DataTable<T>({
           way back out of the mode with it. */}
       {selectable && (rows.allMatching || (rows.count ?? 0) > 0) ? (
         <div className="mz-dt__bulkbar" role="region" aria-label={labels.bulkActions}>
-          <span className="mz-dt__bulkbar-count">
+          {/* Selecting a page changes a number nobody is looking at: the
+              count is announced so a screen-reader user hears what the tick
+              did. Polite, so it waits for a pause rather than cutting in. */}
+          <span className="mz-dt__bulkbar-count" role="status" aria-live="polite">
             {selectionCount === undefined ? (
               // Everything the filter matches is selected, but the host never
               // said how many that is. Any number here would be a guess, so
@@ -808,32 +1276,70 @@ function filtersKey(filters: DataTableFilters): string {
   }
 }
 
+/** How many picked options a chip spells out before it says "+N". */
+const CHIP_VALUES = 3
+
+/**
+ * An ISO day as the reader's locale writes it. The value on the wire is
+ * always `YYYY-MM-DD` — it is what `<input type="date">` produces and what a
+ * backend expects — and printing that raw put an American reader's chip in
+ * one format and their calendar in another. Parsed as local noon: a plain
+ * `new Date('2026-03-01')` is parsed as UTC midnight and prints as the last
+ * day of February anywhere west of Greenwich.
+ */
+function formatDay(iso: string | undefined, locale: string | undefined): string {
+  if (!iso) return '…'
+  const [y, m, d] = iso.split('-').map(Number)
+  if (!y || !m || !d) return iso
+  const date = new Date(y, m - 1, d, 12)
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString(locale)
+}
+
 function describeFilter(
   value: import('./types').FilterValue,
   def: import('./types').ColumnFilterDef | undefined,
-  labels: DataTableLabels
+  labels: DataTableLabels,
+  locale: string | undefined
 ): string {
   switch (value.type) {
-    case 'text':
-      return `: “${value.value}”`
+    case 'text': {
+      // The operator is part of the constraint whenever the column offered a
+      // choice of them: “Name equals Ivanov” and “Name contains Ivanov” are
+      // different filters and used to print as the same chip.
+      const op =
+        value.op && def?.type === 'text' && (def.ops?.length ?? 0) > 1
+          ? ` ${opLabel(value.op, labels).toLocaleLowerCase(locale)}`
+          : ''
+      return `${op}: “${value.value}”`
+    }
     case 'select': {
       // Show what the user picked in the menu, not the raw wire value.
       const options = def?.type === 'select' ? def.options : []
-      const labels = value.value.map(
+      const picked = value.value.map(
         (v) => options.find((option) => option.value === v)?.label ?? v
       )
-      return `: ${labels.join(', ')}`
+      // Ten warehouses in one chip pushed every other chip off the row.
+      const head = picked.slice(0, CHIP_VALUES).join(', ')
+      const rest = picked.length - CHIP_VALUES
+      return `: ${head}${rest > 0 ? ` ${labels.andMore(String(rest))}` : ''}`
     }
-    case 'number-range':
-      return `: ${value.min ?? '…'}–${value.max ?? '…'}`
+    case 'number-range': {
+      const unit = def?.type === 'number-range' && def.unit ? ` ${def.unit}` : ''
+      const n = (value: number | undefined) => (value === undefined ? '…' : value.toLocaleString(locale))
+      return `: ${n(value.min)}–${n(value.max)}${unit}`
+    }
     case 'date-range':
-      return `: ${value.from ?? '…'} – ${value.to ?? '…'}`
+      return `: ${formatDay(value.from, locale)} – ${formatDay(value.to, locale)}`
     case 'boolean':
-      return `: ${value.value ? labels.yes.toLowerCase() : labels.no.toLowerCase()}`
+      return `: ${value.value ? labels.yes.toLocaleLowerCase(locale) : labels.no.toLocaleLowerCase(locale)}`
     case 'custom': {
       // Only the host can put a custom value into words.
       const text = (def?.type === 'custom' ? def.describe?.(value.value) : undefined) ?? value.label
       return text ? `: ${text}` : ''
     }
   }
+}
+
+function opLabel(op: import('./types').TextFilterOp, labels: DataTableLabels): string {
+  return op === 'equals' ? labels.opEquals : op === 'startsWith' ? labels.opStartsWith : labels.opContains
 }

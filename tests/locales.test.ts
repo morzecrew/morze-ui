@@ -18,9 +18,23 @@ describe('locale bundles', () => {
     expect(Object.keys(ru.common).sort()).toEqual(Object.keys(en.common).sort())
   })
 
+  it('covers the fields that carry strings of their own', () => {
+    expect(Object.keys(ru.combobox).sort()).toEqual(Object.keys(en.combobox).sort())
+    expect(Object.keys(ru.datePicker).sort()).toEqual(Object.keys(en.datePicker).sort())
+  })
+
   it('leaves nothing in English', () => {
     for (const key of Object.keys(defaultDataTableLabels) as (keyof DataTableLabels)[]) {
       expect(render(ru.dataTable[key]), key).not.toBe(render(defaultDataTableLabels[key]))
+    }
+    // `andMore` is "+3" in every language, so it is the one exemption rather
+    // than a string someone forgot.
+    for (const key of Object.keys(en.combobox) as (keyof typeof en.combobox)[]) {
+      if (key === 'andMore') continue
+      expect(render(ru.combobox[key]), key).not.toBe(render(en.combobox[key]))
+    }
+    for (const key of Object.keys(en.datePicker) as (keyof typeof en.datePicker)[]) {
+      expect(render(ru.datePicker[key]), key).not.toBe(render(en.datePicker[key]))
     }
   })
 

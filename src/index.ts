@@ -26,6 +26,7 @@ export { Slider } from './components/slider'
 export { Input } from './components/input'
 export type { InputProps } from './components/input'
 export { Textarea } from './components/textarea'
+export type { TextareaProps } from './components/textarea'
 export { Label } from './components/label'
 export { Field, FieldHint, FieldError } from './components/field'
 
@@ -41,6 +42,20 @@ export {
   SelectTrigger,
   SelectValue,
 } from './components/select'
+
+export { Combobox, MultiSelect } from './components/combobox'
+export type {
+  ComboboxProps,
+  MultiSelectProps,
+  ComboboxOption,
+  ComboboxLabels,
+} from './components/combobox'
+
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from './components/collapsible'
+export { NumberInput } from './components/number-input'
+export type { NumberInputProps } from './components/number-input'
+export { Kbd, KbdSequence } from './components/kbd'
+export { Empty, EmptyMedia, EmptyTitle, EmptyDescription, EmptyActions } from './components/empty'
 
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs'
 export type { TabsListProps } from './components/tabs'
@@ -107,6 +122,37 @@ export {
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip'
 
 export {
+  ContextMenu,
+  ContextMenuPortal,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuLabel,
+  ContextMenuItem,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSeparator,
+  ContextMenuShortcut,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from './components/context-menu'
+
+export {
+  Command,
+  CommandDialog,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+  CommandShortcut,
+} from './components/command'
+export type { CommandDialogProps, CommandFilter } from './components/command'
+
+export {
   AlertDialog,
   AlertDialogPortal,
   AlertDialogOverlay,
@@ -140,6 +186,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/table'
+export type { TableHeadProps } from './components/table'
 
 export { ScrollArea, ScrollBar } from './components/scroll-area'
 
@@ -197,6 +244,16 @@ export type {
 export { Calendar } from './components/calendar'
 export type { CalendarProps, CalendarLabels, DateRange, DateMatcher } from './components/calendar'
 
+export { DatePicker, DateRangePicker } from './components/date-picker'
+export type {
+  DatePickerProps,
+  DateRangePickerProps,
+  DatePickerLabels,
+  DateRangePreset,
+} from './components/date-picker'
+/** The bridge between a `Date` and the `YYYY-MM-DD` a backend speaks. */
+export { toISODate, fromISODate } from './lib/date'
+
 export {
   ChartContainer,
   ChartStyle,
@@ -220,6 +277,7 @@ export {
   SheetOverlay,
   SheetContent,
   SheetHeader,
+  SheetBody,
   SheetFooter,
   SheetTitle,
   SheetDescription,
@@ -275,6 +333,7 @@ export {
   parseSort,
   serializeSort,
   setFilter,
+  setSearch,
   sortStateOf,
   toggleSort,
   emptyQuery,
@@ -290,6 +349,7 @@ export type {
   DataTableFilters,
   DataTableQuery,
   DataTableSort,
+  DateRangePreset as DataTableDateRangePreset,
   EditableDef,
   FilterValue,
   RowAttributes,
@@ -297,6 +357,7 @@ export type {
   SavedView,
   SelectOptionDef,
   SortDir,
+  TextFilterOp,
   UseTableQueryOptions,
   UseSavedViewsOptions,
   DataTableLabels,

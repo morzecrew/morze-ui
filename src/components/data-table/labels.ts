@@ -7,6 +7,17 @@ export type DataTableLabels = {
   filterFor: (column: string) => string
   filterActive: string
   contains: string
+  /** The operator row over a text filter. */
+  opContains: string
+  opEquals: string
+  opStartsWith: string
+  /** The box over a long option list, and the answer when it matches nothing. */
+  searchOptions: string
+  noOptions: string
+  selectAllOptions: string
+  clearAllOptions: string
+  /** Closes a truncated value list in a chip: “Draft, Sent +3”. */
+  andMore: (count: string) => string
   apply: string
   reset: string
   resetAll: string
@@ -20,6 +31,11 @@ export type DataTableLabels = {
   no: string
 
   columns: string
+  /** The box over a long column list, and the answer when it matches nothing. */
+  searchColumns: string
+  noColumns: string
+  showAllColumns: string
+  hideAllColumns: string
   moveUp: (column: string) => string
   moveDown: (column: string) => string
   pinning: (column: string, side: string) => string
@@ -31,6 +47,8 @@ export type DataTableLabels = {
 
   sortBy: (column: string) => string
   columnWidth: (column: string) => string
+  /** Hands a hand-dragged column back to auto-fit. */
+  autoWidth: (column: string) => string
   selectPage: string
   selectRow: string
   expandRow: string
@@ -39,6 +57,14 @@ export type DataTableLabels = {
 
   empty: string
   retry: string
+  /** The toolbar search box. */
+  search: string
+  /** A rejected inline edit. Shown in the cell, not in a title attribute. */
+  saveFailed: string
+  /** The totals row under the body. */
+  summary: string
+  expandAll: string
+  collapseAll: string
 
   rowsPerPage: string
   nothingFound: string
@@ -62,6 +88,14 @@ export const defaultDataTableLabels: DataTableLabels = {
   filterFor: (column) => `Filter: ${column}`,
   filterActive: 'active',
   contains: 'Contains…',
+  opContains: 'Contains',
+  opEquals: 'Equals',
+  opStartsWith: 'Starts with',
+  searchOptions: 'Search…',
+  noOptions: 'Nothing matches',
+  selectAllOptions: 'All',
+  clearAllOptions: 'None',
+  andMore: (count) => `+${count}`,
   apply: 'Apply',
   reset: 'Reset',
   resetAll: 'Reset all',
@@ -75,6 +109,10 @@ export const defaultDataTableLabels: DataTableLabels = {
   no: 'No',
 
   columns: 'Columns',
+  searchColumns: 'Find a column…',
+  noColumns: 'No such column',
+  showAllColumns: 'Show all',
+  hideAllColumns: 'Hide all',
   moveUp: (column) => `Move “${column}” up`,
   moveDown: (column) => `Move “${column}” down`,
   pinning: (column, side) => `Pinning for “${column}”: ${side}`,
@@ -86,6 +124,7 @@ export const defaultDataTableLabels: DataTableLabels = {
 
   sortBy: (column) => `Sort by “${column}” (Shift to add to the sort)`,
   columnWidth: (column) => `Width of column “${column}”`,
+  autoWidth: (column) => `Auto width for “${column}”`,
   selectPage: 'Select page',
   selectRow: 'Select row',
   expandRow: 'Expand',
@@ -94,6 +133,11 @@ export const defaultDataTableLabels: DataTableLabels = {
 
   empty: 'Nothing found',
   retry: 'Retry',
+  search: 'Search…',
+  saveFailed: 'Could not save',
+  summary: 'Totals',
+  expandAll: 'Expand all',
+  collapseAll: 'Collapse all',
 
   rowsPerPage: 'Rows per page',
   nothingFound: 'Nothing found',

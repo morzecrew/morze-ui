@@ -48,8 +48,8 @@
   padding-right: 64px;
   font-size: 14px;
   font-weight: 600;
-  text-transform: capitalize;
 }
+.mz-calendar__caption-text::first-letter { text-transform: uppercase; }
 .mz-calendar__caption--dropdown { gap: 6px; padding-right: 64px; }
 
 .mz-calendar__dropdown {
@@ -107,7 +107,7 @@
     color var(--mz-duration) ease,
     border-color var(--mz-duration) ease;
 }
-.mz-calendar__day:hover:not([aria-disabled]) { background: var(--mz-face-hover); }
+.mz-calendar__day:hover:not([aria-disabled]) { background: var(--mz-wash-hover); }
 /* An unavailable day stays focusable (see aria-disabled in calendar.tsx), so it
    is dimmed on the attribute rather than on :disabled. The shared
    [data-disabled] rule in base.css takes care of blocking the pointer. */
@@ -125,7 +125,7 @@
   color: var(--mz-tone-fg);
   font-weight: 600;
   box-shadow:
-    0 6px 18px -8px rgba(var(--mz-tone-rgb), 0.7),
+    var(--mz-glow-soft),
     inset 0 1px 0 var(--mz-convex-top);
 }
 .mz-calendar__day[data-selected]:hover { background-color: var(--mz-fill-hover); }
@@ -156,3 +156,65 @@
 .mz-calendar__day[data-preview][data-range-end] {
   border: 1px dashed rgba(var(--mz-tone-rgb), 0.7);
 }
+
+/* ==========================================================================
+   DatePicker · DateRangePicker — the Calendar behind a field.
+   The trigger is the select trigger's recipe (`.mz-select-trigger`), so a
+   date field and a select in one form row are the same object down to the
+   focus glow; only what sits inside it differs.
+   ========================================================================== */
+
+.mz-datefield { position: relative; display: flex; width: 100%; min-width: 0; }
+.mz-datefield__trigger { justify-content: flex-start; gap: 8px; }
+.mz-datefield__icon { flex-shrink: 0; width: 16px; height: 16px; opacity: 0.6; }
+.mz-datefield__value { overflow: hidden; text-overflow: ellipsis; }
+.mz-datefield__trigger[data-placeholder] .mz-datefield__value { color: var(--mz-text-muted); }
+
+/* The clear control sits over the field rather than inside the trigger: a
+   button cannot contain a button, and nesting one made every clear click also
+   open the popover it had just emptied. */
+.mz-datefield__clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  translate: 0 -50%;
+  display: grid;
+  place-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-muted);
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-datefield__clear:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-datefield__clear svg { width: 13px; height: 13px; }
+/* Room for the × so a long date does not run under it. */
+.mz-datefield:has(.mz-datefield__clear) .mz-datefield__trigger { padding-right: 34px; }
+
+/* The popover is as wide as the months inside it, not the 18rem a popover
+   defaults to. */
+.mz-datefield__panel { width: auto; padding: 12px; }
+
+.mz-datefield__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--mz-border);
+}
+.mz-datefield__preset {
+  padding: 4px 10px;
+  border: 1px solid var(--mz-border);
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-datefield__preset:hover { background: var(--mz-wash-hover); color: var(--mz-text); }

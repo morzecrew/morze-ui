@@ -21,13 +21,24 @@ function RadioGroup({
 function RadioGroupItem({
   className,
   tone,
+  size = 'md',
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Item> & { tone?: Tone }) {
+}: React.ComponentProps<typeof RadioGroupPrimitive.Item> & {
+  tone?: Tone
+  /** The same scale Checkbox and Switch run on. */
+  size?: 'sm' | 'md' | 'lg'
+}) {
   return (
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       data-tone={tone}
-      className={cn('mz-radio mz-focusable', className)}
+      data-size={size}
+      className={cn(
+        'mz-radio mz-focusable',
+        size === 'sm' && 'mz-radio--sm',
+        size === 'lg' && 'mz-radio--lg',
+        className
+      )}
       {...props}
     >
       <RadioGroupPrimitive.Indicator

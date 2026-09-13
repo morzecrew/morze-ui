@@ -1,6 +1,6 @@
 import { StrictMode, act } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import { cleanup, createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -208,22 +208,27 @@ describe('DataTable', () => {
 
   it('spans full-width rows across the slack column too', () => {
     const { container } = table({ data: [], total: 0 })
-    const cols = container.querySelectorAll('colgroup > col').length
-    const stateRow = container.querySelector('.mz-dt__state')
-    expect(stateRow).not.toBeNull()
-    // colgroup width must match what the empty/skeleton rows claim to span.
-    const skeleton = render(
+    expect(container.querySelector('.mz-dt__state')).not.toBeNull()
+    // The detail panel is the row that still spans everything, and the
+    // colgroup width is what it has to agree with — a span one short leaves
+    // the slack column outside the panel. (The first-load placeholder used to
+    // span too; it draws a cell per column now — see G-14.)
+    const expanded = render(
       <DataTable
         columns={columns}
-        data={[]}
+        data={rows}
         rowKey={(r) => r.id}
-        total={0}
-        loading
+        total={rows.length}
         query={emptyQuery}
         onQueryChange={vi.fn()}
+        renderExpanded={() => <span>details</span>}
+        expanded={[rows[0]!.id]}
       />
     )
-    const span = skeleton.container.querySelector('tbody td')?.getAttribute('colspan')
+    const cols = expanded.container.querySelectorAll('colgroup > col').length
+    const span = expanded.container
+      .querySelector('.mz-dt__td--expanded')
+      ?.getAttribute('colspan')
     expect(Number(span)).toBe(cols)
   })
 
@@ -971,3 +976,883 @@ describe('sort semantics', () => {
     expect(screen.getByRole('columnheader', { name: /Total/ })).not.toHaveAttribute('aria-sort')
   })
 })
+
+/* ==========================================================================
+   P1 — the 2026-09 review. Each block names the finding it closes.
+   ========================================================================== */
+
+describe('scroller height and frame (D-05, V-08)', () => {
+  it('gives the scroller something to stick the header against', () => {
+    // `stickyHeader` is measured against the scroller, and the scroller had
+    // no height to scroll within — it simply grew with its content, so the
+    // header never stuck and there was no prop to say otherwise.
+    const { container, rerender } = render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        maxHeight={420}
+      />
+    )
+    const root = container.querySelector('[data-slot="data-table"]') as HTMLElement
+    expect(root.style.getPropertyValue('--mz-dt-max-h')).toBe('420px')
+
+    rerender(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        height="60vh"
+        fill
+        frame="plain"
+      />
+    )
+    expect(root.style.getPropertyValue('--mz-dt-h')).toBe('60vh')
+    expect(root.className).toContain('mz-dt--fill')
+    expect(root.className).toContain('mz-dt--plain')
+  })
+})
+
+describe('header hints and sort direction (D-08)', () => {
+  it('shows a column hint on a sortable column too', async () => {
+    // `title` was taken by the sort hint there, so `headerTitle` silently did
+    // nothing on exactly the columns readers ask about.
+    const hinted: DataTableColumn<Row>[] = [
+      { id: 'sum', header: 'Total', sortable: true, headerTitle: 'Net of VAT' },
+    ]
+    render(
+      <DataTable columns={hinted} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    expect(screen.getByTitle('Net of VAT')).toBeInTheDocument()
+  })
+
+  it('starts an amount column at the big end', async () => {
+    const descFirst: DataTableColumn<Row>[] = [
+      { id: 'sum', header: 'Total', sortable: true, sortDescFirst: true },
+    ]
+    const onQueryChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={descFirst} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={onQueryChange} />
+    )
+    await user.click(screen.getByRole('button', { name: /Total/ }))
+    expect(onQueryChange.mock.calls[0]![0].sort).toEqual([{ id: 'sum', dir: 'desc' }])
+  })
+})
+
+describe('filter chips (D-07, D-12, G-08)', () => {
+  it('prints a range in the reader’s locale, with its unit', () => {
+    const priced: DataTableColumn<Row>[] = [
+      { id: 'sum', header: 'Total', filter: { type: 'number-range', unit: '₽' } },
+    ]
+    render(
+      <DataTable
+        columns={priced}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        locale="ru-RU"
+        query={{ ...emptyQuery, filters: { sum: { type: 'number-range', min: 1000, max: 25000 } } }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    // Grouped by the locale, and carrying the unit the column declared —
+    // `unit` was accepted by the type and read by nothing.
+    const chip = document.querySelector('.mz-dt__chip')!
+    expect(chip.textContent).toContain('₽')
+    expect(chip.textContent).toContain((1000).toLocaleString('ru-RU'))
+    expect(chip.textContent).toContain((25000).toLocaleString('ru-RU'))
+  })
+
+  it('writes a day the way the locale does, not as the wire format', () => {
+    const dated: DataTableColumn<Row>[] = [{ id: 'name', header: 'Created', filter: { type: 'date-range' } }]
+    render(
+      <DataTable
+        columns={dated}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        locale="ru-RU"
+        query={{ ...emptyQuery, filters: { name: { type: 'date-range', from: '2026-03-01' } } }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    const chip = document.querySelector('.mz-dt__chip')!
+    expect(chip.textContent).toContain(new Date(2026, 2, 1).toLocaleDateString('ru-RU'))
+    // And it is still the first of March west of Greenwich: the ISO string is
+    // parsed on the local calendar, not through UTC midnight.
+    expect(chip.textContent).not.toContain('2026-03-01')
+  })
+
+  it('closes a long value list instead of spilling it across the row', () => {
+    const many: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Status',
+        filter: {
+          type: 'select',
+          options: ['a', 'b', 'c', 'd', 'e'].map((v) => ({ value: v, label: v.toUpperCase() })),
+        },
+      },
+    ]
+    render(
+      <DataTable
+        columns={many}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={{ ...emptyQuery, filters: { name: { type: 'select', value: ['a', 'b', 'c', 'd', 'e'] } } }}
+        onQueryChange={vi.fn()}
+      />
+    )
+    const chip = document.querySelector('.mz-dt__chip')!
+    expect(chip.textContent).toContain('A, B, C')
+    expect(chip.textContent).toContain('+2')
+    expect(chip.textContent).not.toContain('D')
+  })
+})
+
+describe('filter semantics (D-13)', () => {
+  it('offers one-of-two as radios rather than checkboxes that act like them', async () => {
+    const flagged: DataTableColumn<Row>[] = [{ id: 'name', header: 'Paid', filter: { type: 'boolean' } }]
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={flagged} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    await user.click(screen.getByTitle('Filter: Paid'))
+    expect(await screen.findByRole('radiogroup')).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(2)
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
+  })
+
+  it('does the same for a single-choice select', async () => {
+    const single: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Status',
+        filter: { type: 'select', multiple: false, options: [{ value: 'a', label: 'A' }] },
+      },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={single} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    await user.click(screen.getByTitle('Filter: Status'))
+    expect(await screen.findByRole('radiogroup')).toBeInTheDocument()
+  })
+})
+
+describe('text filter operators (G-08)', () => {
+  it('sends the chosen operator along with the value', async () => {
+    const withOps: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Name', filter: { type: 'text', ops: ['contains', 'equals'] } },
+    ]
+    const onQueryChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={withOps} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={onQueryChange} />
+    )
+    await user.click(screen.getByTitle('Filter: Name'))
+    await user.click(await screen.findByRole('button', { name: 'Equals' }))
+    await user.type(screen.getByPlaceholderText('Contains…'), 'Ivanov')
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onQueryChange.mock.calls.at(-1)![0].filters.name).toEqual({
+      type: 'text',
+      value: 'Ivanov',
+      op: 'equals',
+    })
+  })
+
+  it('leaves the value operator-free when the column offers no choice', async () => {
+    const onQueryChange = vi.fn()
+    const user = userEvent.setup()
+    table({ onQueryChange } as never)
+    await user.click(screen.getByTitle('Filter: Name'))
+    await user.type(await screen.findByPlaceholderText('Contains…'), 'x')
+    await user.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(onQueryChange.mock.calls.at(-1)![0].filters.name).toEqual({ type: 'text', value: 'x', op: undefined })
+  })
+})
+
+describe('inline editing (D-11)', () => {
+  it('renders the reason a save was refused instead of hiding it in a title', async () => {
+    const editable: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        accessor: (r) => r.name,
+        editable: {
+          type: 'text',
+          value: (r) => r.name,
+          onSave: () => Promise.reject(new Error('Period is closed')),
+        },
+      },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={editable} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    await user.dblClick(screen.getAllByText('First')[0]!)
+    const input = screen.getByDisplayValue('First')
+    await user.clear(input)
+    await user.type(input, 'Changed{Enter}')
+    const message = await screen.findByRole('status')
+    expect(message).toHaveTextContent('Period is closed')
+    // And what the reader typed is still there to correct.
+    expect(screen.getByDisplayValue('Changed')).toBeInTheDocument()
+  })
+
+  it('leaves a row its own rule says is not editable alone', async () => {
+    const onSave = vi.fn()
+    const guarded: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        accessor: (r) => r.name,
+        editable: { type: 'text', value: (r) => r.name, onSave, canEdit: (r) => r.id !== '1' },
+      },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable columns={guarded} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    await user.dblClick(screen.getAllByText('First')[0]!)
+    expect(screen.queryByDisplayValue('First')).not.toBeInTheDocument()
+    await user.dblClick(screen.getAllByText('Second')[0]!)
+    expect(screen.getByDisplayValue('Second')).toBeInTheDocument()
+  })
+})
+
+describe('row activation (G-02)', () => {
+  it('does not open the record from a control inside a cell', async () => {
+    const onRowClick = vi.fn()
+    const onDelete = vi.fn()
+    const withAction: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Name', accessor: (r) => r.name },
+      { id: 'sum', header: '', cell: () => <button type="button" onClick={onDelete}>Delete</button> },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={withAction}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        onRowClick={onRowClick}
+      />
+    )
+    await user.click(screen.getAllByRole('button', { name: 'Delete' })[0]!)
+    expect(onDelete).toHaveBeenCalledTimes(1)
+    // The row used to open behind the dialog the delete button had raised.
+    expect(onRowClick).not.toHaveBeenCalled()
+
+    await user.click(screen.getByText('First'))
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('expansion (G-03)', () => {
+  it('can be driven from outside the table', async () => {
+    const onExpandedChange = vi.fn()
+    const user = userEvent.setup()
+    const { rerender } = render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        renderExpanded={(row) => <span>Details for {row.name}</span>}
+        expanded={[]}
+        onExpandedChange={onExpandedChange}
+      />
+    )
+    await user.click(screen.getAllByRole('button', { name: 'Expand' })[0]!)
+    expect(onExpandedChange).toHaveBeenCalledWith(['1'])
+    // Controlled: nothing opens until the host says so.
+    expect(screen.queryByText('Details for First')).not.toBeInTheDocument()
+
+    rerender(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        renderExpanded={(row) => <span>Details for {row.name}</span>}
+        expanded={['1']}
+        onExpandedChange={onExpandedChange}
+      />
+    )
+    expect(screen.getByText('Details for First')).toBeInTheDocument()
+  })
+
+  it('opens every row on the page at once', async () => {
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        renderExpanded={(row) => <span>Details for {row.name}</span>}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: 'Expand all' }))
+    expect(screen.getByText('Details for First')).toBeInTheDocument()
+    expect(screen.getByText('Details for Second')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Collapse all' }))
+    expect(screen.queryByText('Details for First')).not.toBeInTheDocument()
+  })
+
+  it('opens a row from the row itself when asked to', async () => {
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        renderExpanded={(row) => <span>Details for {row.name}</span>}
+        expandOnRowClick
+      />
+    )
+    await user.click(screen.getByText('First'))
+    expect(screen.getByText('Details for First')).toBeInTheDocument()
+  })
+})
+
+describe('global search (G-04)', () => {
+  it('puts the box’s value in the query and resets the page', async () => {
+    vi.useFakeTimers()
+    try {
+      const onQueryChange = vi.fn()
+      render(
+        <DataTable
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          total={2}
+          query={{ ...emptyQuery, page: 4 }}
+          onQueryChange={onQueryChange}
+          search
+        />
+      )
+      fireEvent.change(screen.getByLabelText('Search…'), { target: { value: 'inv-42' } })
+      // Debounced: one request for a word, not one per letter.
+      expect(onQueryChange).not.toHaveBeenCalled()
+      act(() => void vi.advanceTimersByTime(400))
+      expect(onQueryChange).toHaveBeenCalledWith(
+        expect.objectContaining({ search: 'inv-42', page: 1 })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
+describe('summary row (G-05)', () => {
+  it('adds up the rows the table holds', () => {
+    const summed: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Name', accessor: (r) => r.name },
+      {
+        id: 'sum',
+        header: 'Total',
+        accessor: (r) => r.sum,
+        align: 'right',
+        footer: (list) => list.reduce((total, row) => total + row.sum, 0),
+      },
+    ]
+    const { container } = render(
+      <DataTable columns={summed} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} summary />
+    )
+    expect(container.querySelector('tfoot')!.textContent).toContain('300')
+  })
+
+  it('stays away unless a column has something to put in it', () => {
+    const { container } = render(
+      <DataTable columns={columns} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} summary />
+    )
+    expect(container.querySelector('tfoot')).toBeNull()
+  })
+})
+
+describe('column style hooks (G-05)', () => {
+  it('puts the declared classes on the cells and the header', () => {
+    const styled: DataTableColumn<Row>[] = [
+      { id: 'sum', header: 'Total', accessor: (r) => r.sum, className: 'num', headerClassName: 'num-head' },
+    ]
+    const { container } = render(
+      <DataTable columns={styled} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    expect(container.querySelector('th.num-head')).toBeTruthy()
+    expect(container.querySelectorAll('td.num')).toHaveLength(2)
+  })
+})
+
+describe('state for assistive tech (G-09)', () => {
+  it('says how many rows there are and when they are being replaced', () => {
+    const { container, rerender } = render(
+      <DataTable columns={columns} data={rows} rowKey={(r) => r.id} total={137} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    const grid = container.querySelector('table')!
+    // The header counts as a row, which is what makes "row 30 of 137" add up.
+    expect(grid).toHaveAttribute('aria-rowcount', '138')
+    expect(grid).not.toHaveAttribute('aria-busy')
+
+    rerender(
+      <DataTable columns={columns} data={rows} rowKey={(r) => r.id} total={137} loading query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    expect(grid).toHaveAttribute('aria-busy', 'true')
+  })
+
+  it('announces the selection count', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        selection={{ keys: ['1'], allMatching: false }}
+        onSelectionChange={vi.fn()}
+      />
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('Selected: 1')
+  })
+})
+
+describe('load-more contract (G-11)', () => {
+  it('hands the host the page to ask for', async () => {
+    const onLoadMore = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={100}
+        query={{ ...emptyQuery, pageSize: 2 }}
+        onQueryChange={vi.fn()}
+        onLoadMore={onLoadMore}
+        autoLoadMore={false}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: 'Load more' }))
+    // Two rows of two per page are behind us, so the host wants page 2. The
+    // table cannot bump `query.page` itself — the pager owns that field.
+    expect(onLoadMore).toHaveBeenCalledWith({ nextPage: 2 })
+  })
+})
+
+describe('filter trigger visibility (V-07)', () => {
+  it('is quiet by default and unconditional on request', () => {
+    const { container, rerender } = render(
+      <DataTable columns={columns} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} />
+    )
+    const root = () => container.querySelector('[data-slot="data-table"]')!
+    expect(root()).toHaveAttribute('data-filter-trigger', 'hover')
+    rerender(
+      <DataTable columns={columns} data={rows} rowKey={(r) => r.id} total={2} query={emptyQuery} onQueryChange={vi.fn()} filterTrigger="always" />
+    )
+    expect(root()).toHaveAttribute('data-filter-trigger', 'always')
+  })
+})
+
+describe('the stored layout has a shape and a way back (G-07)', () => {
+  const sizedColumns: DataTableColumn<Row>[] = [
+    { id: 'a', header: 'A', width: 100 },
+    { id: 'b', header: 'B', width: 200 },
+  ]
+
+  it('stamps what it writes', () => {
+    const key = 'test.layout.version'
+    window.localStorage.removeItem(key)
+    const { result } = renderHook(() => useColumnLayout({ columns: sizedColumns, persistKey: key }))
+    act(() => result.current.setWidth('a', 150))
+    const stored = JSON.parse(window.localStorage.getItem(key)!) as { v: number }
+    expect(stored.v).toBe(1)
+    window.localStorage.removeItem(key)
+  })
+
+  it('adopts a layout written before there was a version', () => {
+    // Its shape *is* version 1, so dropping it would lose every layout saved
+    // by an earlier release for nothing.
+    const key = 'test.layout.legacy'
+    window.localStorage.setItem(key, JSON.stringify({ widths: { a: 321 }, hidden: ['b'] }))
+    const { result } = renderHook(() => useColumnLayout({ columns: sizedColumns, persistKey: key }))
+    expect(result.current.widthOf('a')).toBe(321)
+    expect(result.current.layout.hidden).toEqual(['b'])
+    window.localStorage.removeItem(key)
+  })
+
+  it('drops a layout it does not understand rather than half-reading it', () => {
+    const key = 'test.layout.future'
+    window.localStorage.setItem(key, JSON.stringify({ v: 99, widths: { a: 321 } }))
+    const { result } = renderHook(() => useColumnLayout({ columns: sizedColumns, persistKey: key }))
+    expect(result.current.widthOf('a')).toBe(100)
+    window.localStorage.removeItem(key)
+  })
+
+  it('hands a hand-dragged column back to auto-fit', () => {
+    const { result } = renderHook(() => useColumnLayout({ columns: sizedColumns }))
+    act(() => result.current.setWidth('a', 400))
+    expect(result.current.layout.sized).toEqual(['a'])
+    // Sized columns are left alone by the fit — that is the point of the flag.
+    act(() => result.current.fitTo(900))
+    expect(result.current.widthOf('a')).toBe(400)
+
+    const before = result.current.fitEpoch
+    act(() => result.current.unsize('a'))
+    expect(result.current.layout.sized).toEqual([])
+    // Back to the declared width, which is the figure the fit scales from —
+    // leaving the dragged one in would make the next fit depend on a gesture
+    // that has just been undone.
+    expect(result.current.widthOf('a')).toBe(100)
+    // And the fit has to be told to run: nothing about the container changed.
+    expect(result.current.fitEpoch).toBeGreaterThan(before)
+
+    act(() => result.current.fitTo(900))
+    expect(result.current.widthOf('a')).toBeGreaterThan(100)
+  })
+
+  it('offers the way back only on a column that was dragged', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(
+      <DataTable
+        columns={sizedColumns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        layout={{ widths: { a: 400 }, sized: [] }}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: /Columns/ }))
+    expect(screen.queryByTitle('Auto width for “A”')).not.toBeInTheDocument()
+
+    rerender(
+      <DataTable
+        columns={sizedColumns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        layout={{ widths: { a: 400 }, sized: ['a'] }}
+      />
+    )
+    expect(await screen.findByTitle('Auto width for “A”')).toBeInTheDocument()
+    expect(screen.queryByTitle('Auto width for “B”')).not.toBeInTheDocument()
+  })
+})
+
+describe('column ids reach CSS without colliding (G-12)', () => {
+  it('gives two ids that differ only by punctuation two variables', () => {
+    // `replace(/[^a-zA-Z0-9_-]/g, '_')` let `_` through *and* used it as the
+    // replacement, so `a.b` and `a_b` both came out `a_b`: one variable, one
+    // width, and dragging either column resized both.
+    const punctuated: DataTableColumn<Row>[] = [
+      { id: 'order.total', header: 'Dotted', width: 120 },
+      { id: 'order_total', header: 'Scored', width: 260 },
+    ]
+    const { container } = render(
+      <DataTable
+        columns={punctuated}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        autoFit={false}
+      />
+    )
+    // The root carries one custom property per column, and that is where the
+    // two used to land on top of each other. (Asserted here rather than on the
+    // `<col>` elements: happy-dom drops a longhand whose value is a var(), so
+    // their style attribute comes back empty.)
+    const root = container.querySelector<HTMLElement>('[data-slot="data-table"]')!
+    const declared = root.getAttribute('style') ?? ''
+    const names = [...declared.matchAll(/--mz-dt-w-[a-zA-Z0-9_-]+/g)].map((m) => m[0])
+    expect(names).toHaveLength(2)
+    expect(new Set(names).size).toBe(2)
+    // And each column keeps its own declared width rather than the other's.
+    expect(root.style.getPropertyValue(names[0]!)).toBe('120px')
+    expect(root.style.getPropertyValue(names[1]!)).toBe('260px')
+  })
+})
+
+describe('the first-load placeholder has the table under it (G-14)', () => {
+  it('draws a cell per column instead of one bar across the width', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        rowKey={(r) => r.id}
+        loading
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        selection={{ keys: [], allMatching: false }}
+        onSelectionChange={vi.fn()}
+      />
+    )
+    const first = container.querySelector('tbody tr')!
+    // One bar spanning everything announced a list and then jumped into a grid
+    // the moment the rows arrived.
+    expect(first.querySelector('td[colspan]')).toBeNull()
+    // Selection column + the two data columns + the slack column.
+    expect(first.querySelectorAll('td')).toHaveLength(4)
+    expect(first.querySelectorAll('td[data-col]')).toHaveLength(2)
+    expect(first.querySelectorAll('.mz-skeleton')).toHaveLength(2)
+  })
+})
+
+describe('keyboard (G-01)', () => {
+  const clickable: DataTableColumn<Row>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    {
+      id: 'act',
+      header: 'Act',
+      cell: (r) => <button type="button">Open {r.name}</button>,
+    },
+  ]
+
+  it('makes a clickable row reachable and activates it on Enter', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    table({ onRowClick })
+    const row = screen.getAllByRole('row')[1]!
+    expect(row).toHaveAttribute('tabindex', '0')
+    row.focus()
+    await user.keyboard('{Enter}')
+    expect(onRowClick).toHaveBeenCalledWith(rows[0])
+  })
+
+  it('leaves Enter to the control it was pressed on', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    table({ columns: clickable, onRowClick })
+    screen.getByRole('button', { name: 'Open First' }).focus()
+    await user.keyboard('{Enter}')
+    // The button's own Enter, exactly as its click is its own (G-02).
+    expect(onRowClick).not.toHaveBeenCalled()
+  })
+
+  it('leaves a table that asks for no keyboard a table', () => {
+    table({ onRowClick: vi.fn() })
+    expect(screen.getByRole('table')).toBeInTheDocument()
+    expect(screen.queryAllByRole('gridcell')).toHaveLength(0)
+  })
+
+  it('holds exactly one tab stop and moves it with the arrows', async () => {
+    const user = userEvent.setup()
+    table({ keyboard: true })
+    expect(screen.getByRole('grid')).toBeInTheDocument()
+
+    const cells = screen.getAllByRole('gridcell')
+    expect(cells.filter((cell) => cell.tabIndex === 0)).toHaveLength(1)
+    cells[0]!.focus()
+
+    await user.keyboard('{ArrowRight}')
+    expect(document.activeElement).toHaveAttribute('data-col', 'sum')
+    await user.keyboard('{ArrowDown}')
+    expect(document.activeElement).toHaveAttribute('data-grid-row', '1')
+    // The tab stop travels with the focus, so Tab comes back where the reader was.
+    expect(document.activeElement).toHaveAttribute('tabindex', '0')
+    expect(screen.getAllByRole('gridcell').filter((cell) => cell.tabIndex === 0)).toHaveLength(1)
+
+    // The edges hold instead of wrapping onto another row.
+    await user.keyboard('{ArrowDown}{ArrowRight}')
+    expect(document.activeElement).toHaveAttribute('data-grid-row', '1')
+    expect(document.activeElement).toHaveAttribute('data-col', 'sum')
+    await user.keyboard('{Home}')
+    expect(document.activeElement).toHaveAttribute('data-col', 'name')
+  })
+
+  it('opens an editable cell on Enter and on F2, and hands the focus back', async () => {
+    const onSave = vi.fn()
+    const editable: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        accessor: (r) => r.name,
+        editable: { type: 'text', value: (r) => r.name, onSave },
+      },
+      { id: 'sum', header: 'Total', accessor: (r) => r.sum },
+    ]
+    const user = userEvent.setup()
+    table({ columns: editable, keyboard: true })
+    const cell = screen.getAllByRole('gridcell')[0]!
+    cell.focus()
+    await user.keyboard('{F2}')
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByDisplayValue('First')).not.toBeInTheDocument()
+    // Escape out of a cell leaves the reader in that cell, not at the top of
+    // the page with nothing focused.
+    expect(document.activeElement).toBe(cell)
+
+    await user.keyboard('{Enter}')
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+  })
+
+  it('activates the row from a cell that has no editor of its own', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    table({ keyboard: true, onRowClick })
+    screen.getAllByRole('gridcell')[1]!.focus()
+    await user.keyboard('{Enter}')
+    expect(onRowClick).toHaveBeenCalledWith(rows[0])
+    // F2 is the edit key and nothing else: it never opens the record.
+    await user.keyboard('{F2}')
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('ticks the row under the cursor with the space bar', async () => {
+    const onSelectionChange = vi.fn()
+    const user = userEvent.setup()
+    table({
+      keyboard: true,
+      selection: { keys: [], allMatching: false },
+      onSelectionChange,
+    })
+    screen.getAllByRole('gridcell')[0]!.focus()
+    await user.keyboard(' ')
+    expect(onSelectionChange).toHaveBeenCalledWith({ keys: ['1'], allMatching: false })
+  })
+
+  it('numbers the rows of the whole result set, not of the page', () => {
+    table({ query: { ...emptyQuery, page: 3, pageSize: 25 }, total: 13659 })
+    const rendered = screen.getAllByRole('row')
+    expect(rendered[0]).toHaveAttribute('aria-rowindex', '1')
+    // Page 3 of 25: the first row on screen is number 51, header included.
+    expect(rendered[1]).toHaveAttribute('aria-rowindex', '52')
+  })
+})
+
+describe('column manager on a long list (G-10)', () => {
+  type Wide = { id: string }
+  const wideRows: Wide[] = [{ id: '1' }]
+  /** Twelve columns: the table this list stops being scannable for. */
+  const many: DataTableColumn<Wide>[] = Array.from({ length: 12 }, (_, i) => ({
+    id: `c${i}`,
+    header: i === 0 ? 'Number' : `Column ${i}`,
+    accessor: () => 'x',
+  }))
+
+  const open = async (columns = many) => {
+    const user = userEvent.setup()
+    const onLayoutChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={wideRows}
+        rowKey={(r) => r.id}
+        total={1}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        onLayoutChange={onLayoutChange}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: /Columns/ }))
+    return { user, onLayoutChange }
+  }
+
+  const listed = () =>
+    Array.from(document.querySelectorAll('.mz-dt__columns-label')).map((n) => n.textContent)
+
+  it('grows a search box once the list is long, and not before', async () => {
+    await open(many.slice(0, 4))
+    expect(screen.queryByRole('searchbox', { name: /column/i })).toBeNull()
+    cleanup()
+    await open()
+    expect(screen.getByRole('searchbox', { name: /column/i })).toBeInTheDocument()
+  })
+
+  it('narrows the list to what was typed', async () => {
+    const { user } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    // Column 1, 10 and 11 — not Number, and not the other nine.
+    expect(listed()).toEqual(['Column 1', 'Column 10', 'Column 11'])
+    await user.clear(screen.getByRole('searchbox', { name: /column/i }))
+    expect(listed()).toHaveLength(12)
+  })
+
+  it('says so when nothing matches', async () => {
+    const { user } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'zzz')
+    expect(listed()).toEqual([])
+    expect(screen.getByText('No such column')).toBeInTheDocument()
+  })
+
+  it('hides and shows what the search narrowed to, not the whole table', async () => {
+    const { user, onLayoutChange } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    await user.click(screen.getByRole('button', { name: 'Hide all' }))
+    expect(onLayoutChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hidden: ['c1', 'c10', 'c11'] })
+    )
+    // And back, in one write rather than one per column.
+    await user.click(screen.getByRole('button', { name: 'Show all' }))
+    expect(onLayoutChange).toHaveBeenLastCalledWith(expect.objectContaining({ hidden: [] }))
+  })
+
+  it('stops dragging while the list is filtered, and keeps the arrows', async () => {
+    const { user } = await open()
+    const rows = () => Array.from(document.querySelectorAll('.mz-dt__columns-item'))
+    expect(rows()[0]).toHaveAttribute('draggable', 'true')
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    // A drop lands beside the row above it in the table, which in a filtered
+    // list is not the row above it on screen.
+    expect(rows()[0]).toHaveAttribute('draggable', 'false')
+    await user.click(screen.getByRole('button', { name: /Move “Column 11” up/ }))
+    expect(listed()).toEqual(['Column 1', 'Column 11', 'Column 10'])
+  })
+
+  it('reorders from a touch, which never fires a dragstart', async () => {
+    await open()
+    const items = Array.from(document.querySelectorAll<HTMLElement>('[data-column-id]'))
+    const grip = items[3]!.querySelector<HTMLElement>('.mz-dt__columns-grip')!
+    // The finger is over the second row for the whole gesture.
+    const original = document.elementFromPoint
+    document.elementFromPoint = () => items[1]!
+
+    fireEvent.pointerDown(grip, { pointerType: 'touch', pointerId: 1 })
+    fireEvent.pointerMove(document, { pointerType: 'touch', pointerId: 1, clientX: 10, clientY: 40 })
+    expect(items[1]).toHaveAttribute('data-drop')
+    fireEvent.pointerUp(document, { pointerType: 'touch', pointerId: 1 })
+
+    document.elementFromPoint = original
+    expect(listed().slice(0, 4)).toEqual(['Number', 'Column 3', 'Column 1', 'Column 2'])
+  })
+
+  it('leaves the mouse to the drag it already had', async () => {
+    await open()
+    const grip = document.querySelector<HTMLElement>('.mz-dt__columns-grip')!
+    const moves = vi.fn()
+    document.addEventListener('pointermove', moves)
+    fireEvent.pointerDown(grip, { pointerType: 'mouse', pointerId: 1 })
+    fireEvent.pointerMove(document, { pointerType: 'mouse', pointerId: 1 })
+    document.removeEventListener('pointermove', moves)
+    // Nothing was captured: the row is a plain HTML5 drag source for a mouse.
+    expect(document.querySelector('[data-dragging]')).toBeNull()
+  })
+})
+

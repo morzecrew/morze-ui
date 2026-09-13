@@ -30,6 +30,13 @@
   width: var(--mz-sheet-w, 20rem);
   max-width: calc(100vw - 40px);
 }
+/* Sizes for the edges that have a width; top and bottom are content-height
+   already, so `size` there sets how much of the viewport they may take. */
+.mz-sheet[data-size='sm'] { --mz-sheet-w: 17rem; --mz-sheet-h: 30dvh; }
+.mz-sheet[data-size='md'] { --mz-sheet-w: 20rem; --mz-sheet-h: 45dvh; }
+.mz-sheet[data-size='lg'] { --mz-sheet-w: 28rem; --mz-sheet-h: 65dvh; }
+.mz-sheet[data-size='xl'] { --mz-sheet-w: 36rem; --mz-sheet-h: 80dvh; }
+.mz-sheet[data-size='full'] { --mz-sheet-w: 100vw; --mz-sheet-h: 100dvh; }
 .mz-sheet[data-side='right'] { right: 0; border-right: none; }
 .mz-sheet[data-side='left'] { left: 0; border-left: none; }
 
@@ -38,12 +45,22 @@
   left: 0;
   right: 0;
   height: auto;
-  max-height: calc(100dvh - 40px);
+  max-height: min(var(--mz-sheet-h, 100dvh), calc(100dvh - 40px));
 }
 .mz-sheet[data-side='top'] { top: 0; border-top: none; }
 .mz-sheet[data-side='bottom'] { bottom: 0; border-bottom: none; }
 
 .mz-sheet__header { display: flex; flex-direction: column; gap: 6px; padding: 20px 20px 0; }
+/* The body had no padding of its own, so content between the header and the
+   footer ran into the sheet's edge — the one panel in the kit where it did.
+   `SheetBody` is the scrolling middle; a sheet that wants to lay its own
+   content out still just puts children in. */
+.mz-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 20px;
+}
 .mz-sheet__footer {
   display: flex;
   justify-content: flex-end;

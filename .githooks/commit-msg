@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+/**
+ * Conventional-commit check, run by git on `commit-msg`.
+ *
+ * Opt-in, and deliberately not a dependency: `npm run hooks` points
+ * `core.hooksPath` here. Three devDependencies and a postinstall step to
+ * validate one line of text is a worse trade than fifty lines that need
+ * nothing but the Node the repo already builds with.
+ *
+ * The subject line is what the changelog is written from — see CHANGELOG.md,
+ * which starts at 0.4.0 because the eleven releases before it left nothing
+ * behind but `bump x.y.z`.
+ */
+import { readFileSync } from 'node:fs'
+
+const TYPES = [
+  'feat', // a new capability a consumer can use
+  'fix', // a defect, with the symptom in the body
+  'docs', // README, FIXES, CHANGELOG, comments
+  'style', // the visual layer: tokens, CSS, look
+  'refactor', // no behaviour change
+  'perf',
+  'test',
+  'build', // tsup, lightningcss, package.json
+  'ci',
+  'chore', // version bumps, housekeeping
+  'revert',
+]
+
+// type(optional scope)!: subject — the `!` marks a breaking change, which also
+// has to appear as a `BREAKING CHANGE:` footer so the changelog entry writes
+// itself.
+const HEADER = new RegExp(`^(${TYPES.join('|')})(\\([a-z0-9._-]+\\))?(!)?: .{1,80}$`)
+
+const path = process.argv[2]
+if (!path) process.exit(0)
+
+const raw = readFileSync(path, 'utf8')
+// Comments are git's own; a message that is nothing else is an abort, and git
+// handles that itself.
+const lines = raw.split('\n').filter((line) => !line.startsWith('#'))
+const header = lines.find((line) => line.trim().length > 0)
+if (header === undefined) process.exit(0)
+
+// Git writes these itself, and rewording them is not this hook's business.
+if (/^(Merge|Revert|fixup!|squash!|Co-authored-by:)/i.test(header)) process.exit(0)
+
+if (!HEADER.test(header)) {
+  console.error(`\nThis commit message is not a conventional commit:\n\n  ${header}\n`)
+  console.error(`  Shape:  type(scope): subject      — scope optional, subject ≤ 80 chars`)
+  console.error(`  Types:  ${TYPES.join(', ')}\n`)
+  console.error(`  e.g.    fix(data-table): reset askedAt when the query changes`)
+  console.error(`          feat(select): add the lg size the inputs already had`)
+  console.error(`          style: collapse ten tone glows into three tokens\n`)
+  console.error(`  Skip it once with --no-verify; turn the hook off with`)
+  console.error(`  \`git config --unset core.hooksPath\`.\n`)
+  process.exit(1)
+}
+
+if (header.includes('!:') && !/^BREAKING CHANGE: /m.test(lines.join('\n'))) {
+  console.error(`\nThe subject is marked breaking with "!", so the body needs a footer`)
+  console.error(`explaining what breaks and what a consumer does instead:\n`)
+  console.error(`  BREAKING CHANGE: onRowClick no longer fires for clicks on a`)
+  console.error(`  control inside a cell; call it from the control itself.\n`)
+  process.exit(1)
+}

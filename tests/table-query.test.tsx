@@ -74,3 +74,63 @@ describe('useTableQuery and the address bar', () => {
     expect(result.current.reset).toBe(reset)
   })
 })
+
+describe('search and filter serialisation (G-04, D-04)', () => {
+  it('mirrors the search box into the URL and back', () => {
+    const { result } = renderHook(() => useTableQuery({ urlKey: 't.' }))
+    act(() => result.current.setQuery({ ...result.current.query, search: 'inv-42' }))
+    expect(window.location.search).toBe('?t.q=inv-42')
+    // Cleared is a value of its own, so a reload does not put an initial
+    // search back: the key stays with an empty value.
+    act(() => result.current.setQuery({ ...result.current.query, search: undefined }))
+    expect(window.location.search).toBe('')
+  })
+
+  it('reads a search out of the address bar on mount', () => {
+    window.history.replaceState(null, '', '/?t.q=acme')
+    const { result } = renderHook(() => useTableQuery({ urlKey: 't.' }))
+    expect(result.current.query.search).toBe('acme')
+  })
+
+  it('takes a compact filter codec in place of JSON', () => {
+    const { result } = renderHook(() =>
+      useTableQuery({
+        urlKey: 't.',
+        serializeFilters: (filters) =>
+          Object.entries(filters)
+            .map(([id, value]) => `${id}:${value.type === 'text' ? value.value : ''}`)
+            .join(','),
+        parseFilters: (raw) =>
+          Object.fromEntries(
+            raw.split(',').filter(Boolean).map((part) => {
+              const [id, value] = part.split(':')
+              return [id!, { type: 'text' as const, value: value ?? '' }]
+            })
+          ),
+      })
+    )
+    act(() =>
+      result.current.setQuery({
+        ...result.current.query,
+        filters: { name: { type: 'text', value: 'acme' } },
+      })
+    )
+    // `JSON.stringify` would have written %7B%22name%22%3A%7B%22type%22…
+    expect(decodeURIComponent(window.location.search)).toBe('?t.f=name:acme')
+  })
+
+  it('still writes the rest of the query when a custom value will not serialise', () => {
+    const cyclic: Record<string, unknown> = {}
+    cyclic.self = cyclic
+    const { result } = renderHook(() => useTableQuery({ urlKey: 't.' }))
+    act(() =>
+      result.current.setQuery({
+        ...result.current.query,
+        page: 3,
+        filters: { own: { type: 'custom', value: cyclic } },
+      })
+    )
+    // A throw here used to take the whole write-back effect down with it.
+    expect(window.location.search).toBe('?t.page=3')
+  })
+})

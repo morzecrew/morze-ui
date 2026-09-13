@@ -31,17 +31,11 @@
   --mz-tint: rgb(var(--mz-primary-rgb));
   --mz-tint-strength: 3.5%;
 
-  /* The static -rgb companions cannot follow the tint, so they stay on the
-     cold cast alone (r = g, b ≥ r) — a triplet with the default violet baked
-     in would leak Morze's hue into a re-branded host through every wash. */
   --mz-bg: color-mix(in srgb, #0a0a12, var(--mz-tint) var(--mz-tint-strength));
-  --mz-bg-rgb: 15, 15, 26;
   --mz-bg-2: color-mix(in srgb, #0e0e18, var(--mz-tint) var(--mz-tint-strength));
   --mz-surface: color-mix(in srgb, #12121c, var(--mz-tint) var(--mz-tint-strength));
-  --mz-surface-rgb: 22, 22, 35;
   --mz-surface-2: color-mix(in srgb, #171723, var(--mz-tint) var(--mz-tint-strength));
   --mz-elevated: color-mix(in srgb, #1c1c2b, var(--mz-tint) var(--mz-tint-strength));
-  --mz-elevated-rgb: 31, 31, 48;
 
   /* Brand-washed white: the source colour for every "white" line the kit
      draws — borders, hairlines, sheens, secondary text. Alpha'd pure white
@@ -95,8 +89,6 @@
   --mz-danger-fg: #ffffff;
   --mz-warning-fg: #ffffff;
   --mz-info-fg: #ffffff;
-  --mz-primary-soft: rgba(var(--mz-primary-rgb), 0.14);
-  --mz-primary-glow: rgba(var(--mz-primary-rgb), 0.45);
 
   /* ---- The convex recipe ----
      Every active element (button, toggle, checkbox, radio, switch, slider,
@@ -125,6 +117,28 @@
   --mz-face-sheen: none;
   --mz-face-top: color-mix(in srgb, var(--mz-ink) 11%, transparent);
   --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 38%, transparent);
+
+  /* The flat layer: what a control with no face of its own lights up with.
+     Every transparent control in the kit — ghost button, plain toggle,
+     segmented item, menubar and nav triggers, sidebar item, the icon buttons
+     in a table header, a calendar day — used to cut its own percentage of the
+     text colour, and the set had drifted to six values between 6 and 12%.
+     One cut, from the ink like every other line the kit draws, so a row of
+     flat controls lights up at one strength. */
+  --mz-wash-hover: color-mix(in srgb, var(--mz-ink) 8%, transparent);
+  --mz-wash-press: color-mix(in srgb, var(--mz-ink) 12%, transparent);
+
+  /* ---- One table header, two tables ----
+     `Table` and `DataTable` are the same object to a reader, and they used to
+     be drawn as two: a 12px label-cased header on --mz-well against a 14px
+     inherited one on the frosted well, and rows that lit up at 3.5% of the
+     text against a 4.5% mix of it. Put both on one page and the kit looked
+     like two kits. Both now read these; the frost is the shared value because
+     a header is exactly the surface rows pass behind, and without backdrop
+     support it falls back to the opaque ramp step anyway. */
+  --mz-th-bg: var(--mz-glass-well);
+  --mz-th-color: var(--mz-text-dim);
+  --mz-row-hover: color-mix(in srgb, var(--mz-surface) 95.5%, var(--mz-ink));
 
   /* ---- The plain layer: the same cuts with the tint left out ----
      Every fill and line above is cut from --mz-ink, and the ink is part brand
@@ -241,13 +255,10 @@
      lighter step. At 4% on #fcfcfc the old page was one hair off white and
      the two read as the same sheet. */
   --mz-bg: color-mix(in srgb, #f2f2f5, var(--mz-tint) var(--mz-tint-strength));
-  --mz-bg-rgb: 237, 237, 245;
   --mz-bg-2: #ffffff;
   --mz-surface: #ffffff;
-  --mz-surface-rgb: 255, 255, 255;
   --mz-surface-2: color-mix(in srgb, #f6f6f9, var(--mz-tint) 4%);
   --mz-elevated: #ffffff;
-  --mz-elevated-rgb: 255, 255, 255;
 
   /* The dark counterpart of the ink above: a deep brand-leaning navy that
      every grey line and shadow in light mode is cut from. */
@@ -300,6 +311,17 @@
   --mz-face-sheen: none;
   --mz-face-top: rgba(255, 255, 255, 0.9);
   --mz-face-bottom: color-mix(in srgb, var(--mz-shade) 13%, transparent);
+
+  /* See the dark block. In light the ink is the navy, so the same cut
+     darkens a flat control instead of lifting it — which is the right sign
+     on a white page. */
+  --mz-wash-hover: color-mix(in srgb, var(--mz-ink) 8%, transparent);
+  --mz-wash-press: color-mix(in srgb, var(--mz-ink) 12%, transparent);
+
+  /* See the dark block. */
+  --mz-th-bg: var(--mz-glass-well);
+  --mz-th-color: var(--mz-text-dim);
+  --mz-row-hover: color-mix(in srgb, var(--mz-surface) 95.5%, var(--mz-ink));
 
   /* The plain layer in light — see the dark block for what it is for. Every
      base literal is its tinted twin's own, taken neat; the cuts that ran
@@ -402,6 +424,13 @@
   --mz-label-tracking: 0;
   --mz-label-weight: 500;
 
+  /* Table headers, shared by `Table` and `DataTable` — see --mz-th-bg. 13px
+     sits between the 12 the hand-laid table ran and the 14 the grid did: at
+     12 a 44px grid row has a caption too small to aim a sort click at, at 14
+     a dense summary table's header stops reading as a header. */
+  --mz-th-font-size: 13px;
+  --mz-th-weight: 600;
+
   /* ---- Geometry ----
      Rectangular by default: controls share one small radius, surfaces a
      slightly larger one. --mz-radius-pill is kept for what is round by
@@ -409,7 +438,6 @@
   --mz-radius: 8px;
   --mz-radius-sm: 6px;
   --mz-radius-lg: 12px;
-  --mz-radius-xl: 14px;
   --mz-radius-pill: 999px;
   --mz-radius-control: var(--mz-radius);
 
@@ -417,8 +445,15 @@
      Active elements grow in place on hover; nothing shifts position, so a
      button never moves out from under the pointer. */
   --mz-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Two durations, not the five that had accumulated (0.14 / 0.15 / 0.16 /
+     0.2 / 0.28s). The fast one is for a control that has to feel like a
+     keystroke — an icon button, a menu row, a checkbox mark; the long one is
+     for anything with a face to repaint: buttons, fields, panels. */
+  --mz-duration-fast: 0.15s;
   --mz-duration: 0.28s;
   --mz-hover-scale: 1.02;
+  /* One press dip for the whole kit. Checkbox and radio used to sink to .94,
+     which beside a button pressing to .98 read as a different mechanism. */
   --mz-press-scale: 0.98;
 
   /* How much black is mixed into a *filled* surface on hover / press.

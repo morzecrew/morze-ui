@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../lib/utils'
+import { ArrowDownIcon, ArrowUpIcon, SortIcon } from '../lib/icons'
 
 /**
  * Plain table primitives — the markup layer under a data grid, not a grid
@@ -56,8 +57,56 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return <tr data-slot="table-row" className={cn('mz-table__row', className)} {...props} />
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
-  return <th data-slot="table-head" className={cn('mz-table__th', className)} {...props} />
+type TableHeadProps = React.ComponentProps<'th'> & {
+  /** Draws the sort control and claims `aria-sort` for this column. */
+  sortable?: boolean
+  /** How the column is sorted right now; `false` for "sortable, not sorted". */
+  sorted?: 'asc' | 'desc' | false
+  onSort?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  /** Accessible name for the control — "Sort by Amount". */
+  sortLabel?: string
+}
+
+/**
+ * A header cell, optionally the sorting kind. The hand-laid table and the
+ * grid draw one header (see `--mz-th-bg`), and this is the half of that the
+ * hand-laid one was missing: every host wrote its own button, icon and
+ * `aria-sort` and each came out slightly different.
+ *
+ * `aria-sort` is set only on a sortable column: to assistive tech `none`
+ * means "sortable, not sorted yet", not "cannot be sorted".
+ */
+function TableHead({
+  className,
+  sortable = false,
+  sorted = false,
+  onSort,
+  sortLabel,
+  children,
+  ...props
+}: TableHeadProps) {
+  return (
+    <th
+      data-slot="table-head"
+      data-sortable={sortable || undefined}
+      aria-sort={
+        sortable ? (sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none') : undefined
+      }
+      className={cn('mz-table__th', className)}
+      {...props}
+    >
+      {sortable ? (
+        <button type="button" className="mz-table__sort mz-focusable" title={sortLabel} onClick={onSort}>
+          <span>{children}</span>
+          <span className="mz-table__sort-icon" data-active={sorted ? true : undefined}>
+            {sorted === 'asc' ? <ArrowUpIcon /> : sorted === 'desc' ? <ArrowDownIcon /> : <SortIcon />}
+          </span>
+        </button>
+      ) : (
+        children
+      )}
+    </th>
+  )
 }
 
 function TableCell({ className, ...props }: React.ComponentProps<'td'>) {
@@ -71,3 +120,4 @@ function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) 
 }
 
 export { Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, TableCaption }
+export type { TableHeadProps }

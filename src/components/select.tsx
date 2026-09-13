@@ -25,7 +25,8 @@ function SelectTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: 'sm' | 'md'
+  /** The 34/40/48 scale shared with Button, Input and Toggle. */
+  size?: 'sm' | 'md' | 'lg'
   tone?: Tone
 }) {
   return (
@@ -39,6 +40,7 @@ function SelectTrigger({
       className={cn(
         'mz-select-trigger',
         size === 'sm' && 'mz-select-trigger--sm',
+        size === 'lg' && 'mz-select-trigger--lg',
         className
       )}
       {...props}

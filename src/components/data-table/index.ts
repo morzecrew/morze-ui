@@ -14,6 +14,7 @@ export {
   parseSort,
   serializeSort,
   setFilter,
+  setSearch,
   sortStateOf,
   toggleSort,
 } from './utils'
@@ -28,6 +29,7 @@ export type {
   DataTableFilters,
   DataTableQuery,
   DataTableSort,
+  DateRangePreset,
   EditableDef,
   FilterValue,
   RowAttributes,
@@ -35,4 +37,5 @@ export type {
   SavedView,
   SelectOptionDef,
   SortDir,
+  TextFilterOp,
 } from './types'

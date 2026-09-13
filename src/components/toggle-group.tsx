@@ -67,24 +67,28 @@ function ToggleGroupItem({
   children,
   variant,
   size,
+  tone,
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof toggleVariants>) {
+  VariantProps<typeof toggleVariants> & { tone?: Tone }) {
   // The item's own props win; the group only supplies the default. The other
   // way round the context defaults would always short-circuit and per-item
-  // variant/size would be silently dropped.
+  // variant/size would be silently dropped. `tone` used to be the exception:
+  // the group's was forwarded unconditionally, so one destructive item in a
+  // neutral bar was not expressible.
   const context = React.useContext(ToggleGroupContext)
   const resolvedVariant = variant ?? context.variant
   const resolvedSize = size ?? context.size
+  const resolvedTone = tone ?? context.tone
 
   return (
     <ToggleGroupPrimitive.Item
       data-slot="toggle-group-item"
       data-variant={resolvedVariant}
       data-size={resolvedSize}
-      // Each item declares its own tone default, so the group's tone is
+      // Each item declares its own tone default, so the resolved tone is
       // forwarded explicitly rather than left to inheritance.
-      data-tone={context.tone}
+      data-tone={resolvedTone}
       className={cn(
         toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
         'mz-focusable',

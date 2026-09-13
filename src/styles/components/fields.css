@@ -92,6 +92,12 @@
 .mz-input--sm { height: 34px; font-size: 13px; padding: 0 10px; }
 .mz-input--lg { height: 48px; font-size: 15px; padding: 0 14px; }
 
+/* A textarea has no height on the scale, so its size is type and padding —
+   and the minimum height it opens at. Without this it was the one field in a
+   form that could not be told to match its neighbours. */
+.mz-textarea--sm { min-height: 76px; padding: 8px 10px; font-size: 13px; }
+.mz-textarea--lg { min-height: 120px; padding: 12px 14px; font-size: 15px; }
+
 .mz-input[type='file'] {
   align-items: center;
   padding-top: 9px;
@@ -112,3 +118,48 @@
   text-transform: var(--mz-label-transform);
   cursor: pointer;
 }
+
+/* ------------------------------ NumberInput ------------------------------ */
+/* A text field that holds a number, so the well is the input's own and only
+   the trim is new: the unit sits inside the field after the value, and the
+   two steppers stack in the corner where the native spinners used to be —
+   the ones nothing could style and the wheel could spin by accident. */
+.mz-number { position: relative; display: flex; width: 100%; min-width: 0; }
+.mz-number__input { width: 100%; padding-right: 28px; text-align: inherit; }
+.mz-number[data-size='lg'] .mz-number__input { padding-right: 32px; }
+/* Room for both, when there is a unit to make room for. */
+.mz-number:has(.mz-number__unit) .mz-number__input { padding-right: 56px; }
+.mz-number__unit {
+  position: absolute;
+  top: 50%;
+  right: 30px;
+  translate: 0 -50%;
+  color: var(--mz-text-muted);
+  font-size: 13px;
+  pointer-events: none;
+}
+.mz-number__steppers {
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  right: 1px;
+  display: flex;
+  flex-direction: column;
+  width: 22px;
+  border-radius: 0 var(--mz-radius) var(--mz-radius) 0;
+  overflow: hidden;
+}
+.mz-number__stepper {
+  display: grid;
+  place-content: center;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--mz-text-muted);
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-number__stepper:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-number__stepper:active { background: var(--mz-wash-press); }
+.mz-number__stepper svg { width: 12px; height: 12px; }
+.mz-number[data-disabled] { opacity: 0.5; }

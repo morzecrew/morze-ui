@@ -431,7 +431,15 @@ function Calendar({
               </div>
             ) : (
               <div className="mz-calendar__caption" aria-live="polite">
-                {fmt.caption.format(displayed)}
+                {/* Wrapped, so the caption can be capitalised on its first
+                    letter alone: `Intl` writes the month lowercase in a good
+                    half of the world's locales, and `text-transform:
+                    capitalize` on the flex row hit every word — Russian came
+                    out "Сентябрь 2026 Г.". ::first-letter needs a block
+                    container, which a flex row is not. */}
+                <span className="mz-calendar__caption-text">
+                  {fmt.caption.format(displayed)}
+                </span>
               </div>
             )}
 
