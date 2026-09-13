@@ -987,3 +987,68 @@ describe('the aurora is a layer, not a fixed attachment (K-12)', () => {
     expect(css).not.toMatch(/\.mz-sidebar-layout:before\{/)
   })
 })
+
+describe('the searchable field (K-11)', () => {
+  it('sizes its panel to the field, after the popover has sized itself', () => {
+    const panel = at('.mz-combobox__panel')
+    expect(panel).toBeGreaterThan(-1)
+    // `.mz-popover-content` fixes a popover at 18rem; the two selectors carry
+    // the same specificity, so the only thing that makes the combobox's own
+    // width win is combobox.css landing after overlays.css in the bundle.
+    expect(panel).toBeGreaterThan(at('.mz-popover-content'))
+    expect(css).toMatch(/\.mz-combobox__panel\{[^}]*--radix-popover-trigger-width/)
+  })
+
+  it('borrows the menu highlight rather than growing a second one', () => {
+    // The rows are `.mz-item`, so the keyboard and the pointer share the one
+    // highlight every list in the kit draws. A background of its own here
+    // would be a second hover language inside the same panel (V-03).
+    const own = css.match(/\.mz-combobox__option\{([^}]*)\}/)?.[1] ?? ''
+    expect(own).not.toContain('background')
+    expect(at('.mz-item[data-highlighted]')).toBeGreaterThan(-1)
+  })
+
+  it('keeps the clear button clear of the chevron', () => {
+    // Both sit at the right edge of the trigger, and the × used to be put
+    // where the date field puts it — on top of the chevron the select trigger
+    // draws and the date field does not.
+    const clear = css.match(/\.mz-combobox__clear\{([^}]*)\}/)?.[1] ?? ''
+    expect(clear).toContain('right:30px')
+    expect(css).toMatch(/\.mz-combobox:has\([^)]*\) \.mz-combobox__trigger\{[^}]*padding-right/)
+  })
+})
+
+describe('the table has a keyboard (G-01)', () => {
+  it('rings the cell the grid focus is on, inside its own box', () => {
+    const rule = css.match(/\.mz-dt__td:focus-visible[^{]*\{([^}]*)\}/)?.[1] ?? ''
+    expect(rule).toContain('outline:')
+    // A positive offset is painted over by the next cell's opaque background,
+    // and lifting the cell out of that with a stacking context would take a
+    // pinned column off its sticky edge.
+    expect(rule).toMatch(/outline-offset:calc\(var\(--mz-ring-width\) \* ?-1\)|outline-offset:-2px/)
+  })
+
+  it('rings a clickable row the same way', () => {
+    expect(css).toMatch(/\.mz-dt__row\[data-clickable\]:focus-visible/)
+  })
+})
+
+describe('two ways to say no (K-07)', () => {
+  it('keeps an aria-disabled control on the pointer’s map', () => {
+    // A natively disabled control dispatches no mouse events, so a tooltip
+    // over it never opens — `aria-disabled` is the answer to that, and it
+    // only works while the control still receives a pointer.
+    const shared = css.match(/\[class\^=mz-\]\[aria-disabled=true\][^{]*\{([^}]*)\}/)?.[1] ?? ''
+    expect(shared).toContain('cursor:not-allowed')
+    expect(shared).not.toContain('pointer-events')
+    const button = css.match(/\.mz-btn\[aria-disabled=true\]\{([^}]*)\}/)?.[1] ?? ''
+    expect(button).not.toContain('pointer-events')
+  })
+
+  it('keeps it off the map for a natively disabled one', () => {
+    // Deliberate: the hit test then falls through to whatever wraps the
+    // control, which is what lets a tooltip on that wrapper open at all.
+    const native = css.match(/\[class\^=mz-\]:disabled[^{]*\{([^}]*)\}/)?.[1] ?? ''
+    expect(native).toContain('pointer-events:none')
+  })
+})

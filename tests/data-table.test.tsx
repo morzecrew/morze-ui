@@ -1,6 +1,6 @@
 import { StrictMode, act } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import { cleanup, createEvent, fireEvent, render, renderHook, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -1622,3 +1622,257 @@ describe('the first-load placeholder has the table under it (G-14)', () => {
     expect(first.querySelectorAll('.mz-skeleton')).toHaveLength(2)
   })
 })
+
+describe('keyboard (G-01)', () => {
+  const clickable: DataTableColumn<Row>[] = [
+    { id: 'name', header: 'Name', accessor: (r) => r.name },
+    {
+      id: 'act',
+      header: 'Act',
+      cell: (r) => <button type="button">Open {r.name}</button>,
+    },
+  ]
+
+  it('makes a clickable row reachable and activates it on Enter', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    table({ onRowClick })
+    const row = screen.getAllByRole('row')[1]!
+    expect(row).toHaveAttribute('tabindex', '0')
+    row.focus()
+    await user.keyboard('{Enter}')
+    expect(onRowClick).toHaveBeenCalledWith(rows[0])
+  })
+
+  it('leaves Enter to the control it was pressed on', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={clickable}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        onRowClick={onRowClick}
+      />
+    )
+    screen.getByRole('button', { name: 'Open First' }).focus()
+    await user.keyboard('{Enter}')
+    // The button's own Enter, exactly as its click is its own (G-02).
+    expect(onRowClick).not.toHaveBeenCalled()
+  })
+
+  it('leaves a table that asks for no keyboard a table', () => {
+    table({ onRowClick: vi.fn() })
+    expect(screen.getByRole('table')).toBeInTheDocument()
+    expect(screen.queryAllByRole('gridcell')).toHaveLength(0)
+  })
+
+  it('holds exactly one tab stop and moves it with the arrows', async () => {
+    const user = userEvent.setup()
+    table({ keyboard: true })
+    expect(screen.getByRole('grid')).toBeInTheDocument()
+
+    const cells = screen.getAllByRole('gridcell')
+    expect(cells.filter((cell) => cell.tabIndex === 0)).toHaveLength(1)
+    cells[0]!.focus()
+
+    await user.keyboard('{ArrowRight}')
+    expect(document.activeElement).toHaveAttribute('data-col', 'sum')
+    await user.keyboard('{ArrowDown}')
+    expect(document.activeElement).toHaveAttribute('data-grid-row', '1')
+    // The tab stop travels with the focus, so Tab comes back where the reader was.
+    expect(document.activeElement).toHaveAttribute('tabindex', '0')
+    expect(screen.getAllByRole('gridcell').filter((cell) => cell.tabIndex === 0)).toHaveLength(1)
+
+    // The edges hold instead of wrapping onto another row.
+    await user.keyboard('{ArrowDown}{ArrowRight}')
+    expect(document.activeElement).toHaveAttribute('data-grid-row', '1')
+    expect(document.activeElement).toHaveAttribute('data-col', 'sum')
+    await user.keyboard('{Home}')
+    expect(document.activeElement).toHaveAttribute('data-col', 'name')
+  })
+
+  it('opens an editable cell on Enter and on F2, and hands the focus back', async () => {
+    const onSave = vi.fn()
+    const editable: DataTableColumn<Row>[] = [
+      {
+        id: 'name',
+        header: 'Name',
+        accessor: (r) => r.name,
+        editable: { type: 'text', value: (r) => r.name, onSave },
+      },
+      { id: 'sum', header: 'Total', accessor: (r) => r.sum },
+    ]
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={editable}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        keyboard
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    )
+    const cell = screen.getAllByRole('gridcell')[0]!
+    cell.focus()
+    await user.keyboard('{F2}')
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByDisplayValue('First')).not.toBeInTheDocument()
+    // Escape out of a cell leaves the reader in that cell, not at the top of
+    // the page with nothing focused.
+    expect(document.activeElement).toBe(cell)
+
+    await user.keyboard('{Enter}')
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+  })
+
+  it('activates the row from a cell that has no editor of its own', async () => {
+    const onRowClick = vi.fn()
+    const user = userEvent.setup()
+    table({ keyboard: true, onRowClick })
+    screen.getAllByRole('gridcell')[1]!.focus()
+    await user.keyboard('{Enter}')
+    expect(onRowClick).toHaveBeenCalledWith(rows[0])
+    // F2 is the edit key and nothing else: it never opens the record.
+    await user.keyboard('{F2}')
+    expect(onRowClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('ticks the row under the cursor with the space bar', async () => {
+    const onSelectionChange = vi.fn()
+    const user = userEvent.setup()
+    table({
+      keyboard: true,
+      selection: { keys: [], allMatching: false },
+      onSelectionChange,
+    })
+    screen.getAllByRole('gridcell')[0]!.focus()
+    await user.keyboard(' ')
+    expect(onSelectionChange).toHaveBeenCalledWith({ keys: ['1'], allMatching: false })
+  })
+
+  it('numbers the rows of the whole result set, not of the page', () => {
+    table({ query: { ...emptyQuery, page: 3, pageSize: 25 }, total: 13659 })
+    const rendered = screen.getAllByRole('row')
+    expect(rendered[0]).toHaveAttribute('aria-rowindex', '1')
+    // Page 3 of 25: the first row on screen is number 51, header included.
+    expect(rendered[1]).toHaveAttribute('aria-rowindex', '52')
+  })
+})
+
+describe('column manager on a long list (G-10)', () => {
+  type Wide = { id: string }
+  const wideRows: Wide[] = [{ id: '1' }]
+  /** Twelve columns: the table this list stops being scannable for. */
+  const many: DataTableColumn<Wide>[] = Array.from({ length: 12 }, (_, i) => ({
+    id: `c${i}`,
+    header: i === 0 ? 'Number' : `Column ${i}`,
+    accessor: () => 'x',
+  }))
+
+  const open = async (columns = many) => {
+    const user = userEvent.setup()
+    const onLayoutChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={wideRows}
+        rowKey={(r) => r.id}
+        total={1}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+        onLayoutChange={onLayoutChange}
+      />
+    )
+    await user.click(screen.getByRole('button', { name: /Columns/ }))
+    return { user, onLayoutChange }
+  }
+
+  const listed = () =>
+    Array.from(document.querySelectorAll('.mz-dt__columns-label')).map((n) => n.textContent)
+
+  it('grows a search box once the list is long, and not before', async () => {
+    await open(many.slice(0, 4))
+    expect(screen.queryByRole('searchbox', { name: /column/i })).toBeNull()
+    cleanup()
+    await open()
+    expect(screen.getByRole('searchbox', { name: /column/i })).toBeInTheDocument()
+  })
+
+  it('narrows the list to what was typed', async () => {
+    const { user } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    // Column 1, 10 and 11 — not Number, and not the other nine.
+    expect(listed()).toEqual(['Column 1', 'Column 10', 'Column 11'])
+    await user.clear(screen.getByRole('searchbox', { name: /column/i }))
+    expect(listed()).toHaveLength(12)
+  })
+
+  it('says so when nothing matches', async () => {
+    const { user } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'zzz')
+    expect(listed()).toEqual([])
+    expect(screen.getByText('No such column')).toBeInTheDocument()
+  })
+
+  it('hides and shows what the search narrowed to, not the whole table', async () => {
+    const { user, onLayoutChange } = await open()
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    await user.click(screen.getByRole('button', { name: 'Hide all' }))
+    expect(onLayoutChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hidden: ['c1', 'c10', 'c11'] })
+    )
+    // And back, in one write rather than one per column.
+    await user.click(screen.getByRole('button', { name: 'Show all' }))
+    expect(onLayoutChange).toHaveBeenLastCalledWith(expect.objectContaining({ hidden: [] }))
+  })
+
+  it('stops dragging while the list is filtered, and keeps the arrows', async () => {
+    const { user } = await open()
+    const rows = () => Array.from(document.querySelectorAll('.mz-dt__columns-item'))
+    expect(rows()[0]).toHaveAttribute('draggable', 'true')
+    await user.type(screen.getByRole('searchbox', { name: /column/i }), 'column 1')
+    // A drop lands beside the row above it in the table, which in a filtered
+    // list is not the row above it on screen.
+    expect(rows()[0]).toHaveAttribute('draggable', 'false')
+    await user.click(screen.getByRole('button', { name: /Move “Column 11” up/ }))
+    expect(listed()).toEqual(['Column 1', 'Column 11', 'Column 10'])
+  })
+
+  it('reorders from a touch, which never fires a dragstart', async () => {
+    await open()
+    const items = Array.from(document.querySelectorAll<HTMLElement>('[data-column-id]'))
+    const grip = items[3]!.querySelector<HTMLElement>('.mz-dt__columns-grip')!
+    // The finger is over the second row for the whole gesture.
+    const original = document.elementFromPoint
+    document.elementFromPoint = () => items[1]!
+
+    fireEvent.pointerDown(grip, { pointerType: 'touch', pointerId: 1 })
+    fireEvent.pointerMove(document, { pointerType: 'touch', pointerId: 1, clientX: 10, clientY: 40 })
+    expect(items[1]).toHaveAttribute('data-drop')
+    fireEvent.pointerUp(document, { pointerType: 'touch', pointerId: 1 })
+
+    document.elementFromPoint = original
+    expect(listed().slice(0, 4)).toEqual(['Number', 'Column 3', 'Column 1', 'Column 2'])
+  })
+
+  it('leaves the mouse to the drag it already had', async () => {
+    await open()
+    const grip = document.querySelector<HTMLElement>('.mz-dt__columns-grip')!
+    const moves = vi.fn()
+    document.addEventListener('pointermove', moves)
+    fireEvent.pointerDown(grip, { pointerType: 'mouse', pointerId: 1 })
+    fireEvent.pointerMove(document, { pointerType: 'mouse', pointerId: 1 })
+    document.removeEventListener('pointermove', moves)
+    // Nothing was captured: the row is a plain HTML5 drag source for a mouse.
+    expect(document.querySelector('[data-dragging]')).toBeNull()
+  })
+})
+

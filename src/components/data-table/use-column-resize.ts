@@ -31,6 +31,10 @@ export function useColumnResize(options: {
 
       const handle = event.currentTarget
       const startX = event.clientX
+      // The handle sits on the column's inline end, which in an RTL table is
+      // its left edge: there a drag towards the left is what widens it, and a
+      // raw clientX delta would shrink the column the reader is pulling open.
+      const towardsEnd = getComputedStyle(root).direction === 'rtl' ? -1 : 1
       const startWidth = widthOf(id)
       const min = minWidthOf(id)
       let width = startWidth
@@ -39,7 +43,7 @@ export function useColumnResize(options: {
       setResizing(id)
 
       const onMove = (moveEvent: PointerEvent) => {
-        width = Math.max(min, Math.round(startWidth + moveEvent.clientX - startX))
+        width = Math.max(min, Math.round(startWidth + (moveEvent.clientX - startX) * towardsEnd))
         root.style.setProperty(varName(id), `${width}px`)
       }
 
@@ -84,10 +88,13 @@ export function useColumnResize(options: {
       const step = event.shiftKey ? 32 : 8
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
       event.preventDefault()
-      const next = Math.max(
-        minWidthOf(id),
-        widthOf(id) + (event.key === 'ArrowRight' ? step : -step)
-      )
+      // Same reversal as the drag: the arrow that points away from the text's
+      // own direction is the one that makes the column wider.
+      const rtl = rootRef.current
+        ? getComputedStyle(rootRef.current).direction === 'rtl'
+        : false
+      const wider = event.key === (rtl ? 'ArrowLeft' : 'ArrowRight')
+      const next = Math.max(minWidthOf(id), widthOf(id) + (wider ? step : -step))
       rootRef.current?.style.setProperty(varName(id), `${next}px`)
       onCommit(id, next)
     },

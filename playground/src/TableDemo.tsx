@@ -192,6 +192,8 @@ export default function TableDemo() {
       maxHeight={520}
       search={{ placeholder: 'Search orders…' }}
       summary
+      // Arrows move a cell, Enter or F2 edits one, Space ticks the row.
+      keyboard
       selection={selection}
       onSelectionChange={setSelection}
       rowProps={(row) => ({ 'data-status': row.status })}

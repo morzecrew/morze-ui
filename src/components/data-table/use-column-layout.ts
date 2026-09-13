@@ -313,6 +313,14 @@ export function useColumnLayout<T>({
         ...c,
         hidden: c.hidden.includes(id) ? c.hidden.filter((h) => h !== id) : [...c.hidden, id],
       })),
+    /**
+     * The whole hidden list in one write — what "show all" and "hide all"
+     * need. A loop over `toggleHidden` is right uncontrolled and wrong under a
+     * controlled `layout`: every call in the loop reads the same `layout`
+     * prop, which the host has not re-rendered yet, so all but the last are
+     * lost.
+     */
+    setHidden: (ids: string[]) => update((c) => ({ ...c, hidden: [...new Set(ids)] })),
     setPinned: (id: string, side: 'left' | 'right' | undefined) =>
       update((c) => ({ ...c, pinned: { ...c.pinned, [id]: side } })),
     move: (id: string, delta: number) =>
