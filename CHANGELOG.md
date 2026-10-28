@@ -146,6 +146,10 @@ issue.
   It was always a left chevron, which on a phone — where it is the only way
   into the navigation — reads as "back". `icon` overrides it, and the trigger
   reports `aria-expanded` on the desktop.
+- **DataTable — one page, no buttons** (#23). With nowhere to go, the pager
+  keeps the count and drops "1 / 1" and the four disabled buttons that sat
+  under a three-row table. `pagination="always"` keeps them;
+  `DataTablePagination` takes the same choice as `nav="auto" | "always"`.
 
 ### Fixed
 

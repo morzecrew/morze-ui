@@ -28,6 +28,7 @@ export function DataTablePagination({
   pageSizeOptions = [10, 25, 50, 100],
   labels: labelsProp,
   locale: localeProp,
+  nav = 'auto',
   onQueryChange,
 }: {
   query: DataTableQuery
@@ -41,6 +42,12 @@ export function DataTablePagination({
   labels?: Partial<DataTableLabels>
   /** Number formatting locale; defaults to the browser's. */
   locale?: string
+  /**
+   * `auto` drops the page counter and the four buttons while there is nowhere
+   * to go — one page, nothing before it — and keeps the count. `always` keeps
+   * them, disabled.
+   */
+  nav?: 'auto' | 'always'
   onQueryChange: (query: DataTableQuery) => void
 }) {
   const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
@@ -61,6 +68,9 @@ export function DataTablePagination({
   const empty = total === 0 || (unknownTotal && rowsOnPage === 0)
   const from = total === 0 ? 0 : (query.page - 1) * query.pageSize + 1
   const to = unknownTotal ? from + rowsOnPage - 1 : Math.min(query.page * query.pageSize, total)
+  // Four disabled buttons and "1 / 1" under three rows say nothing the count
+  // has not said already (#23).
+  const showNav = nav === 'always' || canPrevious || canNext
   const go = (page: number) =>
     onQueryChange({
       ...query,
@@ -111,51 +121,53 @@ export function DataTablePagination({
         </div>
       ) : null}
 
-      <div className="mz-dt__pagination-nav">
-        <span className="mz-dt__pagination-page">
-          {query.page.toLocaleString(locale)}
-          {unknownTotal ? null : ` / ${pages.toLocaleString(locale)}`}
-        </span>
-        <Button type="button"
-          variant="secondary"
-          size="icon-sm"
-          disabled={!canPrevious}
-          onClick={() => go(1)}
-          aria-label={labels.firstPage}
-        >
-          <ChevronsLeftIcon />
-        </Button>
-        <Button type="button"
-          variant="secondary"
-          size="icon-sm"
-          disabled={!canPrevious}
-          onClick={() => go(query.page - 1)}
-          aria-label={labels.previousPage}
-        >
-          <ChevronLeftIcon />
-        </Button>
-        <Button type="button"
-          variant="secondary"
-          size="icon-sm"
-          disabled={!canNext}
-          onClick={() => go(query.page + 1)}
-          aria-label={labels.nextPage}
-        >
-          <ChevronRightIcon />
-        </Button>
-        {/* Nothing to jump to when the last page is unknown. */}
-        {unknownTotal ? null : (
+      {showNav ? (
+        <div className="mz-dt__pagination-nav">
+          <span className="mz-dt__pagination-page">
+            {query.page.toLocaleString(locale)}
+            {unknownTotal ? null : ` / ${pages.toLocaleString(locale)}`}
+          </span>
           <Button type="button"
             variant="secondary"
             size="icon-sm"
-            disabled={query.page >= pages}
-            onClick={() => go(pages)}
-            aria-label={labels.lastPage}
+            disabled={!canPrevious}
+            onClick={() => go(1)}
+            aria-label={labels.firstPage}
           >
-            <ChevronsRightIcon />
+            <ChevronsLeftIcon />
           </Button>
-        )}
-      </div>
+          <Button type="button"
+            variant="secondary"
+            size="icon-sm"
+            disabled={!canPrevious}
+            onClick={() => go(query.page - 1)}
+            aria-label={labels.previousPage}
+          >
+            <ChevronLeftIcon />
+          </Button>
+          <Button type="button"
+            variant="secondary"
+            size="icon-sm"
+            disabled={!canNext}
+            onClick={() => go(query.page + 1)}
+            aria-label={labels.nextPage}
+          >
+            <ChevronRightIcon />
+          </Button>
+          {/* Nothing to jump to when the last page is unknown. */}
+          {unknownTotal ? null : (
+            <Button type="button"
+              variant="secondary"
+              size="icon-sm"
+              disabled={query.page >= pages}
+              onClick={() => go(pages)}
+              aria-label={labels.lastPage}
+            >
+              <ChevronsRightIcon />
+            </Button>
+          )}
+        </div>
+      ) : null}
     </div>
   )
 }

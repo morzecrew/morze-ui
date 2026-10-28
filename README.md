@@ -1026,7 +1026,9 @@ What it does:
   counter of its own; the table cannot bump `query.page` itself, because the
   pager owns that field.
 - **The pager adapts** — `pageSizeOptions={false}`, or a single option, hides
-  the rows-per-page select for a backend that fixes the page size.
+  the rows-per-page select for a backend that fixes the page size. While there
+  is only one page it keeps the count ("1–3 of 3") and drops the page counter
+  and the four buttons; `pagination="always"` keeps them.
 
 Helpers for your own UI: `useTableQuery`, `useSavedViews`, `useColumnLayout`,
 `useRowSelection`, plus the pure functions `toggleSort`, `setFilter`,

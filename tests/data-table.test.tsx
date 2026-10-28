@@ -254,7 +254,7 @@ describe('DataTable', () => {
   })
 
   it('hides the rows-per-page control when the host fixes the page size', () => {
-    const fixed = table({ pageSizeOptions: false })
+    const fixed = table({ pageSizeOptions: false, total: 60, query: { ...emptyQuery, pageSize: 25 } })
     expect(fixed.container.querySelector('.mz-dt__pagination-size')).toBeNull()
     // The pager itself stays: the page count and the arrows still mean something.
     expect(fixed.container.querySelector('.mz-dt__pagination-nav')).not.toBeNull()
@@ -671,7 +671,43 @@ describe('pagination without a total', () => {
   })
 
   it('stops at a partial page, because that is the last one', () => {
+    pager({ data: rows.slice(0, 1), query: { ...emptyQuery, pageSize: 2, page: 2 } })
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+  })
+
+  // "1–3 of 3", "1 / 1" and four disabled buttons under three rows (#23).
+  it('keeps the count and drops the buttons when there is one page', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        pageSizeOptions={false}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    )
+    expect(container.querySelector('.mz-dt__pagination-info')).toHaveTextContent('1–2 of 2')
+    expect(container.querySelector('.mz-dt__pagination-nav')).toBeNull()
+    // A partial first page with no total is one page too.
+    cleanup()
     pager({ data: rows.slice(0, 1) })
+    expect(screen.queryByLabelText('Next page')).toBeNull()
+  })
+
+  it('keeps them under `pagination="always"`', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={rows}
+        rowKey={(r) => r.id}
+        total={2}
+        pagination="always"
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    )
     expect(screen.getByLabelText('Next page')).toBeDisabled()
   })
 

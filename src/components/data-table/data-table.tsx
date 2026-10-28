@@ -171,8 +171,12 @@ export type DataTableProps<T> = {
   emptyState?: React.ReactNode
   /** `false` — or a single option — hides the rows-per-page select. */
   pageSizeOptions?: number[] | false
-  /** Renders the pager. Defaults to `false` once `onLoadMore` is given. */
-  pagination?: boolean
+  /**
+   * Renders the pager. Defaults to `false` once `onLoadMore` is given. While
+   * there is only one page it keeps the count and drops the buttons; `always`
+   * keeps them.
+   */
+  pagination?: boolean | 'always'
   /**
    * Appends the next page instead of replacing the current one. Passing it
    * puts a footer inside the table's own scroller — the element an infinite
@@ -415,7 +419,7 @@ export function DataTable<T>({
   const canLoadMore =
     Boolean(onLoadMore) && (hasMore ?? (total === undefined || data.length < total))
   const showLoadMore = canLoadMore && !error && data.length > 0
-  const showPager = pagination ?? !onLoadMore
+  const showPager = pagination === undefined ? !onLoadMore : pagination !== false
 
   // The page the host should ask for next. The table cannot increment
   // `query.page` itself — that would make the pager and the infinite scroll
@@ -1224,6 +1228,7 @@ export function DataTable<T>({
           pageSizeOptions={pageSizeOptions}
           labels={labelsProp}
           locale={locale}
+          nav={pagination === 'always' ? 'always' : 'auto'}
           onQueryChange={onQueryChange}
         />
       ) : null}
