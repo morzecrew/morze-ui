@@ -88,7 +88,7 @@ export default function SidebarDemo() {
               height: 28,
               flexShrink: 0,
               borderRadius: 8,
-              background: 'linear-gradient(135deg, rgb(var(--mz-primary-rgb)), rgba(var(--mz-primary-rgb), .7))',
+              background: 'linear-gradient(135deg, var(--mz-primary), color-mix(in srgb, var(--mz-primary) 70%, transparent))',
               color: '#fff',
               fontSize: 13,
               fontWeight: 700,

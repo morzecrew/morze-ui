@@ -46,19 +46,19 @@
    at 0.7 it flashed brighter than the fields beside it. */
 .mz-select-trigger:focus-visible,
 .mz-select-trigger[data-state='open'] {
-  border-color: rgba(var(--mz-tone-rgb), 0.65);
+  border-color: color-mix(in srgb, var(--mz-tone) 65%, transparent);
   box-shadow:
     inset 0 1px 0 var(--mz-face-top),
-    0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
-    0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.45);
+    0 0 0 3px color-mix(in srgb, var(--mz-tone) 22%, transparent),
+    0 10px 30px -14px color-mix(in srgb, var(--mz-tone) 45%, transparent);
 }
 /* The error state, the input's own: a danger rim at rest, and the tone
    re-pointed so focus and the open list glow danger too. Without it a missing
    required choice looked exactly like a valid one (#11). Covers `Select`,
    `Combobox`, `MultiSelect` and the date fields — all four wear this trigger. */
 .mz-select-trigger[aria-invalid='true'] {
-  --mz-tone-rgb: var(--mz-danger-rgb);
-  border-color: rgba(var(--mz-danger-rgb), 0.6);
+  --mz-tone: var(--mz-danger);
+  border-color: color-mix(in srgb, var(--mz-danger) 60%, transparent);
 }
 .mz-select-trigger[data-placeholder] { color: var(--mz-text-muted); }
 .mz-select-trigger[data-disabled] { opacity: 0.5; cursor: not-allowed; }
@@ -129,13 +129,13 @@
    that used to sit on the top edge went with the sweep — on a 6px-tall menu
    row it was reading as a seam between items rather than as light. */
 .mz-item[data-highlighted] {
-  background: rgba(var(--mz-tone-rgb), 0.16);
-  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.28);
+  background: color-mix(in srgb, var(--mz-tone) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mz-tone) 28%, transparent);
   color: var(--mz-text);
 }
-.mz-item[data-state='checked'] { color: rgb(var(--mz-tone-rgb)); font-weight: 600; }
+.mz-item[data-state='checked'] { color: var(--mz-tone); font-weight: 600; }
 .mz-item[data-disabled] { opacity: 0.45; pointer-events: none; }
-.mz-item--destructive { --mz-tone-rgb: var(--mz-danger-rgb); color: rgb(var(--mz-danger-rgb)); }
+.mz-item--destructive { --mz-tone: var(--mz-danger); color: var(--mz-danger); }
 
 .mz-item__indicator {
   position: absolute;
@@ -330,7 +330,7 @@
 .mz-tooltip-arrow {
   /* The tone, not a fixed primary: the tooltip is a toned root, and a
      retoned bubble kept sprouting a violet arrow otherwise. */
-  fill: rgb(var(--mz-tone-rgb));
+  fill: var(--mz-tone);
   z-index: 1;
   translate: 0 -1px;
   border-radius: 2px;

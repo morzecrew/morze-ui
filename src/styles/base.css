@@ -95,16 +95,16 @@
   .mz-avatar, .mz-table, .mz-menubar, .mz-navmenu, .mz-scroll-area, .mz-toast,
   .mz-calendar, .mz-chart, .mz-dt, .mz-card, .mz-sidebar
 ) {
-  --mz-tone-rgb: var(--mz-primary-rgb);
+  --mz-tone: var(--mz-primary);
   /* The label colour that goes with the fill — see --mz-primary-fg. A tone
      re-points both, so a filled control never has to know which it wears. */
   --mz-tone-fg: var(--mz-primary-fg);
 
   /* The toned fill as a plain colour: hover and press just darken it, and
      background-color animates where a gradient could not. */
-  --mz-fill: rgb(var(--mz-tone-rgb));
-  --mz-fill-hover: color-mix(in srgb, rgb(var(--mz-tone-rgb)) var(--mz-hover-mix), #000);
-  --mz-fill-press: color-mix(in srgb, rgb(var(--mz-tone-rgb)) var(--mz-press-mix), #000);
+  --mz-fill: var(--mz-tone);
+  --mz-fill-hover: color-mix(in srgb, var(--mz-tone) var(--mz-hover-mix), #000);
+  --mz-fill-press: color-mix(in srgb, var(--mz-tone) var(--mz-press-mix), #000);
 
   /* The light a convex fill throws downward. One idea, and it used to be
      written ten ways — the button at -4px/.4, the checkbox at -5px/.7, the
@@ -116,17 +116,17 @@
      floating surface. They are declared here rather than on :root because a
      custom property is substituted where it is *declared* — one written at
      the root would bake the root's tone in and stop following [data-tone]. */
-  --mz-glow: 0 3px 10px -4px rgba(var(--mz-tone-rgb), 0.4);
-  --mz-glow-hover: 0 4px 12px -4px rgba(var(--mz-tone-rgb), 0.5);
-  --mz-glow-soft: 0 3px 10px -5px rgba(var(--mz-tone-rgb), 0.6);
-  --mz-glow-panel: 0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.5);
+  --mz-glow: 0 3px 10px -4px color-mix(in srgb, var(--mz-tone) 40%, transparent);
+  --mz-glow-hover: 0 4px 12px -4px color-mix(in srgb, var(--mz-tone) 50%, transparent);
+  --mz-glow-soft: 0 3px 10px -5px color-mix(in srgb, var(--mz-tone) 60%, transparent);
+  --mz-glow-panel: 0 10px 30px -14px color-mix(in srgb, var(--mz-tone) 50%, transparent);
 
   /* The selected row, shared by `Table` and `DataTable` — see --mz-th-bg. It
      lives here rather than with --mz-row-hover because it follows the tone,
      and a custom property is substituted where it is declared. Opaque, not a
      wash: a pinned cell has to stay opaque, and a translucent value beside an
      opaque one renders as two different shades of one row. */
-  --mz-row-selected: color-mix(in srgb, var(--mz-surface) 88%, rgb(var(--mz-tone-rgb)));
+  --mz-row-selected: color-mix(in srgb, var(--mz-surface) 88%, var(--mz-tone));
 }
 
 /* The plain control layer: the hardware runs untinted.
@@ -167,7 +167,7 @@
 
 /* Focus is always an outline so it never fights the layered box-shadows. */
 .mz-focusable:focus-visible {
-  outline: var(--mz-ring-width) solid rgba(var(--mz-tone-rgb, var(--mz-primary-rgb)), 0.9);
+  outline: var(--mz-ring-width) solid color-mix(in srgb, var(--mz-tone, var(--mz-primary)) 90%, transparent);
   outline-offset: var(--mz-ring-offset);
 }
 

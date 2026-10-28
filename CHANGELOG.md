@@ -17,6 +17,16 @@ changes among them, and the only record left is six commits that say
 What erp-frontend still had to work around on top of 0.5.0 — issues #3 – #12
 on GitHub, one entry per issue.
 
+### Breaking
+
+- **A tone is `--mz-tone`, a colour, not `--mz-tone-rgb`, a triplet** (#5). A
+  one-off tone set inline as `--mz-tone-rgb: 255, 100, 130` no longer reaches
+  anything; write `--mz-tone: rgb(255 100 130)` (or any colour) instead.
+- **`--mz-text-rgb` is gone** (#5). The translucent text cuts — a field's hover
+  rim, the scrollbar thumb, the skeleton shimmer, the chart's cursor — are cut
+  from `--mz-text` itself. A host that set both keeps the right result from
+  `--mz-text` alone; one that set only the triplet sets `--mz-text`.
+
 ### Added
 
 - **`Button` — `wrap`** (#8). The label may break over lines and the button
@@ -75,6 +85,16 @@ on GitHub, one entry per issue.
   `<html>` for its own reasons and the kit deliberately light through
   `data-mz-theme="light"` now gets the dark palette; set the attribute on a
   wrapper (`target="element"`) instead.
+- **Every translucent tone is cut from one colour** (#5). Glows, washes, rims
+  and the halo were `rgba(var(--mz-*-rgb), a)`, which forced a re-skinning host
+  to state each colour twice per theme — once as the colour, once as a
+  hand-converted `R, G, B` triplet — with nothing keeping the two in step. They
+  are `color-mix(in srgb, var(--mz-primary) a%, transparent)` now (the same
+  colour, in the same space), and each theme declares `--mz-primary`,
+  `--mz-accent`, `--mz-success`, `--mz-danger`, `--mz-warning` and
+  `--mz-info`. Set the colour in any syntax and everything follows; the
+  `--mz-*-rgb` triplets still carry the defaults, so a theme written against
+  them keeps working.
 
 ### Fixed
 

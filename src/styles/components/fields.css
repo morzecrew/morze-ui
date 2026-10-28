@@ -19,7 +19,7 @@
 .mz-label:has(+ :disabled) { opacity: 0.5; }
 /* A label over a field that failed validation. The colour is the whole of the
    signal here — the message under the field carries the reason. */
-.mz-label--error { color: rgb(var(--mz-danger-rgb)); }
+.mz-label--error { color: var(--mz-danger); }
 
 .mz-field {
   display: flex;
@@ -32,7 +32,7 @@
 }
 .mz-field__error {
   font-size: 12px;
-  color: rgb(var(--mz-danger-rgb));
+  color: var(--mz-danger);
 }
 
 .mz-input,
@@ -67,17 +67,17 @@
 .mz-textarea::placeholder { color: var(--mz-text-muted); }
 
 .mz-input:hover,
-.mz-textarea:hover { border-color: rgba(var(--mz-text-rgb), 0.24); }
+.mz-textarea:hover { border-color: color-mix(in srgb, var(--mz-text) 24%, transparent); }
 
 /* The drop glow stays modest: a sunken well casting a strong shadow outward
    read as the field popping up on focus, the opposite of its shape. */
 .mz-input:focus-visible,
 .mz-textarea:focus-visible {
-  border-color: rgba(var(--mz-tone-rgb), 0.65);
+  border-color: color-mix(in srgb, var(--mz-tone) 65%, transparent);
   box-shadow:
     var(--mz-well-inset),
-    0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
-    0 8px 26px -14px rgba(var(--mz-tone-rgb), 0.45);
+    0 0 0 3px color-mix(in srgb, var(--mz-tone) 22%, transparent),
+    0 8px 26px -14px color-mix(in srgb, var(--mz-tone) 45%, transparent);
 }
 
 .mz-input:disabled,
@@ -85,8 +85,8 @@
 
 .mz-input[aria-invalid='true'],
 .mz-textarea[aria-invalid='true'] {
-  --mz-tone-rgb: var(--mz-danger-rgb);
-  border-color: rgba(var(--mz-danger-rgb), 0.6);
+  --mz-tone: var(--mz-danger);
+  border-color: color-mix(in srgb, var(--mz-danger) 60%, transparent);
 }
 
 .mz-input--sm { height: 34px; font-size: 13px; padding: 0 10px; }

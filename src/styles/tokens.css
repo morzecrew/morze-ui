@@ -33,10 +33,10 @@
 
      The literals lean blue on purpose (the landing's own cast); the brand
      hue on top comes from the tint, so a host that re-points
-     --mz-primary-rgb (the playground runs green) gets a matching night of
+     --mz-primary (the playground runs blue) gets a matching night of
      its own rather than someone else's violet. For a neutral kit point the
      tint at a grey instead: --mz-tint: #808080. */
-  --mz-tint: rgb(var(--mz-primary-rgb));
+  --mz-tint: var(--mz-primary);
   --mz-tint-strength: 3.5%;
 
   --mz-bg: color-mix(in srgb, #0a0a12, var(--mz-tint) var(--mz-tint-strength));
@@ -69,11 +69,23 @@
      Same recipe as the landing's #ECECF5 / #A3A0B8: white and grey pulled a
      step toward the brand. Muted stays above 4:1 on an elevated panel. */
   --mz-text: color-mix(in srgb, #f2f2f2 92%, var(--mz-tint));
-  --mz-text-rgb: 235, 235, 242;
   --mz-text-dim: color-mix(in srgb, #a6a6a6 86%, var(--mz-tint));
   --mz-text-muted: color-mix(in srgb, #808080 88%, var(--mz-tint));
 
-  /* ---- Tones ---- */
+  /* ---- Tones ----
+     Each tone is one colour, and everything translucent the kit draws from it
+     — a glow, a wash, a rim at 65% — is a color-mix() cut of that colour, the
+     way the surfaces are cut from the ink. A host re-skinning the kit sets
+     --mz-primary once per theme, in any syntax (a hex, an oklch(), a
+     var(--brand) of its own), and nothing can drift out of step with it.
+
+     The channel triplets are where the defaults are written, and they stay a
+     way in: a host that already re-points --mz-primary-rgb keeps working,
+     because the colour is built from it. Setting the colour itself wins over
+     the triplet. Both are declared in each theme block, not once on :root,
+     because a custom property is substituted where it is declared — a
+     [data-mz-theme] scope deeper in the page would otherwise inherit the
+     other theme's colour. */
   --mz-primary-rgb: 168, 124, 248;
   --mz-accent-rgb: 52, 211, 153;
   --mz-danger-rgb: 255, 100, 130;
@@ -82,6 +94,11 @@
   --mz-success-rgb: 52, 211, 153;
 
   --mz-primary: rgb(var(--mz-primary-rgb));
+  --mz-accent: rgb(var(--mz-accent-rgb));
+  --mz-danger: rgb(var(--mz-danger-rgb));
+  --mz-warning: rgb(var(--mz-warning-rgb));
+  --mz-info: rgb(var(--mz-info-rgb));
+  --mz-success: rgb(var(--mz-success-rgb));
 
   /* The label on each tone's fill. White on every tone the kit ships: the
      fills are saturated enough that a label reads by weight and hue, and one
@@ -241,7 +258,7 @@
   /* The ambient brand glow .mz-root bleeds in from above the fold — the
      landing's aurora, and an orientation cue: light from one edge tells the
      eye where the page starts. Set it to transparent to run a flat page. */
-  --mz-halo: rgba(var(--mz-primary-rgb), 0.1);
+  --mz-halo: color-mix(in srgb, var(--mz-primary) 10%, transparent);
 
   /* Every shadow is a cut of --mz-shade — see its note above. */
   --mz-overlay: rgba(8, 8, 17, 0.74);
@@ -255,7 +272,7 @@
 .mz-theme-light {
   color-scheme: light;
 
-  --mz-tint: rgb(var(--mz-primary-rgb));
+  --mz-tint: var(--mz-primary);
   --mz-tint-strength: 5%;
 
   /* The EIS pattern, with the brand hue in place of its fixed zinc: the page
@@ -281,17 +298,25 @@
   --mz-border-strong: color-mix(in srgb, var(--mz-ink) 32%, transparent);
 
   --mz-text: color-mix(in srgb, #141414 92%, var(--mz-tint));
-  --mz-text-rgb: 30, 30, 38;
   --mz-text-dim: color-mix(in srgb, #545454 88%, var(--mz-tint));
   /* #8a8a8a fell to 2.98:1 on the tinted page with a mid-lightness brand. */
   --mz-text-muted: color-mix(in srgb, #7c7c7c 90%, var(--mz-tint));
 
+  /* See the dark block: the triplets carry the defaults, the colours are
+     what the kit reads. */
   --mz-primary-rgb: 124, 74, 232;
   --mz-accent-rgb: 16, 175, 122;
   --mz-danger-rgb: 226, 60, 92;
   --mz-warning-rgb: 202, 138, 4;
   --mz-info-rgb: 14, 145, 214;
   --mz-success-rgb: 16, 175, 122;
+
+  --mz-primary: rgb(var(--mz-primary-rgb));
+  --mz-accent: rgb(var(--mz-accent-rgb));
+  --mz-danger: rgb(var(--mz-danger-rgb));
+  --mz-warning: rgb(var(--mz-warning-rgb));
+  --mz-info: rgb(var(--mz-info-rgb));
+  --mz-success: rgb(var(--mz-success-rgb));
 
   /* White throughout here too; see the dark block. The light tones are the
      deeper cut, so the amber lands at 2.9:1 and the rest above 3:1. */
@@ -395,7 +420,7 @@
   --mz-glass-edge: rgba(255, 255, 255, 0.55);
 
   /* Weaker than dark: over a light page the same alpha reads twice as loud. */
-  --mz-halo: rgba(var(--mz-primary-rgb), 0.06);
+  --mz-halo: color-mix(in srgb, var(--mz-primary) 6%, transparent);
 
   /* Cut from the shade (= the ink), never a fixed navy: a hardcoded veil
      colour was a second hue source a re-branded host could not override. */

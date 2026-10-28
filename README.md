@@ -154,13 +154,34 @@ and the focus ring:
 ```
 
 `primary` (violet) · `accent`/`success` (emerald) · `danger` · `warning` ·
-`info`. A tone is the `--mz-tone-rgb` custom property, so a one-off value works
-too: `style={{ '--mz-tone-rgb': '255, 100, 130' }}` (channels separated by
-commas — the value is substituted into `rgb()`/`rgba()`). Each tone also
-names the label colour on its fill (`--mz-primary-fg` … `--mz-info-fg`, read
-through `--mz-tone-fg`). Every shipped tone uses white; a pale tone of your
-own — a pastel yellow, a mint — sets `--mz-tone-fg` alongside `--mz-tone-rgb`,
-or re-points one `--mz-<tone>-fg` for the whole kit.
+`info`. A tone is the `--mz-tone` custom property, so a one-off value works
+too, in any colour syntax: `style={{ '--mz-tone': '#ff6482' }}`. Every glow,
+wash and rim the kit draws in a tone is a `color-mix()` cut of that one colour.
+Each tone also names the label colour on its fill (`--mz-primary-fg` …
+`--mz-info-fg`, read through `--mz-tone-fg`). Every shipped tone uses white; a
+pale tone of your own — a pastel yellow, a mint — sets `--mz-tone-fg` alongside
+`--mz-tone`, or re-points one `--mz-<tone>-fg` for the whole kit.
+
+**Re-skinning the kit is one colour per tone**, per theme: `--mz-primary`,
+`--mz-accent`, `--mz-success`, `--mz-danger`, `--mz-warning`, `--mz-info`, and
+`--mz-text` for the text. A hex, an `oklch()`, or a `var()` of the
+application's own tokens all work:
+
+```css
+:root, .dark {
+  --mz-primary: var(--primary);
+  --mz-danger: var(--destructive);
+  --mz-text: var(--foreground);
+}
+.light {
+  --mz-primary: var(--primary);
+  /* … */
+}
+```
+
+The `--mz-<tone>-rgb` channel triplets (`168, 124, 248`) are where the kit
+writes its defaults, and a theme that already sets them keeps working — the
+colour is built from the triplet unless the colour is set itself.
 
 ## Shape and type
 
@@ -206,7 +227,7 @@ untouched.
 body { font-family: var(--mz-font-sans); }
 
 :root {
-  --mz-primary-rgb: 120, 90, 250;   /* brand colour */
+  --mz-primary: #785afa;            /* brand colour */
   --mz-font-sans: 'Inter', sans-serif;   /* or your own face */
   --mz-font-display: 'Unbounded', sans-serif;  /* headings only */
   --mz-radius: 4px;                 /* tighter */
@@ -287,12 +308,12 @@ and the sunken wells are a grey ramp with a few percent of `--mz-tint` mixed in
 — three channel steps out of 255, enough that a surface is not flat cardboard,
 not enough to name a colour. Dark runs the tint weaker than light (2.5% against
 4%): there the brand is far lighter than the surfaces it sits in, so the same
-percentage pulls a lot more hue. The tint follows `--mz-primary-rgb`, so the greys
+percentage pulls a lot more hue. The tint follows `--mz-primary`, so the greys
 move with the brand instead of keeping a violet cast that belongs to no one:
 
 ```css
 :root {
-  --mz-primary-rgb: 16, 175, 122;   /* panels and wells go faintly green */
+  --mz-primary: #10af7a;            /* panels and wells go faintly green */
   --mz-tint-strength: 0%;           /* …or take the hue out altogether */
   --mz-tint: #808080;               /* same thing, keeping the lightness */
 }

@@ -146,7 +146,7 @@
 .mz-btn--outline {
   background: color-mix(in srgb, var(--mz-surface) 65%, transparent);
   color: var(--mz-text);
-  border-color: rgba(var(--mz-text-rgb), 0.16);
+  border-color: color-mix(in srgb, var(--mz-text) 16%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -154,7 +154,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(var(--mz-text-rgb), 0.05);
+  background: color-mix(in srgb, var(--mz-text) 5%, transparent);
   opacity: 0;
   transition: opacity var(--mz-duration) ease;
   z-index: 1;
@@ -164,8 +164,8 @@
    colour. */
 .mz-btn--outline:hover {
   transform: scale(var(--mz-hover-scale));
-  color: rgb(var(--mz-tone-rgb));
-  border-color: rgb(var(--mz-tone-rgb));
+  color: var(--mz-tone);
+  border-color: var(--mz-tone);
 }
 .mz-btn--outline:hover::before { opacity: 1; }
 .mz-btn--outline:active { transform: scale(var(--mz-press-scale)); }
@@ -190,7 +190,7 @@
 
 /* ---- Destructive: primary recipe on the danger tone ---- */
 .mz-btn--destructive {
-  --mz-tone-rgb: var(--mz-danger-rgb);
+  --mz-tone: var(--mz-danger);
   --mz-tone-fg: var(--mz-danger-fg);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
@@ -222,7 +222,7 @@
   padding: 0;
   background: none;
   border: none;
-  color: rgb(var(--mz-tone-rgb));
+  color: var(--mz-tone);
   text-transform: none;
   letter-spacing: normal;
   font-family: inherit;

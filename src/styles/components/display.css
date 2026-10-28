@@ -85,8 +85,8 @@
   margin-bottom: -1px;
 }
 .mz-tabs-list--line .mz-tabs-trigger[data-state='active'] {
-  color: rgb(var(--mz-tone-rgb));
-  border-bottom-color: rgb(var(--mz-tone-rgb));
+  color: var(--mz-tone);
+  border-bottom-color: var(--mz-tone);
   background: none;
   box-shadow: var(--mz-glow-panel);
   text-shadow: none;
@@ -133,7 +133,7 @@
 .mz-tabs-overflow__caret { width: 13px; height: 13px; opacity: 0.7; }
 /* The active tab is inside the menu: the row would otherwise read as if
    nothing at all were selected. */
-.mz-tabs-overflow[data-active] { color: rgb(var(--mz-tone-rgb)); }
+.mz-tabs-overflow[data-active] { color: var(--mz-tone); }
 .mz-tabs-overflow[data-state='open'] { color: var(--mz-text); background: var(--mz-face); }
 @media (max-width: 640px) {
   .mz-tabs-overflow__label { display: none; }
@@ -163,7 +163,7 @@
 }
 .mz-card--interactive { cursor: pointer; }
 .mz-card--interactive:hover {
-  border-color: rgba(var(--mz-tone-rgb), 0.35);
+  border-color: color-mix(in srgb, var(--mz-tone) 35%, transparent);
   box-shadow: var(--mz-glow-panel), inset 0 1px 0 var(--mz-face-top);
 }
 .mz-card-header {
@@ -216,9 +216,9 @@
    literal white it was a leftover of the gradient era, and it was the wrong
    sign in the light theme, where a "highlight" cut from the ink is a shadow. */
 .mz-badge--soft {
-  background: rgba(var(--mz-tone-rgb), 0.14);
-  color: rgb(var(--mz-tone-rgb));
-  border-color: rgba(var(--mz-tone-rgb), 0.32);
+  background: color-mix(in srgb, var(--mz-tone) 14%, transparent);
+  color: var(--mz-tone);
+  border-color: color-mix(in srgb, var(--mz-tone) 32%, transparent);
 }
 .mz-badge--outline {
   background: transparent;
@@ -238,14 +238,14 @@
   /* One tinted surface, mixed rather than layered: two flat colours cannot be
      stacked as background layers, and the 135° wash this replaces averaged
      out at about a tenth of the tone anyway. */
-  background: color-mix(in srgb, var(--mz-surface), rgb(var(--mz-tone-rgb)) 11%);
-  border: 1px solid rgba(var(--mz-tone-rgb), 0.32);
+  background: color-mix(in srgb, var(--mz-surface), var(--mz-tone) 11%);
+  border: 1px solid color-mix(in srgb, var(--mz-tone) 32%, transparent);
   box-shadow: var(--mz-glow-panel);
   color: var(--mz-text);
   font-size: 14px;
 }
 .mz-alert:has(> svg) { grid-template-columns: 18px 1fr; gap: 2px 12px; }
-.mz-alert > svg { width: 17px; height: 17px; translate: 0 2px; color: rgb(var(--mz-tone-rgb)); }
+.mz-alert > svg { width: 17px; height: 17px; translate: 0 2px; color: var(--mz-tone); }
 .mz-alert-title { grid-column-start: 2; font-weight: 700; line-height: 1.35; }
 .mz-alert-description { grid-column-start: 2; font-size: 13px; color: var(--mz-text-dim); }
 
@@ -272,7 +272,7 @@
   outline: none;
   transition: color var(--mz-duration) ease;
 }
-.mz-accordion-trigger:hover { color: rgb(var(--mz-tone-rgb)); }
+.mz-accordion-trigger:hover { color: var(--mz-tone); }
 .mz-accordion-trigger__icon {
   flex-shrink: 0;
   width: 26px;
@@ -395,8 +395,8 @@
 .mz-progress__indicator {
   height: 100%;
   border-radius: inherit;
-  background: rgb(var(--mz-tone-rgb));
-  box-shadow: 0 0 14px rgba(var(--mz-tone-rgb), 0.6), inset 0 1px 0 var(--mz-convex-top);
+  background: var(--mz-tone);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--mz-tone) 60%, transparent), inset 0 1px 0 var(--mz-convex-top);
   transition: transform 0.5s var(--mz-ease);
 }
 
@@ -417,7 +417,7 @@
    The fallback face speaks the button's convex language: the solid tone between
    the same two inset lines, so an initials avatar sits in the UI the way a
    primary button does instead of reading as a washed-out swatch. The tone
-   follows --mz-tone-rgb, so `data-tone` recolours it the same way it does a
+   follows --mz-tone, so `data-tone` recolours it the same way it does a
    badge — identity avatars can vary the tone per person. */
 /* Round, like a face: --mz-radius-pill is what the kit keeps for the shapes
    that are round by meaning. Override --mz-avatar-radius for a squared crop. */
@@ -452,7 +452,7 @@
   place-content: center;
   width: 100%;
   height: 100%;
-  background-color: rgb(var(--mz-tone-rgb));
+  background-color: var(--mz-tone);
   /* Its own wider diagonal sweep used to sit here, the one place the fill
      gloss was hand-rolled instead of taken from --mz-fill-sheen. Both are gone
      the same way: the tone is flat and the light is on the edges. */
@@ -504,9 +504,9 @@
   border-radius: var(--mz-radius-sm);
   background: linear-gradient(
     90deg,
-    rgba(var(--mz-text-rgb), 0.06) 0%,
-    rgba(var(--mz-text-rgb), 0.13) 50%,
-    rgba(var(--mz-text-rgb), 0.06) 100%
+    color-mix(in srgb, var(--mz-text) 6%, transparent) 0%,
+    color-mix(in srgb, var(--mz-text) 13%, transparent) 50%,
+    color-mix(in srgb, var(--mz-text) 6%, transparent) 100%
   );
   background-size: 200% 100%;
   animation: mz-shimmer 1.6s linear infinite;
@@ -517,6 +517,6 @@
   display: inline-block;
   width: 18px;
   height: 18px;
-  color: rgb(var(--mz-primary-rgb));
+  color: var(--mz-primary);
 }
 .mz-spinner svg { width: 100%; height: 100%; animation: mz-spin 0.8s linear infinite; }

@@ -42,7 +42,7 @@ describe('tone cascade', () => {
   })
 
   it('keeps component tone defaults at zero specificity', () => {
-    expect(css).toMatch(/:where\([^)]*\.mz-btn[^)]*\)\{--mz-tone-rgb/)
+    expect(css).toMatch(/:where\([^)]*\.mz-btn[^)]*\)\{--mz-tone:/)
   })
 })
 
@@ -104,7 +104,7 @@ describe('hover states', () => {
     expect(secondary).not.toContain('border-color')
     expect(outline).not.toContain('box-shadow')
     // The outline picks up the tone in its own border, at full strength.
-    expect(outline).toContain('border-color:rgb(var(--mz-tone-rgb))')
+    expect(outline).toContain('border-color:var(--mz-tone)')
   })
 })
 
@@ -134,14 +134,14 @@ describe('table rows', () => {
 
 describe('tone defaults reach every toned component', () => {
   /**
-   * A component that reads --mz-tone-rgb without a default gets an invalid
+   * A component that reads --mz-tone without a default gets an invalid
    * var() substitution, and the browser drops the whole declaration — the
    * border simply vanishes rather than falling back to something. Each of
    * these has to appear in the :where() list in base.css.
    */
   // Read inside the test, not in the describe body: the bundle is loaded in
   // beforeAll, and a describe body runs before that.
-  const tonedRoot = () => css.match(/:where\(([^)]*)\)\{--mz-tone-rgb/)?.[1] ?? ''
+  const tonedRoot = () => css.match(/:where\(([^)]*)\)\{--mz-tone:/)?.[1] ?? ''
 
   it.each([
     ['.mz-toast', '.mz-toast'],
@@ -192,7 +192,7 @@ describe('calendar', () => {
 
   it('keeps the tentative range visually apart from a chosen one', () => {
     const preview = css.match(/\.mz-calendar__day\[data-preview\]\{[^}]*\}/)?.[0] ?? ''
-    expect(preview).toContain('background:rgba(var(--mz-tone-rgb)')
+    expect(preview).toContain('background:color-mix(in srgb, var(--mz-tone)')
     // No convex fill and no glow: those belong to a committed selection.
     expect(preview).toContain('box-shadow:none')
   })
@@ -316,7 +316,7 @@ describe('the night ramp', () => {
   // page. The current contract keeps the good half of each: the literals
   // carry the landing's *cold* cast (blue a step above red/green, never a
   // nameable colour), and every drop of actual brand hue still comes from
-  // one place — --mz-tint, following --mz-primary-rgb — so a re-branded host
+  // one place — --mz-tint, following --mz-primary — so a re-branded host
   // gets its own night, not Morze's violet.
 
   /** Every hex the token is declared as, expanded to r/g/b. */
@@ -341,7 +341,7 @@ describe('the night ramp', () => {
   })
 
   it('builds the surfaces from a cold base plus the brand tint', () => {
-    expect(css).toContain('--mz-tint:rgb(var(--mz-primary-rgb))')
+    expect(css).toContain('--mz-tint:var(--mz-primary)')
     // --mz-well is deliberately absent: it is a control face, not a step of
     // the ramp, and is cut from the ink in both themes — see the test below.
     for (const token of ['--mz-bg', '--mz-surface', '--mz-elevated', '--mz-cap']) {
@@ -407,7 +407,7 @@ describe('the night ramp', () => {
     // quietly aliasing a tinted one fails here — an alias two hops from
     // --mz-ink is exactly how this would come back. It is the chain of token
     // names that gets checked, not the expanded value: expand far enough and
-    // --mz-primary-rgb turns into its own digits and the evidence is gone.
+    // --mz-primary turns into its own digits and the evidence is gone.
     const chainOf = (theme: string, token: string) => {
       const declared = (name: string) => new RegExp(`\\${name}:([^;}]+)`).exec(theme)?.[1]
       const reached = new Set<string>()
@@ -436,9 +436,10 @@ describe('the night ramp', () => {
       ]) {
         const { value, reached } = chainOf(theme, token)
         expect(value, `${token} is missing from a theme`).not.toBe('')
-        // --mz-tint and the --mz-primary-rgb it follows are the kit's one
+        // --mz-tint and the --mz-primary it follows are the kit's one
         // source of hue, and the one thing a plain cut may not reach.
         expect([...reached], token).not.toContain('--mz-tint')
+        expect([...reached], token).not.toContain('--mz-primary')
         expect([...reached], token).not.toContain('--mz-primary-rgb')
       }
     }
@@ -446,7 +447,7 @@ describe('the night ramp', () => {
 
   it('carries no fixed violet that would bypass the tint', () => {
     // The one leak the neutralisation was for: hue hardcoded outside
-    // --mz-primary-rgb / --mz-tint, which a re-branded host cannot override.
+    // --mz-primary / --mz-tint, which a re-branded host cannot override.
     expect(css).not.toContain('16,12,40')
     expect(css).not.toContain('#17162a')
   })
@@ -719,7 +720,7 @@ describe('one glow for every convex fill (V-04)', () => {
     // Declared beside --mz-fill rather than on :root: a custom property is
     // substituted where it is declared, so one written at the root would bake
     // the root's tone in and stop following [data-tone].
-    const tonedBlock = css.match(/:where\([^)]*\)\{--mz-tone-rgb[^}]*\}/)?.[0] ?? ''
+    const tonedBlock = css.match(/:where\([^)]*\)\{--mz-tone:[^}]*\}/)?.[0] ?? ''
     for (const token of ['--mz-glow:', '--mz-glow-hover:', '--mz-glow-soft:', '--mz-glow-panel:']) {
       expect(tonedBlock, token).toContain(token)
     }
@@ -737,7 +738,7 @@ describe('one glow for every convex fill (V-04)', () => {
       // A drop shadow: an offset chain ending in a tone colour. A spread-less
       // `0 0 Npx` glow (the slider range, the progress bar) is a different
       // thing — it rings the element rather than pooling under it.
-      return /box-shadow:[^;}]*\d+px -\d+px rgba\(var\(--mz-tone-rgb\)/.test(body!)
+      return /box-shadow:[^;}]*\d+px -\d+px color-mix\(in srgb, var\(--mz-tone\)/.test(body!)
     })
     expect(bespoke.map(([, selector]) => selector)).toEqual([])
   })
@@ -745,7 +746,7 @@ describe('one glow for every convex fill (V-04)', () => {
   it('keeps the field focus glow out of the set', () => {
     // Input and the select trigger share one focus recipe, and it is a ring
     // plus a soft drop — not the convex glow. It stays spelled out.
-    expect(css).toMatch(/\.mz-input:focus-visible[^{]*\{[^}]*0 0 0 3px rgba\(var\(--mz-tone-rgb\), ?\.22\)/)
+    expect(css).toMatch(/\.mz-input:focus-visible[^{]*\{[^}]*0 0 0 3px color-mix\(in srgb, var\(--mz-tone\) 22%, transparent\)/)
   })
 })
 
@@ -822,7 +823,7 @@ describe('the three verbs (V-03)', () => {
   it('gives the switch the hover its family has', () => {
     // Checkbox and radio picked up a tone rim; the switch, off, did nothing at
     // all — the one dead-looking control in a column of settings.
-    expect(css).toMatch(/\.mz-switch:hover\{[^}]*border-color:rgba\(var\(--mz-tone-rgb\), ?\.5\)/)
+    expect(css).toMatch(/\.mz-switch:hover\{[^}]*border-color:color-mix\(in srgb, var\(--mz-tone\) 50%, transparent\)/)
   })
 
   it('answers the pointer neutrally in a field row', () => {
@@ -830,8 +831,8 @@ describe('the three verbs (V-03)', () => {
     // beside it went neutral grey. Tone is focus and open, in both.
     const hover = css.match(/\.mz-select-trigger:hover\{[^}]*\}/)?.[0] ?? ''
     expect(hover).toContain('--mz-face-hover')
-    expect(hover).not.toContain('--mz-tone-rgb')
-    expect(css).toMatch(/\.mz-select-trigger:focus-visible[^{]*\{[^}]*--mz-tone-rgb/)
+    expect(hover).not.toContain('var(--mz-tone)')
+    expect(css).toMatch(/\.mz-select-trigger:focus-visible[^{]*\{[^}]*var\(--mz-tone\)/)
   })
 })
 
@@ -859,16 +860,16 @@ describe('one header and one row, two tables (V-06)', () => {
 
 describe('the tone reaches what follows it (V-10)', () => {
   it('leaves no component pinned to the primary', () => {
-    // Twenty places read --mz-primary-rgb directly — the table's chips and
+    // Twenty places read the primary directly — the table's chips and
     // count, the sidebar badge and sub-item, the active sort arrow, the
     // resizer, the card and accordion hovers — so `tone` moved everything on
     // the page except them.
     const componentRules = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)]
       .filter(([, selector]) => !selector!.includes('--mz-tint') && !/^:root|\[data-mz-theme/.test(selector!))
-      // Pointing --mz-tone-rgb at the primary is how a default tone is
+      // Pointing --mz-tone at the primary is how a default tone is
       // declared; it is the reads of the primary, not that one write, that
       // this is about.
-      .filter(([, , body]) => /--mz-primary-rgb/.test(body!.replace(/--mz-tone-rgb:var\(--mz-primary-rgb\)/g, '')))
+      .filter(([, , body]) => /var\(--mz-primary(-rgb)?\)/.test(body!.replace(/--mz-tone:var\(--mz-primary\)/g, '')))
       .map(([, selector]) => selector!.trim())
     // What may still name it: the focus ring's fallback (it lands on elements
     // outside every toned root) and the standalone spinner.
@@ -876,7 +877,7 @@ describe('the tone reaches what follows it (V-10)', () => {
   })
 
   it('gives the four newly toned roots a tone to follow', () => {
-    const tonedRoot = css.match(/:where\(([^)]*)\)\{--mz-tone-rgb/)?.[1] ?? ''
+    const tonedRoot = css.match(/:where\(([^)]*)\)\{--mz-tone:/)?.[1] ?? ''
     for (const selector of ['.mz-dt', '.mz-card', '.mz-sidebar', '.mz-accordion-trigger']) {
       expect(tonedRoot, selector).toContain(selector)
     }
@@ -1135,5 +1136,23 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     expect(light).toContain(':root.light')
     expect(dark).toContain(':root.dark')
     expect(css).not.toMatch(/(^|[},])\.light[,{]/)
+  })
+
+  it('cuts every translucent tone from one colour (#5)', () => {
+    // A re-skinning host stated each colour twice — once as the colour, once as
+    // an `R, G, B` triplet for rgba() — and nothing kept the two in step.
+    // The triplets survive only as the source of each theme's default colour.
+    const reads = [...css.matchAll(/([a-z-]*):?rgba?\(var\(--mz-([a-z]+)-rgb\)\)/g)].map((m) => m[0])
+    for (const read of reads) expect(read).toMatch(/^--mz-([a-z]+):rgb\(var\(--mz-\1-rgb\)\)$/)
+    expect(css).not.toMatch(/rgba\(var\(--mz-/)
+    expect(css).not.toContain('--mz-text-rgb')
+    expect(css).not.toContain('--mz-tone-rgb')
+    // Declared in each theme block, or a [data-mz-theme] scope deeper in the
+    // page would inherit the other theme's colour.
+    for (const theme of themeBlocks()) {
+      for (const tone of ['primary', 'accent', 'danger', 'warning', 'info', 'success']) {
+        expect(theme, tone).toContain(`--mz-${tone}:rgb(var(--mz-${tone}-rgb))`)
+      }
+    }
   })
 })

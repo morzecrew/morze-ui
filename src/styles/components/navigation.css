@@ -80,8 +80,8 @@
    showing once the pointer has moved down into the panel. */
 .mz-menubar__trigger[data-state='open'] {
   color: var(--mz-text);
-  background: rgba(var(--mz-tone-rgb), 0.16);
-  border-color: rgba(var(--mz-tone-rgb), 0.28);
+  background: color-mix(in srgb, var(--mz-tone) 16%, transparent);
+  border-color: color-mix(in srgb, var(--mz-tone) 28%, transparent);
 }
 
 /* ---------------------------- Navigation menu --------------------------- */
@@ -196,8 +196,8 @@
 }
 .mz-navmenu__link:hover,
 .mz-navmenu__link[data-active] {
-  background: rgba(var(--mz-tone-rgb), 0.14);
-  box-shadow: inset 0 0 0 1px rgba(var(--mz-tone-rgb), 0.26);
+  background: color-mix(in srgb, var(--mz-tone) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mz-tone) 26%, transparent);
 }
 
 .mz-navmenu__indicator {

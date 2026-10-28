@@ -130,8 +130,8 @@
 /* Optional chrome texture behind the navigation. */
 .mz-sidebar-layout--grid {
   background-image:
-    linear-gradient(to right, rgba(var(--mz-text-rgb), 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(var(--mz-text-rgb), 0.03) 1px, transparent 1px);
+    linear-gradient(to right, color-mix(in srgb, var(--mz-text) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--mz-text) 3%, transparent) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
@@ -339,8 +339,8 @@
   min-width: 20px;
   padding: 1px 6px;
   border-radius: var(--mz-radius-sm);
-  background: rgba(var(--mz-tone-rgb), 0.2);
-  color: rgb(var(--mz-tone-rgb));
+  background: color-mix(in srgb, var(--mz-tone) 20%, transparent);
+  color: var(--mz-tone);
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
@@ -380,8 +380,8 @@
 .mz-sidebar__menu-sub-button[data-size='sm'] { height: 26px; font-size: 12px; }
 .mz-sidebar__menu-sub-button:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-sidebar__menu-sub-button[data-active] {
-  color: rgb(var(--mz-tone-rgb));
-  background: rgba(var(--mz-tone-rgb), 0.12);
+  color: var(--mz-tone);
+  background: color-mix(in srgb, var(--mz-tone) 12%, transparent);
 }
 
 /* ---------------------------- Collapsed rail ---------------------------- */

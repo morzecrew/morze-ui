@@ -24,7 +24,7 @@
     box-shadow var(--mz-duration) ease,
     transform var(--mz-duration-fast) var(--mz-ease);
 }
-.mz-checkbox:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
+.mz-checkbox:hover { border-color: color-mix(in srgb, var(--mz-tone) 50%, transparent); }
 .mz-checkbox:active { transform: scale(var(--mz-press-scale)); }
 
 .mz-checkbox[data-state='checked'],
@@ -92,7 +92,7 @@
     box-shadow var(--mz-duration) ease,
     transform var(--mz-duration-fast) var(--mz-ease);
 }
-.mz-radio:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
+.mz-radio:hover { border-color: color-mix(in srgb, var(--mz-tone) 50%, transparent); }
 .mz-radio:active { transform: scale(var(--mz-press-scale)); }
 
 .mz-radio[data-state='checked'] {
@@ -157,7 +157,7 @@
    way. The switch was the one that did not: off, it had no hover at all, so
    the only control in a settings column that looked dead was the one the
    column is made of. */
-.mz-switch:hover { border-color: rgba(var(--mz-tone-rgb), 0.5); }
+.mz-switch:hover { border-color: color-mix(in srgb, var(--mz-tone) 50%, transparent); }
 .mz-switch--sm { --mz-switch-h: 20px; --mz-switch-w: 36px; border-radius: 5px; }
 .mz-switch--lg { --mz-switch-h: 30px; --mz-switch-w: 54px; border-radius: 8px; }
 
@@ -415,9 +415,9 @@
    values, where the range is nothing but its own first stop. */
 .mz-slider__range {
   position: absolute;
-  background: rgb(var(--mz-tone-rgb));
+  background: var(--mz-tone);
   box-shadow:
-    0 0 14px rgba(var(--mz-tone-rgb), 0.55),
+    0 0 14px color-mix(in srgb, var(--mz-tone) 55%, transparent),
     inset 0 1px 0 var(--mz-convex-top);
 }
 .mz-slider[data-orientation='horizontal'] .mz-slider__range { height: 100%; }
