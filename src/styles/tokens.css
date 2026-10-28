@@ -12,11 +12,13 @@
    already has a theme switch should not have to copy its answer into a second
    attribute — nor run its own script before first paint to do it in time.
    Only on the root element: `.light` is too common a class name to theme
-   whatever else in the page happens to wear it.
+   whatever else in the page happens to wear it. Behind :where(), so the
+   selector weighs what [data-mz-theme] does — a host's own `.light { … }`
+   override, loaded after the kit, still wins.
    ========================================================================== */
 
 :root,
-:root.dark,
+:root:where(.dark),
 [data-mz-theme='dark'],
 .mz-theme-dark {
   color-scheme: dark;
@@ -268,7 +270,7 @@
 }
 
 [data-mz-theme='light'],
-:root.light,
+:root:where(.light),
 .mz-theme-light {
   color-scheme: light;
 

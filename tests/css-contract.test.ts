@@ -1133,8 +1133,10 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     const lists = [...css.matchAll(/(?:^|\})([^{}]+)\{[^}]*--mz-tint:/g)].map((m) => m[1]!.split(','))
     const light = lists.find((list) => list.includes('[data-mz-theme=light]'))
     const dark = lists.find((list) => list.includes('[data-mz-theme=dark]'))
-    expect(light).toContain(':root.light')
-    expect(dark).toContain(':root.dark')
+    expect(light).toContain(':root:where(.light)')
+    expect(dark).toContain(':root:where(.dark)')
+    // At the attribute's weight, not above it: `:root.light` would outrank a
+    // host's own `.light { --mz-primary: … }` and keep the kit's colour.
     expect(css).not.toMatch(/(^|[},])\.light[,{]/)
   })
 

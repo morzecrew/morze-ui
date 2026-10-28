@@ -80,11 +80,13 @@ on GitHub, one entry per issue.
   A host that *shrank* a button with a smaller `height` than its size now
   picks the smaller `size` (or sets `min-height` too). The `icon-*` sizes stay
   square and fixed.
-- **A `dark` / `light` class on `<html>` selects the palette** (#3), and wins
-  over `data-mz-theme` on the same element. A host that had `class="dark"` on
-  `<html>` for its own reasons and the kit deliberately light through
-  `data-mz-theme="light"` now gets the dark palette; set the attribute on a
-  wrapper (`target="element"`) instead.
+- **A `dark` / `light` class on `<html>` selects the palette** (#3). A host
+  that had `class="light"` on `<html>` for its own reasons, and nothing else,
+  used to get the dark palette and now gets the light one. Where the class
+  and `data-mz-theme` disagree on `<html>`, light wins; a host that wants the
+  kit dark under a light page uses `target="element"`. The selector weighs
+  what `[data-mz-theme]` does, so token overrides written against `.light` /
+  `.dark` still win.
 - **Every translucent tone is cut from one colour** (#5). Glows, washes, rims
   and the halo were `rgba(var(--mz-*-rgb), a)`, which forced a re-skinning host
   to state each colour twice per theme — once as the colour, once as a
