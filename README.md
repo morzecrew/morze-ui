@@ -669,6 +669,18 @@ rather than in `dataKey` — a pie, where every slice comes from one series:
 <Tooltip content={<ChartTooltipContent nameKey="material" hideLabel />} />
 ```
 
+A series drawn as a line keys as one: `indicator: 'line' | 'dashed'` (and
+`opacity`) on its config entry draws a 12×2 stroke in its colour in both the
+legend and the tooltip, so a compared period drawn dashed at half strength is
+not a second identical dot:
+
+```tsx
+const config = {
+  now: { label: 'This year', color: 'var(--mz-primary)', indicator: 'line' },
+  before: { label: 'Last year', color: 'var(--mz-primary)', indicator: 'dashed', opacity: 0.5 },
+} satisfies ChartConfig
+```
+
 `ChartTooltip` and `ChartLegend` are not exported: they were only ever
 recharts' own `Tooltip` and `Legend`, so import those from recharts directly.
 

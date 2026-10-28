@@ -101,6 +101,11 @@ issue.
   only the footer, the pager and the chart tooltip had it, and Golos Text sets
   proportional digits, so a right-aligned column of 300 figures did not line
   up.
+- **Chart — a series keyed in the shape it is drawn** (#21). A `ChartConfig`
+  entry takes `indicator: 'dot' | 'line' | 'dashed'` and `opacity`, used by
+  both `ChartLegendContent` (which only ever drew a dot) and
+  `ChartTooltipContent` (where it overrides the tooltip's own `indicator`). The
+  line key is 12×2px.
 
 ### Changed
 

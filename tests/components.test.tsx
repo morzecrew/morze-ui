@@ -464,6 +464,33 @@ describe('Chart', () => {
     expect(screen.getByText('42')).toBeTruthy()
   })
 
+  // A compared period drawn dashed at half strength was keyed by a second
+  // identical dot (#21).
+  it('keys each series in the shape it is drawn', () => {
+    const periods = {
+      now: { label: 'This year', color: '#4e75ff' },
+      before: { label: 'Last year', color: '#4e75ff', indicator: 'dashed', opacity: 0.5 },
+    } satisfies ChartConfig
+    const payload = [
+      { dataKey: 'now', value: 10, color: '#4e75ff' },
+      { dataKey: 'before', value: 8, color: '#4e75ff' },
+    ]
+    const { container } = render(
+      <ChartContainer config={periods}>
+        <ChartTooltipContent active payload={payload} indicator="line" />
+        <ChartLegendContent payload={payload} />
+      </ChartContainer>
+    )
+    const shapes = (scope: string) =>
+      [...container.querySelectorAll(`${scope} .mz-chart__swatch`)].map((el) => [
+        el.getAttribute('data-indicator'),
+        (el as HTMLElement).style.opacity,
+      ])
+    // The tooltip's own `indicator` is the default; the config wins per series.
+    expect(shapes('[data-slot="chart-tooltip"]')).toEqual([['line', ''], ['dashed', '0.5']])
+    expect(shapes('[data-slot="chart-legend"]')).toEqual([['dot', ''], ['dashed', '0.5']])
+  })
+
   it('names a slice from a field inside the datum', () => {
     // A pie has one series and many slices: the config key lives in the datum,
     // not in dataKey, which is the whole reason nameKey exists.

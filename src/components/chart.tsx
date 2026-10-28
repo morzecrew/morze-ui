@@ -36,6 +36,15 @@ import { cn } from '../lib/utils'
 export type ChartSeriesConfig = {
   label?: React.ReactNode
   icon?: React.ComponentType<{ className?: string }>
+  /**
+   * How the series is keyed in the legend and the tooltip: `dot` (default),
+   * or a `line` / `dashed` stroke for a series drawn as one — a compared
+   * period drawn dashed was otherwise a second identical dot. Overrides the
+   * tooltip's own `indicator` for this series.
+   */
+  indicator?: 'dot' | 'line' | 'dashed'
+  /** The series' opacity, carried onto its key — a faded comparison line. */
+  opacity?: number
 } & ({ color?: string; theme?: never } | { color?: never; theme: { light: string; dark: string } })
 
 export type ChartConfig = Record<string, ChartSeriesConfig>
@@ -207,10 +216,7 @@ function ChartTooltipContent({
                 series?.icon ? (
                   <series.icon className="mz-chart__tooltip-icon" />
                 ) : (
-                  <span
-                    className={cn('mz-chart__swatch', `mz-chart__swatch--${indicator}`)}
-                    style={{ '--mz-chart-color': color } as React.CSSProperties}
-                  />
+                  <Swatch color={color} indicator={series?.indicator ?? indicator} opacity={series?.opacity} />
                 )
               ) : null}
               <span className="mz-chart__tooltip-name">{name}</span>
@@ -255,10 +261,7 @@ function ChartLegendContent({
               series?.icon ? (
                 <series.icon className="mz-chart__tooltip-icon" />
               ) : (
-                <span
-                  className="mz-chart__swatch mz-chart__swatch--dot"
-                  style={{ '--mz-chart-color': color } as React.CSSProperties}
-                />
+                <Swatch color={color} indicator={series?.indicator ?? 'dot'} opacity={series?.opacity} />
               )
             ) : null}
             {series?.label ?? item.name ?? key}
@@ -266,6 +269,25 @@ function ChartLegendContent({
         )
       })}
     </div>
+  )
+}
+
+/** A series' key: its colour, in the shape the series is drawn. */
+function Swatch({
+  color,
+  indicator,
+  opacity,
+}: {
+  color: string
+  indicator: 'dot' | 'line' | 'dashed'
+  opacity?: number
+}) {
+  return (
+    <span
+      data-indicator={indicator}
+      className={cn('mz-chart__swatch', `mz-chart__swatch--${indicator}`)}
+      style={{ '--mz-chart-color': color, opacity } as React.CSSProperties}
+    />
   )
 }
 

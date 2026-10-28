@@ -79,7 +79,9 @@
   border-radius: 2px;
 }
 .mz-chart__swatch--dot { width: 9px; height: 9px; border-radius: var(--mz-radius-pill); }
-.mz-chart__swatch--line { width: 12px; height: 3px; }
+/* 12×2: a stroke's key, the width a legend needs to tell a solid line from a
+   dashed one at a glance (#21). */
+.mz-chart__swatch--line { width: 12px; height: 2px; }
 .mz-chart__swatch--dashed {
   width: 12px;
   height: 0;
