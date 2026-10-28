@@ -1055,6 +1055,34 @@ server component. `@morze/ui/locales/en` is the same shape for English, and
   descendant selectors: your own markup inside a `Card` or `Dialog` keeps its
   box model and typography.
 
+## Testing an application built on the kit
+
+jsdom implements none of `ResizeObserver`, `IntersectionObserver`,
+`matchMedia`, `scrollIntoView` or pointer capture. The kit's own components
+guard their calls and simply stop measuring without them; Radix and a charting
+library under `ChartContainer` do not. `@morze/ui/testing` installs inert
+stand-ins for whatever the environment is missing — and leaves anything it
+already has alone, so it is harmless under happy-dom too:
+
+```ts
+// vitest.config.ts
+export default defineConfig({
+  test: { environment: 'jsdom', setupFiles: ['@morze/ui/testing/setup'] },
+})
+```
+
+Or call it yourself and keep the teardown:
+
+```ts
+import { setupJsdom } from '@morze/ui/testing'
+const restore = setupJsdom()
+```
+
+The stand-ins measure nothing: an observer never fires and a media query never
+matches, so the layout is the desktop one. Layout itself — auto-fit, overflow,
+the sticky header — needs a real engine; see `npm run test:browser` below for
+how the kit tests its own.
+
 ## Next.js
 
 The bundle is marked `"use client"` — import components into client parts and

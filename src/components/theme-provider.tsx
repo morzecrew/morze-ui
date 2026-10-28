@@ -80,6 +80,7 @@ function MorzeThemeProvider({
       return
     }
     setResolved(systemTheme())
+    if (typeof window.matchMedia !== 'function') return
     const mql = window.matchMedia('(prefers-color-scheme: light)')
     const onChange = () => setResolved(systemTheme())
     mql.addEventListener('change', onChange)

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 
 import { cn, type Tone } from '../lib/utils'
+import { observeResize } from '../lib/observe-resize'
 import { ChevronDownIcon, EllipsisIcon } from '../lib/icons'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './dropdown-menu'
 
@@ -95,12 +96,10 @@ function TabsListWithMenu({
     const el = containerRef.current
     if (!el) return
     setContainerWidth(el.getBoundingClientRect().width)
-    const observer = new ResizeObserver((entries) => {
+    return observeResize(el, (entries) => {
       const entry = entries[0]
       if (entry) setContainerWidth(entry.contentRect.width)
     })
-    observer.observe(el)
-    return () => observer.disconnect()
   }, [])
 
   React.useLayoutEffect(() => {

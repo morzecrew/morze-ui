@@ -23,7 +23,8 @@
   },
   "type": "module",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./dist/testing/setup.*"
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -48,6 +49,16 @@
       "types": "./dist/locales/ru.d.ts",
       "import": "./dist/locales/ru.js",
       "require": "./dist/locales/ru.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.cjs"
+    },
+    "./testing/setup": {
+      "types": "./dist/testing/setup.d.ts",
+      "import": "./dist/testing/setup.js",
+      "require": "./dist/testing/setup.cjs"
     },
     "./styles.css": "./dist/morze-ui.css",
     "./tokens.css": "./dist/morze-ui-tokens.css",

@@ -3,7 +3,15 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   // Locales are separate entries so a host pays for the language it imports —
   // they are plain data and pull in nothing from the component bundle.
-  entry: ['src/index.ts', 'src/form/index.tsx', 'src/locales/en.ts', 'src/locales/ru.ts'],
+  // The testing helpers too: a host's test setup should not pull in React.
+  entry: [
+    'src/index.ts',
+    'src/form/index.tsx',
+    'src/locales/en.ts',
+    'src/locales/ru.ts',
+    'src/testing/index.ts',
+    'src/testing/setup.ts',
+  ],
   format: ['esm', 'cjs'],
   dts: true,
   sourcemap: true,

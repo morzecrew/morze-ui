@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { observeResize } from '../../lib/observe-resize'
+
 /* --------------------------------------------------------------------------
    Virtual rows (G-06).
 
@@ -111,11 +113,10 @@ export function useVirtualRows<T>({
     }
     update()
     scroller.addEventListener('scroll', update, { passive: true })
-    const observer = new ResizeObserver(update)
-    observer.observe(scroller)
+    const unobserve = observeResize(scroller, update)
     return () => {
       scroller.removeEventListener('scroll', update)
-      observer.disconnect()
+      unobserve()
     }
   }, [virtualOn, rowHeight, overscan, data.length, scrollerRef])
 

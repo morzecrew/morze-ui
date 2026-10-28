@@ -46,6 +46,11 @@ on GitHub, one entry per issue.
   portalled content), and removes it from `<html>` on unmount. erp read
   `useSidebar()` and wrote the variable itself, with `16rem` / `3.5rem`
   hardcoded.
+- **`@morze/ui/testing`** (#10) — `setupJsdom()` installs inert
+  `ResizeObserver`, `IntersectionObserver`, `matchMedia`, `scrollIntoView` and
+  pointer-capture stand-ins wherever the environment has none, and returns the
+  teardown; `@morze/ui/testing/setup` does it on import, for `setupFiles`. erp
+  carried its own copy of these stubs in three test files.
 
 ### Changed
 
@@ -76,6 +81,11 @@ on GitHub, one entry per issue.
   trigger now draws `aria-invalid="true"` the way an input does (danger rim,
   danger focus glow), and the four fields forward `aria-invalid` and
   `aria-describedby` to it, so `FormControl` reaches them too.
+- **The kit mounts in jsdom** (#10). `TabsList`'s overflow and `DataTable`'s
+  fit, edge shadows and window constructed a `ResizeObserver` unguarded, and
+  `useIsMobile` / the `system` theme called `matchMedia` — so a jsdom test
+  threw before its first assertion. Each call is guarded now; without the API
+  the component simply stops re-measuring.
 
 ## [0.5.0] — 2026-09-13
 

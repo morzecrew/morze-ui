@@ -11,6 +11,8 @@ export function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = React.useState(false)
 
   React.useEffect(() => {
+    // jsdom has no matchMedia; without one the layout stays desktop.
+    if (typeof window.matchMedia !== 'function') return
     const query = window.matchMedia(`(max-width: ${breakpoint - 1}px)`)
     const update = () => setIsMobile(query.matches)
     update()

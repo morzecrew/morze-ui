@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { observeResize } from '../../lib/observe-resize'
 import {
   AlertIcon,
   ArrowDownIcon,
@@ -347,9 +348,7 @@ export function DataTable<T>({
       fitTo(available)
     }
     run()
-    const observer = new ResizeObserver(run)
-    observer.observe(scroller)
-    return () => observer.disconnect()
+    return observeResize(scroller, run)
     // `fitEpoch` is bumped by a layout reset: every column is flexible again
     // and nothing about the container has changed, so nothing else would
     // trigger the fit that has to follow.
@@ -376,11 +375,10 @@ export function DataTable<T>({
     }
     update()
     scroller.addEventListener('scroll', update, { passive: true })
-    const observer = new ResizeObserver(update)
-    observer.observe(scroller)
+    const unobserve = observeResize(scroller, update)
     return () => {
       scroller.removeEventListener('scroll', update)
-      observer.disconnect()
+      unobserve()
     }
   }, [visible.length, data.length])
 
