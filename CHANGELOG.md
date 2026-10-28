@@ -23,6 +23,14 @@ on GitHub, one entry per issue.
   grows to fit; `buttonVariants({ wrap: true })` carries it onto anything
   styled as a button. erp put the padding back by hand on a trigger that
   lists the chosen records (`h-auto min-h-10 py-2 whitespace-normal`).
+- **`DialogContent` — `position="top"`** (#7), passed through by
+  `CommandDialog`. The panel is pinned `--mz-dialog-top` (16px, the gutter
+  `size="full"` leaves) below the top of the viewport and grows downward to the
+  bottom gutter, with an entrance of its own that does not dip below the top.
+  A centred search panel jumped up and down under the reader's typing, so erp
+  built its global search from its own overlay and panel, and re-did the
+  backdrop click and the close button with them. Focus trapping, Escape and
+  `aria-modal` are the centred dialog's.
 
 ### Changed
 

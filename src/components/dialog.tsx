@@ -39,6 +39,7 @@ function DialogContent({
   className,
   children,
   size = 'md',
+  position = 'center',
   showCloseButton = true,
   closeLabel = 'Close',
   ...props
@@ -49,6 +50,13 @@ function DialogContent({
    * `md`, so anything else meant a `max-width` through `className`.
    */
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  /**
+   * `center` (default) centres the dialog. `top` pins it a gutter below the
+   * top of the viewport (`--mz-dialog-top`, 16px) and lets it grow downward —
+   * for a search or command panel whose height changes as results arrive,
+   * which jumps up and down under the reader's typing when centred.
+   */
+  position?: 'center' | 'top'
   showCloseButton?: boolean
   closeLabel?: string
 }) {
@@ -58,6 +66,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         data-size={size}
+        data-position={position}
         className={cn('mz-panel mz-dialog-content', className)}
         {...props}
       >

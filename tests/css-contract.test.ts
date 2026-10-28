@@ -1095,4 +1095,15 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     // After the focus rule, or focus would put the tone rim back.
     expect(at('.mz-select-trigger[aria-invalid=true]')).toBeGreaterThan(at('.mz-select-trigger:focus-visible'))
   })
+
+  it('pins a top dialog below the gutter and keeps it there while it opens (#7)', () => {
+    const top = css.match(/\.mz-dialog-content\[data-position=top\]\{([^}]*)\}/)?.[1] ?? ''
+    expect(top).toContain('top:var(--mz-dialog-top,16px)')
+    // Only the horizontal centring is left: a vertical translate is what a
+    // centred dialog moves by when its height changes.
+    expect(top).toMatch(/transform:translate(X)?\(-50%(,\s*0)?\)/)
+    // Its own keyframes, or the centred entrance would yank it to -50%.
+    expect(css).toMatch(/@keyframes mz-dialog-top-in\{[^@]*to\{[^}]*translate\(-50%(,\s*0)?\)/)
+    expect(css).toContain('.mz-dialog-content[data-position=top][data-state=open]{animation-name:mz-dialog-top-in}')
+  })
 })

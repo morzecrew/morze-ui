@@ -250,6 +250,29 @@
   to { opacity: 0; transform: translate(-50%, -46%) scale(0.96) }
 }
 
+/* Top-anchored: for a search or command panel whose height follows its
+   results. Centred, such a panel moves up and down under the reader's typing;
+   pinned at the top it only grows downward. The gutter is the one `full`
+   leaves, as a token so a host can drop the panel lower (12vh is common). The
+   scale grows from the top edge, so the entrance does not dip below it. */
+.mz-dialog-content[data-position='top'] {
+  top: var(--mz-dialog-top, 16px);
+  transform: translateX(-50%);
+  transform-origin: top center;
+  max-height: calc(100dvh - var(--mz-dialog-top, 16px) - 16px);
+}
+.mz-dialog-content[data-position='top'][data-state='open'] { animation-name: mz-dialog-top-in; }
+.mz-dialog-content[data-position='top'][data-state='closed'] { animation-name: mz-dialog-top-out; }
+
+@keyframes mz-dialog-top-in {
+  from { opacity: 0; transform: translate(-50%, -8px) scale(0.98) }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1) }
+}
+@keyframes mz-dialog-top-out {
+  from { opacity: 1; transform: translate(-50%, 0) scale(1) }
+  to { opacity: 0; transform: translate(-50%, -8px) scale(0.98) }
+}
+
 .mz-dialog-header { display: flex; flex-direction: column; gap: 6px; text-align: left; }
 .mz-dialog-title { font-family: var(--mz-font-display); font-size: 18px; font-weight: 700; line-height: 1.3; }
 .mz-dialog-description { font-size: 14px; color: var(--mz-text-dim); }

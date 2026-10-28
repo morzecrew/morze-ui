@@ -313,6 +313,11 @@ export type CommandDialogProps = React.ComponentProps<typeof Dialog> & {
    * application has agreed on. `null` leaves the shortcut to the host.
    */
   shortcut?: string | null
+  /**
+   * Where the palette sits — see `DialogContent`. `top` keeps the search box
+   * still while the list under it grows and shrinks with every keystroke.
+   */
+  position?: 'center' | 'top'
   className?: string
   filter?: CommandFilter
   children: React.ReactNode
@@ -325,6 +330,7 @@ function CommandDialog({
   shortcut = 'k',
   open: controlled,
   onOpenChange,
+  position,
   className,
   filter,
   children,
@@ -360,7 +366,7 @@ function CommandDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen} {...props}>
-      <DialogContent size="lg" className={cn('mz-command-dialog', className)}>
+      <DialogContent size="lg" position={position} className={cn('mz-command-dialog', className)}>
         <DialogTitle className={showTitle ? undefined : 'mz-sr-only'}>{title}</DialogTitle>
         <DialogDescription className="mz-sr-only">{description}</DialogDescription>
         <Command filter={filter}>{children}</Command>

@@ -571,6 +571,35 @@ describe('Dialog and Sheet sizing (K-02, V-09)', () => {
     expect(await screen.findByRole('dialog')).toHaveAttribute('data-size', 'lg')
   })
 
+  // A centred search panel jumps up and down as its results change (#7).
+  it('pins a dialog to the top when asked, and stays a modal dialog', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(
+      <Dialog defaultOpen onOpenChange={onOpenChange}>
+        <DialogContent position="top" size="xl">
+          <DialogTitle>Search</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    )
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveAttribute('data-position', 'top')
+    expect(dialog).toHaveAttribute('data-size', 'xl')
+    await user.keyboard('{Escape}')
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('centres a dialog by default', async () => {
+    render(
+      <Dialog defaultOpen>
+        <DialogContent>
+          <DialogTitle>Plain</DialogTitle>
+        </DialogContent>
+      </Dialog>
+    )
+    expect(await screen.findByRole('dialog')).toHaveAttribute('data-position', 'center')
+  })
+
   it('gives a sheet a body with the padding its header already had', async () => {
     render(
       <Sheet defaultOpen>
@@ -1102,6 +1131,17 @@ describe('the command palette (K-11)', () => {
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
     // And it is a dialog with a name, not an unlabelled box.
     expect(screen.getByRole('dialog', { name: 'Command palette' })).toBeInTheDocument()
+  })
+
+  it('hands its position to the dialog (#7)', async () => {
+    render(
+      <CommandDialog open position="top">
+        <CommandList>
+          <CommandItem value="New order">New order</CommandItem>
+        </CommandList>
+      </CommandDialog>
+    )
+    expect(await screen.findByRole('dialog')).toHaveAttribute('data-position', 'top')
   })
 })
 

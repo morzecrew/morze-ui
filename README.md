@@ -350,7 +350,10 @@ What this kit adds on top:
 - `SelectTrigger` — `size`: `sm` `md` `lg`, the same 34/40/48 scale, so a
   select stands in a row with an `inputSize="lg"` field.
 - `Dialog` — `size`: `sm` (24rem) `md` (32, default) `lg` (44) `xl` (60)
-  `full`.
+  `full`; `position`: `center` (default) or `top`. A top dialog is pinned
+  `--mz-dialog-top` (16px) below the top edge and grows downward, which is what
+  a search panel wants: centred, it jumps up and down as its results arrive.
+  Focus trapping, Escape, the backdrop click and `aria-modal` are the same.
 - `Sheet` — `size`: `sm` `md` `lg` `xl` `full` (width on the side edges, height
   on the top and bottom ones), and `SheetBody` for the scrolling middle, with
   the padding the header and footer already had.
@@ -400,9 +403,11 @@ What this kit adds on top:
   each item's `value` plus its `keywords`, hides a group whose items have all
   been filtered away, and runs the highlighted item on Enter through its own
   click — so an item wrapped in a link behaves like the link it is.
+  `position="top"` keeps the search box still while the list under it changes
+  height.
 
   ```tsx
-  <CommandDialog>
+  <CommandDialog position="top">
     <CommandInput placeholder="Type a command…" />
     <CommandList>
       <CommandEmpty>Nothing matches</CommandEmpty>
