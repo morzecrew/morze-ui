@@ -52,6 +52,14 @@
     0 0 0 3px rgba(var(--mz-tone-rgb), 0.22),
     0 10px 30px -14px rgba(var(--mz-tone-rgb), 0.45);
 }
+/* The error state, the input's own: a danger rim at rest, and the tone
+   re-pointed so focus and the open list glow danger too. Without it a missing
+   required choice looked exactly like a valid one (#11). Covers `Select`,
+   `Combobox`, `MultiSelect` and the date fields — all four wear this trigger. */
+.mz-select-trigger[aria-invalid='true'] {
+  --mz-tone-rgb: var(--mz-danger-rgb);
+  border-color: rgba(var(--mz-danger-rgb), 0.6);
+}
 .mz-select-trigger[data-placeholder] { color: var(--mz-text-muted); }
 .mz-select-trigger[data-disabled] { opacity: 0.5; cursor: not-allowed; }
 .mz-select-trigger__icon {

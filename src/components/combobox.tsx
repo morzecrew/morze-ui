@@ -99,6 +99,14 @@ type BaseProps = {
   onOpenChange?: (open: boolean) => void
   'aria-label'?: string
   'aria-labelledby'?: string
+  /**
+   * The field's error state, drawn the way an `Input` draws it — a danger rim
+   * at rest, a danger glow on focus. Forwarded to the trigger, so a form's
+   * `FormControl` reaches it too.
+   */
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  /** The hint or the error message under the field, read after its value. */
+  'aria-describedby'?: string
 }
 
 type OptionList = {
@@ -408,6 +416,8 @@ function Field({
   panelClassName,
   ariaLabel,
   ariaLabelledby,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedby,
   onClear,
   trigger,
   children,
@@ -426,6 +436,8 @@ function Field({
   panelClassName?: string
   ariaLabel?: string
   ariaLabelledby?: string
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  'aria-describedby'?: string
   onClear: () => void
   trigger: React.ReactNode
   children: React.ReactNode
@@ -449,6 +461,8 @@ function Field({
             aria-controls={listId}
             aria-label={ariaLabel}
             aria-labelledby={ariaLabelledby}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
             className={cn(
               'mz-select-trigger mz-combobox__trigger',
               size === 'sm' && 'mz-select-trigger--sm',

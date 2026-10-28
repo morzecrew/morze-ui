@@ -767,6 +767,26 @@ describe('Combobox and MultiSelect (K-11)', () => {
     { value: 'nsk', label: 'Novosibirsk' },
   ]
 
+  // A missing required choice looked exactly like a valid one: the props
+  // were a fixed list and the error never reached the trigger (#11).
+  it('puts the error state and its message on the trigger', () => {
+    render(
+      <>
+        <Combobox options={cities} aria-invalid aria-describedby="city-error" aria-label="City" />
+        <MultiSelect options={cities} aria-invalid="true" aria-label="Cities" />
+        <DatePicker aria-invalid aria-describedby="day-error" />
+      </>
+    )
+    const city = screen.getByRole('combobox', { name: 'City' })
+    expect(city).toHaveAttribute('aria-invalid', 'true')
+    expect(city).toHaveAttribute('aria-describedby', 'city-error')
+    expect(city).toHaveClass('mz-select-trigger')
+    expect(screen.getByRole('combobox', { name: 'Cities' })).toHaveAttribute('aria-invalid', 'true')
+    const day = document.querySelector('.mz-datefield__trigger')
+    expect(day).toHaveAttribute('aria-invalid', 'true')
+    expect(day).toHaveAttribute('aria-describedby', 'day-error')
+  })
+
   it('filters the list it was given and reports the pick', async () => {
     const onChange = vi.fn()
     const user = userEvent.setup()

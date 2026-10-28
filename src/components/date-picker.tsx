@@ -57,6 +57,9 @@ type FieldProps = Pick<
   className?: string
   /** Width of the popover's calendar in months. */
   numberOfMonths?: number
+  /** The error state, drawn the way an `Input` draws it; set on the trigger. */
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  'aria-describedby'?: string
 }
 
 function Field({
@@ -72,6 +75,8 @@ function Field({
   placeholder,
   id,
   className,
+  'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedby,
   onClear,
   children,
 }: {
@@ -87,6 +92,8 @@ function Field({
   placeholder: string
   id?: string
   className?: string
+  'aria-invalid'?: React.AriaAttributes['aria-invalid']
+  'aria-describedby'?: string
   onClear: () => void
   children: React.ReactNode
 }) {
@@ -101,6 +108,8 @@ function Field({
             data-size={size}
             data-placeholder={filled ? undefined : true}
             aria-label={labels.open}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedby}
             className={cn(
               'mz-select-trigger mz-datefield__trigger',
               size === 'sm' && 'mz-select-trigger--sm',

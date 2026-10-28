@@ -1086,4 +1086,13 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     expect(css).toMatch(/\.mz-btn--link\{[^}]*min-height:0/)
     expect(css).toMatch(/\.mz-btn--wrap\{[^}]*white-space:normal/)
   })
+
+  it('draws an invalid select trigger the way it draws an invalid input (#11)', () => {
+    const invalid = css.match(/\.mz-select-trigger\[aria-invalid=true\]\{([^}]*)\}/)?.[1] ?? ''
+    expect(invalid).toMatch(/border-color:/)
+    // The tone moves with it, so focus and the open list glow danger too.
+    expect(invalid).toMatch(/--mz-tone(-rgb)?:var\(--mz-danger/)
+    // After the focus rule, or focus would put the tone rim back.
+    expect(at('.mz-select-trigger[aria-invalid=true]')).toBeGreaterThan(at('.mz-select-trigger:focus-visible'))
+  })
 })

@@ -601,6 +601,17 @@ does not reserve a blank line under every input.
 Without React Hook Form, `Field` / `FieldHint` / `FieldError` from the main
 entry are the same layout with none of the binding.
 
+**The error state is `aria-invalid="true"`**, on every field the kit draws:
+`Input`, `Textarea`, `SelectTrigger`, `Combobox`, `MultiSelect`, `DatePicker`
+and `DateRangePicker` all turn their rim danger at rest and glow danger on
+focus. The select-like fields forward `aria-invalid` and `aria-describedby` to
+their trigger, so `FormControl` reaches them, and so does a hand-wired form:
+
+```tsx
+<Combobox options={suppliers} aria-invalid={!supplier} aria-describedby="supplier-error" />
+<FieldError id="supplier-error">Pick a supplier</FieldError>
+```
+
 ## Sidebar
 
 A navigation column: it collapses into an icon rail, turns into a sliding sheet

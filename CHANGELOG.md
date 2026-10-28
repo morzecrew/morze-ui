@@ -44,6 +44,15 @@ on GitHub, one entry per issue.
   (`vertical` | `horizontal` | `both`); left out, it is `both` when a
   horizontal `ScrollBar` is among the children and `vertical` otherwise, so
   an existing two-way area keeps scrolling sideways.
+- **`Select`, `Combobox`, `MultiSelect` and the date fields have an error
+  state** (#11). `.mz-input[aria-invalid=true]` turned an input's rim danger,
+  but the select trigger had no such rule, and `Combobox` / `MultiSelect` /
+  `DatePicker` / `DateRangePicker` took a fixed list of props with no way to
+  put the attribute on their trigger at all — a missing required choice looked
+  exactly like a valid one, and erp drew a ring on a wrapper instead. The
+  trigger now draws `aria-invalid="true"` the way an input does (danger rim,
+  danger focus glow), and the four fields forward `aria-invalid` and
+  `aria-describedby` to it, so `FormControl` reaches them too.
 
 ## [0.5.0] — 2026-09-13
 
