@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { warnIfFontMissing } from '../lib/font-check'
+import { DEFAULT_THEME_STORAGE_KEY } from '../theme-script'
 
 export type MorzeTheme = 'dark' | 'light' | 'system'
 export type MorzeDensity = 'default' | 'comfortable' | 'compact'
@@ -37,10 +38,29 @@ function writeStored(key: string | null, theme: MorzeTheme) {
   }
 }
 
+/**
+ * What the system asks for. Without `matchMedia` to ask, whatever <html>
+ * already says — a pre-paint script, a server-rendered attribute — and only
+ * then the dark default (#26).
+ */
 function systemTheme(): 'dark' | 'light' {
-  if (typeof window === 'undefined' || !window.matchMedia) return 'dark'
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  if (typeof window === 'undefined') return 'dark'
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  }
+  const root = document.documentElement
+  const said = root.getAttribute('data-mz-theme')
+  if (said === 'light' || said === 'dark') return said
+  return root.classList.contains('light') ? 'light' : 'dark'
 }
+
+/**
+ * Layout effects on the client: the stored and the system theme settle, and
+ * <html> is written, before the browser paints the mounted tree — not one
+ * frame after it, which is the dark flash. A plain effect on the server,
+ * where neither runs.
+ */
+const useBeforePaint = typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect
 
 type MorzeThemeProviderProps = {
   children: React.ReactNode
@@ -87,28 +107,29 @@ function MorzeThemeProvider({
   defaultTheme = 'dark',
   theme: controlled,
   onThemeChange,
-  storageKey = 'morze-ui-theme',
+  storageKey = DEFAULT_THEME_STORAGE_KEY,
   target = 'html',
   attribute = 'data-mz-theme',
   density = 'default',
   className,
 }: MorzeThemeProviderProps) {
   // Both the server and the first client render start from defaultTheme; the
-  // stored/system preference is applied after mount. Reading storage during
-  // render would make the markup disagree with the server and break hydration.
+  // stored/system preference is applied after mount — before paint, in a
+  // layout effect. Reading storage during render would make the markup
+  // disagree with the server and break hydration.
   const [internal, setInternal] = React.useState<MorzeTheme>(defaultTheme)
   const theme = controlled ?? internal
   const [systemResolved, setSystemResolved] = React.useState<'dark' | 'light'>('dark')
   const resolved = theme === 'system' ? systemResolved : theme
 
   const isControlled = controlled !== undefined
-  React.useEffect(() => {
+  useBeforePaint(() => {
     if (isControlled) return
     const stored = readStored(storageKey)
     if (stored) setInternal(stored)
   }, [storageKey, isControlled])
 
-  React.useEffect(() => {
+  useBeforePaint(() => {
     if (theme !== 'system') return
     setSystemResolved(systemTheme())
     if (typeof window.matchMedia !== 'function') return
@@ -118,16 +139,24 @@ function MorzeThemeProvider({
     return () => mql.removeEventListener('change', onChange)
   }, [theme])
 
-  React.useEffect(() => {
+  // What lands on <html> is worked out from the sources, not from state: on
+  // the mount pass the state still holds defaultTheme and a 'dark' guess for
+  // `system`, and writing those overwrote what a pre-paint script had just
+  // set — the flash this was meant to prevent (#26). Uncontrolled, storage
+  // is the source: every setTheme writes it, so it only differs from
+  // `internal` on that first pass.
+  useBeforePaint(() => {
     if (target !== 'html' || typeof document === 'undefined') return
+    const current = isControlled ? theme : (readStored(storageKey) ?? theme)
+    const painted = current === 'system' ? systemTheme() : current
     const root = document.documentElement
     if (attribute === 'class') {
-      root.classList.remove(resolved === 'dark' ? 'light' : 'dark')
-      root.classList.add(resolved)
+      root.classList.remove(painted === 'dark' ? 'light' : 'dark')
+      root.classList.add(painted)
     } else {
-      root.setAttribute('data-mz-theme', resolved)
+      root.setAttribute('data-mz-theme', painted)
     }
-  }, [resolved, target, attribute])
+  }, [resolved, theme, isControlled, storageKey, target, attribute])
 
   React.useEffect(() => {
     if (target !== 'html' || typeof document === 'undefined' || density === 'default') return

@@ -11,6 +11,8 @@ export default defineConfig({
     'src/locales/ru.ts',
     'src/testing/index.ts',
     'src/testing/setup.ts',
+    // No "use client": a server component calls it to render the head.
+    'src/theme-script.ts',
   ],
   format: ['esm', 'cjs'],
   dts: true,

@@ -97,10 +97,28 @@ const { resolvedTheme, setTheme } = useMorzeTheme()
 setTheme('light') // 'dark' | 'light' | 'system'
 ```
 
-The first render is always `defaultTheme`; the stored preference is applied in
-an effect after mount, so server and client markup agree and hydration does not
-break. Storage access is wrapped in try/catch — with site data blocked the
-theme simply does not persist.
+The first render is always `defaultTheme`, so server and client markup agree
+and hydration does not break; the stored and the system preference are applied
+in a layout effect, before the mounted page paints. What the provider writes to
+`<html>` is worked out from storage and `matchMedia` directly, so it never
+passes through a `dark` guess on the way. Storage access is wrapped in
+try/catch — with site data blocked the theme simply does not persist.
+
+The page still paints once before the bundle runs. **`themeScript()`** is the
+provider's own logic as an inline script for the head: same storage key, same
+`system` resolution, same attribute, so a light-system user's first frame is
+already light. Its entry has no `"use client"`, so a server component can call
+it:
+
+```tsx
+import { themeScript } from '@morze/ui/theme-script'
+
+<head>
+  <script dangerouslySetInnerHTML={{ __html: themeScript({ defaultTheme: 'system' }) }} />
+</head>
+```
+
+Pass it what you pass the provider (`storageKey`, `defaultTheme`, `attribute`).
 
 The provider renders a wrapper with the `mz-root` class (background and text
 colour from the tokens). By default `data-mz-theme` is written to `<html>`, so

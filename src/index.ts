@@ -11,6 +11,8 @@ export { panelClass, overlayClass } from './lib/surfaces'
 
 export { MorzeThemeProvider, useMorzeTheme } from './components/theme-provider'
 export type { MorzeTheme, MorzeDensity, MorzeThemeProviderProps } from './components/theme-provider'
+export { themeScript } from './theme-script'
+export type { ThemeScriptOptions } from './theme-script'
 export { MorzeLocaleProvider, useMorzeLocale } from './components/locale-provider'
 export type { MorzeLocaleProviderProps } from './components/locale-provider'
 

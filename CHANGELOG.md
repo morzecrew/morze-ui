@@ -132,6 +132,11 @@ issue.
   that forgot to load it got the OS's face without a word. `MorzeThemeProvider`
   now also warns once in development when the first family in the stack is
   not available.
+- **`themeScript()`** (#26), from `@morze/ui/theme-script` (no `"use client"`,
+  so a server component can call it) and the main entry: the provider's theme
+  logic as an inline head script — the same storage key, `system` resolution
+  and attribute — so the first frame is right before the bundle loads. Hosts
+  hand-wrote this script and kept it in step with the provider by hand.
 
 ### Changed
 
@@ -231,6 +236,14 @@ issue.
   and 3.64:1 on the page under the sidebar; it is cut from `#6a6a6a` now
   (5.46 / 4.59:1). Dark passed on the page but fell to 4.19:1 on an elevated
   panel — a dialog, a menu — and moves from `#808080` to `#8a8a8a` (4.68:1).
+- **`MorzeThemeProvider` no longer flashes dark** (#26). With `system` it
+  resolved to `'dark'` first and wrote that to `<html>` in an effect after
+  paint — over whatever a pre-paint script had set — before it asked
+  `matchMedia`; a stored `light` was overwritten by the default the same way.
+  The stored and system theme now settle in layout effects, and the value
+  written to `<html>` is computed from storage and `matchMedia` directly, so
+  it is right on the first write. Without `matchMedia`, `system` keeps what
+  `<html>` already says.
 
 ## [0.5.0] — 2026-09-13
 

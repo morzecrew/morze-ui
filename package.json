@@ -50,6 +50,11 @@
       "import": "./dist/locales/ru.js",
       "require": "./dist/locales/ru.cjs"
     },
+    "./theme-script": {
+      "types": "./dist/theme-script.d.ts",
+      "import": "./dist/theme-script.js",
+      "require": "./dist/theme-script.cjs"
+    },
     "./testing": {
       "types": "./dist/testing/index.d.ts",
       "import": "./dist/testing/index.js",
