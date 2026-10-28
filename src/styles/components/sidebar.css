@@ -264,7 +264,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  height: 36px;
+  height: var(--mz-nav-item-h);
   padding: 0 8px;
   border: 1px solid transparent;
   border-radius: var(--mz-radius-sm);
@@ -356,7 +356,7 @@
   color: var(--mz-tone-fg);
 }
 
-.mz-sidebar__menu-skeleton { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 8px; }
+.mz-sidebar__menu-skeleton { display: flex; align-items: center; gap: 10px; height: var(--mz-nav-item-h); padding: 0 8px; }
 .mz-sidebar__menu-skeleton-icon { width: 17px; height: 17px; border-radius: 5px; flex-shrink: 0; }
 .mz-sidebar__menu-skeleton-text { height: 12px; }
 

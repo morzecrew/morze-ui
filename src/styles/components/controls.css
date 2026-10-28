@@ -228,16 +228,16 @@
    28px control's radius has to come down with it or the pill swallows the
    label. The rest of the scale is the shared 34/40/48. */
 .mz-toggle--xs {
-  height: 28px;
-  min-width: 28px;
+  height: var(--mz-control-h-xs);
+  min-width: var(--mz-control-h-xs);
   padding: 0 10px;
   font-size: var(--mz-text-xs);
   gap: 0.4em;
   border-radius: var(--mz-radius-sm);
 }
-.mz-toggle--sm { height: 34px; min-width: 34px; padding: 0 12px; font-size: var(--mz-text-sm); }
-.mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: var(--mz-text-md); }
-.mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: var(--mz-text-lg); }
+.mz-toggle--sm { height: var(--mz-control-h-sm); min-width: var(--mz-control-h-sm); padding: 0 12px; font-size: var(--mz-text-sm); }
+.mz-toggle--md { height: var(--mz-control-h); min-width: var(--mz-control-h); padding: 0 14px; font-size: var(--mz-text-md); }
+.mz-toggle--lg { height: var(--mz-control-h-lg); min-width: var(--mz-control-h-lg); padding: 0 20px; font-size: var(--mz-text-lg); }
 
 /* The secondary button's face, in the same two lines: flat colour, sheen hook. */
 .mz-toggle--outline {

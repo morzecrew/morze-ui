@@ -309,6 +309,43 @@ describe('MorzeThemeProvider', () => {
   })
 })
 
+// Only DataTable had a density, so a dense app mixed 34 and 40px controls
+// in one toolbar (#20).
+describe('MorzeThemeProvider density', () => {
+  it('writes the density where it writes the theme, and takes it back', () => {
+    const { unmount } = render(
+      <MorzeThemeProvider density="compact" storageKey={null}>
+        <span>x</span>
+      </MorzeThemeProvider>
+    )
+    expect(document.documentElement).toHaveAttribute('data-mz-density', 'compact')
+    unmount()
+    expect(document.documentElement).not.toHaveAttribute('data-mz-density')
+  })
+
+  it('scopes it to the wrapper with the theme', () => {
+    const { container } = render(
+      <MorzeThemeProvider target="element" density="comfortable" storageKey={null}>
+        <span>x</span>
+      </MorzeThemeProvider>
+    )
+    expect(container.querySelector('[data-slot="morze-root"]')).toHaveAttribute(
+      'data-mz-density',
+      'comfortable'
+    )
+    expect(document.documentElement).not.toHaveAttribute('data-mz-density')
+  })
+
+  it('writes nothing for the default', () => {
+    render(
+      <MorzeThemeProvider storageKey={null}>
+        <span>x</span>
+      </MorzeThemeProvider>
+    )
+    expect(document.documentElement).not.toHaveAttribute('data-mz-density')
+  })
+})
+
 describe('surface helpers (#6)', () => {
   it('names the classes a host composes its own surface from', () => {
     expect(panelClass).toBe('mz-panel')

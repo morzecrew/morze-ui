@@ -273,6 +273,31 @@ To bring back the landing's own look (pills plus mono caps):
 }
 ```
 
+## Density
+
+Every control shares one height scale, and the surfaces around them one
+spacing — so a dense app switches it once instead of mixing 34 and 40px
+controls in a toolbar:
+
+```tsx
+<MorzeThemeProvider density="compact">…</MorzeThemeProvider>
+```
+
+| Token | default | `comfortable` | `compact` |
+| --- | --- | --- | --- |
+| `--mz-control-h-xs` / `-sm` / `--mz-control-h` / `-lg` | 28 / 34 / 40 / 48 | 28 / 32 / 36 / 44 | 24 / 28 / 32 / 40 |
+| `--mz-row-h` (DataTable `normal`) | 44 | 40 | 32 |
+| `--mz-nav-item-h` (sidebar, navigation menu) | 36 | 36 | 32 |
+| `--mz-card-pad` / `--mz-card-gap` | 20 / 18 | 16 / 16 | 12 / 12 |
+
+Buttons, inputs, select-like triggers, toggles and tabs read the control
+heights; a button's vertical padding is worked out from its step, so one line
+still lands on it exactly and a wrapping label still grows it. The provider
+writes `data-mz-density` where it writes the theme (`<html>`, or its wrapper
+with `target="element"`); put the attribute on any element to scope a density
+to part of the page. `--mz-card-title-size` and `--mz-card-title-weight` set
+the card title. `DataTable`'s own `density` prop still works on top of this.
+
 ## States
 
 **Every control at rest belongs to one of three surfaces, and the hover belongs

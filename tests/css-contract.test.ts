@@ -649,9 +649,10 @@ describe('typography contracts', () => {
   })
 
   it('keeps the button compact while the label still has air', () => {
-    expect(css).toMatch(/\.mz-btn--md\{[^}]*min-height:40px[^}]*padding:8px 20px/)
+    expect(css).toMatch(/\.mz-btn--md\{[^}]*min-height:var\(--mz-control-h\)[^}]*padding:max\([^;]*\) 20px/)
     // The height scale stays shared with the fields, or controls stop lining up.
-    expect(css).toContain('.mz-input--sm{height:34px')
+    expect(css).toContain('.mz-input--sm{height:var(--mz-control-h-sm)')
+    expect(css).toMatch(/\.mz-select-trigger--sm\{height:var\(--mz-control-h-sm\)/)
   })
 })
 
@@ -1079,11 +1080,12 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
   it('lets a button grow for a label that wraps (#8)', () => {
     // A floor plus vertical padding: one line lands on the 34/40/48 scale,
     // two lines grow. A fixed height collapsed under `height: auto`.
-    for (const [size, floor] of [['xs', 28], ['sm', 34], ['md', 40], ['lg', 48]] as const) {
+    for (const [size, token] of [['xs', '-xs'], ['sm', '-sm'], ['md', ''], ['lg', '-lg']] as const) {
       const rule = css.match(new RegExp(`\\.mz-btn--${size}\\{([^}]*)\\}`))?.[1] ?? ''
-      expect(rule, size).toContain(`min-height:${floor}px`)
+      expect(rule, size).toContain(`min-height:var(--mz-control-h${token})`)
       expect(rule, size).not.toMatch(/(^|;)height:/)
-      expect(rule, size).toMatch(/padding:[1-9]\d*px /)
+      // Padding worked out from the step, so one line lands on it exactly.
+      expect(rule, size).toContain(`calc((var(--mz-control-h${token}) - var(--mz-text-${size}) * var(--mz-line))`)
     }
     // A link is text, not a control: it must not inherit the floor.
     expect(css).toMatch(/\.mz-btn--link\{[^}]*min-height:0/)
@@ -1202,5 +1204,28 @@ describe('the 2026-10 audit', () => {
       expect(css).toContain(`--mz-text-${step}:${size}px`)
       expect(css).toMatch(new RegExp(`--mz-leading-${step}:\\d+px`))
     }
+  })
+
+  it('sizes controls and surfaces from one density (#20)', () => {
+    // The defaults are the kit's own scale, so nothing moves without a switch.
+    for (const [token, value] of [
+      ['--mz-control-h-xs', 28],
+      ['--mz-control-h-sm', 34],
+      ['--mz-control-h', 40],
+      ['--mz-control-h-lg', 48],
+      ['--mz-row-h', 44],
+      ['--mz-nav-item-h', 36],
+      ['--mz-card-pad', 20],
+      ['--mz-card-gap', 18],
+    ] as const) {
+      expect(css).toContain(`${token}:${value}px`)
+    }
+    expect(css).toMatch(/\[data-mz-density=compact\]\{[^}]*--mz-control-h:32px/)
+    expect(css).toMatch(/\[data-mz-density=comfortable\]\{[^}]*--mz-control-h:36px/)
+    // And the components read them, not literals.
+    expect(css).toMatch(/\.mz-card\{[^}]*padding:var\(--mz-card-pad\)/)
+    expect(css).toMatch(/\.mz-sidebar__menu-button\{[^}]*height:var\(--mz-nav-item-h\)/)
+    expect(css).toMatch(/\.mz-dt\{[^}]*--mz-dt-row-h:var\(--mz-row-h\)/)
+    expect(css).toMatch(/\.mz-toggle--md\{[^}]*height:var\(--mz-control-h\)/)
   })
 })

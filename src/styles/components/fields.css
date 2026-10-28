@@ -47,7 +47,7 @@
   width: 100%;
   min-width: 0;
   padding: 0 12px;
-  height: 40px;
+  height: var(--mz-control-h);
   color: var(--mz-text);
   font-family: inherit;
   font-size: var(--mz-text-md);
@@ -96,8 +96,8 @@
   border-color: color-mix(in srgb, var(--mz-danger) 60%, transparent);
 }
 
-.mz-input--sm { height: 34px; font-size: var(--mz-text-sm); padding: 0 10px; }
-.mz-input--lg { height: 48px; font-size: var(--mz-text-lg); padding: 0 14px; }
+.mz-input--sm { height: var(--mz-control-h-sm); font-size: var(--mz-text-sm); padding: 0 10px; }
+.mz-input--lg { height: var(--mz-control-h-lg); font-size: var(--mz-text-lg); padding: 0 14px; }
 
 /* A textarea has no height on the scale, so its size is type and padding —
    and the minimum height it opens at. Without this it was the one field in a

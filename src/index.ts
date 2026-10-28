@@ -10,7 +10,7 @@ export type { Tone } from './lib/utils'
 export { panelClass, overlayClass } from './lib/surfaces'
 
 export { MorzeThemeProvider, useMorzeTheme } from './components/theme-provider'
-export type { MorzeTheme, MorzeThemeProviderProps } from './components/theme-provider'
+export type { MorzeTheme, MorzeDensity, MorzeThemeProviderProps } from './components/theme-provider'
 export { MorzeLocaleProvider, useMorzeLocale } from './components/locale-provider'
 export type { MorzeLocaleProviderProps } from './components/locale-provider'
 

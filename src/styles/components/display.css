@@ -41,7 +41,7 @@
   justify-content: center;
   gap: 0.5em;
   flex: 1 1 auto;
-  height: 34px;
+  height: var(--mz-control-h-sm);
   padding: 0 16px;
   cursor: pointer;
   white-space: nowrap;
@@ -143,8 +143,8 @@
 .mz-card {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 20px;
+  gap: var(--mz-card-gap);
+  padding: var(--mz-card-pad);
   border-radius: var(--mz-radius-lg);
   /* The plain surface step. The sheen above it is the `none` hook, still
      sized to the top 60px rather than the whole card: a tall card under a
@@ -172,7 +172,12 @@
   align-items: start;
   gap: 4px 12px;
 }
-.mz-card-title { font-family: var(--mz-font-display); font-size: var(--mz-text-lg); font-weight: 700; line-height: var(--mz-leading-lg); }
+.mz-card-title {
+  font-family: var(--mz-font-display);
+  font-size: var(--mz-card-title-size);
+  font-weight: var(--mz-card-title-weight);
+  line-height: var(--mz-leading-lg);
+}
 .mz-card-description { grid-column: 1; font-size: var(--mz-text-sm); color: var(--mz-text-dim); }
 .mz-card-action { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
 .mz-card-content { flex: 1; }

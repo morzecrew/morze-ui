@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 export type MorzeTheme = 'dark' | 'light' | 'system'
+export type MorzeDensity = 'default' | 'comfortable' | 'compact'
 
 type ThemeContextValue = {
   /** What was requested — may be `system`. */
@@ -70,6 +71,12 @@ type MorzeThemeProviderProps = {
    * `element` target always uses the data attribute.
    */
   attribute?: 'data-mz-theme' | 'class'
+  /**
+   * How much room controls and surfaces take, everywhere under the target:
+   * `compact` (32px controls, 12px card padding), `comfortable` (36px, 16px),
+   * or `default` — the kit's own 40px scale. Written as `data-mz-density`.
+   */
+  density?: MorzeDensity
   className?: string
 }
 
@@ -81,6 +88,7 @@ function MorzeThemeProvider({
   storageKey = 'morze-ui-theme',
   target = 'html',
   attribute = 'data-mz-theme',
+  density = 'default',
   className,
 }: MorzeThemeProviderProps) {
   // Both the server and the first client render start from defaultTheme; the
@@ -119,6 +127,13 @@ function MorzeThemeProvider({
     }
   }, [resolved, target, attribute])
 
+  React.useEffect(() => {
+    if (target !== 'html' || typeof document === 'undefined' || density === 'default') return
+    const root = document.documentElement
+    root.setAttribute('data-mz-density', density)
+    return () => root.removeAttribute('data-mz-density')
+  }, [density, target])
+
   const onThemeChangeRef = React.useRef(onThemeChange)
   onThemeChangeRef.current = onThemeChange
   const setTheme = React.useCallback(
@@ -143,6 +158,7 @@ function MorzeThemeProvider({
       <div
         data-slot="morze-root"
         data-mz-theme={target === 'element' ? resolved : undefined}
+        data-mz-density={target === 'element' && density !== 'default' ? density : undefined}
         className={['mz-root', className].filter(Boolean).join(' ')}
       >
         {children}

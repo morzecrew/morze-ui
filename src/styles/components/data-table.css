@@ -4,7 +4,7 @@
    ========================================================================== */
 
 .mz-dt {
-  --mz-dt-row-h: 44px;
+  --mz-dt-row-h: var(--mz-row-h);
   --mz-dt-cell-x: 14px;
   --mz-dt-font: var(--mz-text-md);
   position: relative;

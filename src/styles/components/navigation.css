@@ -108,7 +108,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
-  height: 36px;
+  height: var(--mz-nav-item-h);
   padding: 0 12px;
   border: 1px solid transparent;
   border-radius: var(--mz-radius);

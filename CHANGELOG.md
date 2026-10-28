@@ -113,6 +113,16 @@ issue.
   titles and the label take the step's leading. `--mz-th-font-size` and the
   table's `--mz-dt-font` point at the scale. The only literals left are glyphs
   sized to their box: an avatar's initials and the sort-order digit.
+- **Density for the whole kit** (#20): `MorzeThemeProvider density="compact" |
+  "comfortable"` writes `data-mz-density`, which switches `--mz-control-h-xs`
+  … `--mz-control-h-lg`, `--mz-row-h`, `--mz-nav-item-h`, `--mz-card-pad` and
+  `--mz-card-gap`. Buttons, inputs, select-like triggers, toggles, tabs, the
+  sidebar and navigation rows, cards and the table's row read them; the
+  defaults are today's sizes. A button's vertical padding is derived from its
+  step, so it lands on the step in every density (checked in Chrome by
+  `tests/density.browser.test.tsx`). `--mz-card-title-size` and
+  `--mz-card-title-weight` set the card title. Only `DataTable` had a density
+  before, so a dense app mixed 34 and 40px controls in one toolbar.
 
 ### Changed
 

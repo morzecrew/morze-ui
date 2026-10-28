@@ -528,6 +528,25 @@
   --mz-th-font-size: var(--mz-text-sm);
   --mz-th-weight: 600;
 
+  /* ---- Density ----
+     The heights everything you press shares, and the spacing of the surfaces
+     around them. They used to be literals per component, so only DataTable
+     had a density switch and a dense app ended up with 34 and 40px controls
+     in one toolbar (#20). The defaults are the kit's own scale (28/34/40/48);
+     `MorzeThemeProvider density` — or `data-mz-density` on any element —
+     switches the whole set below. */
+  --mz-control-h-xs: 28px;
+  --mz-control-h-sm: 34px;
+  --mz-control-h: 40px;
+  --mz-control-h-lg: 48px;
+  /* A table row (DataTable's `normal` density) and a navigation row. */
+  --mz-row-h: 44px;
+  --mz-nav-item-h: 36px;
+  --mz-card-pad: 20px;
+  --mz-card-gap: 18px;
+  --mz-card-title-size: var(--mz-text-lg);
+  --mz-card-title-weight: 700;
+
   /* ---- Geometry ----
      Rectangular by default: controls share one small radius, surfaces a
      slightly larger one. --mz-radius-pill is kept for what is round by
@@ -579,6 +598,29 @@
   /* ---- Focus ---- */
   --mz-ring-width: 2px;
   --mz-ring-offset: 2px;
+}
+
+/* Density. Plain lengths, so they inherit like any other value and a scope
+   deeper in the page (a dense side panel in a roomy app) works by itself. */
+[data-mz-density='comfortable'] {
+  --mz-control-h-xs: 28px;
+  --mz-control-h-sm: 32px;
+  --mz-control-h: 36px;
+  --mz-control-h-lg: 44px;
+  --mz-row-h: 40px;
+  --mz-nav-item-h: 36px;
+  --mz-card-pad: 16px;
+  --mz-card-gap: 16px;
+}
+[data-mz-density='compact'] {
+  --mz-control-h-xs: 24px;
+  --mz-control-h-sm: 28px;
+  --mz-control-h: 32px;
+  --mz-control-h-lg: 40px;
+  --mz-row-h: 32px;
+  --mz-nav-item-h: 32px;
+  --mz-card-pad: 12px;
+  --mz-card-gap: 12px;
 }
 
 /* Solid ground on request — and in any engine without backdrop blur, where a

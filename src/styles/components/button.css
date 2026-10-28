@@ -63,14 +63,15 @@
    toggles share, so controls keep lining up in a row.
 
    A floor, not a fixed height: one line of label plus the vertical padding
-   comes in under each step, so a single-line button sits exactly on the scale
+   comes to exactly the step (the padding is worked out from the step, the
+   size and --mz-line, so it holds in every density), so a single-line button sits exactly on the scale
    and a label that wraps grows the button instead of spilling out of it. With
    a fixed `height` and no vertical padding, `height: auto` collapsed a
    wrapping button to one line height (#8). */
-.mz-btn--xs { min-height: 28px; padding: 4px 12px; font-size: var(--mz-text-xs); gap: 0.4em; border-radius: var(--mz-radius-sm); }
-.mz-btn--sm { min-height: 34px; padding: 6px 16px; font-size: var(--mz-text-sm); }
-.mz-btn--md { min-height: 40px; padding: 8px 20px; font-size: var(--mz-text-md); }
-.mz-btn--lg { min-height: 48px; padding: 10px 24px; font-size: var(--mz-text-lg); }
+.mz-btn--xs { min-height: var(--mz-control-h-xs); padding: max(0px, calc((var(--mz-control-h-xs) - var(--mz-text-xs) * var(--mz-line)) / 2 - 1px)) 12px; font-size: var(--mz-text-xs); gap: 0.4em; border-radius: var(--mz-radius-sm); }
+.mz-btn--sm { min-height: var(--mz-control-h-sm); padding: max(0px, calc((var(--mz-control-h-sm) - var(--mz-text-sm) * var(--mz-line)) / 2 - 1px)) 16px; font-size: var(--mz-text-sm); }
+.mz-btn--md { min-height: var(--mz-control-h); padding: max(0px, calc((var(--mz-control-h) - var(--mz-text-md) * var(--mz-line)) / 2 - 1px)) 20px; font-size: var(--mz-text-md); }
+.mz-btn--lg { min-height: var(--mz-control-h-lg); padding: max(0px, calc((var(--mz-control-h-lg) - var(--mz-text-lg) * var(--mz-line)) / 2 - 1px)) 24px; font-size: var(--mz-text-lg); }
 
 /* `wrap`: the label may break over lines — a selection summary, a narrow
    column. Off by default because a button label that wraps is usually a
@@ -81,10 +82,10 @@
   text-align: center;
 }
 
-.mz-btn--icon-xs { height: 28px; width: 28px; padding: 0; border-radius: var(--mz-radius-sm); }
-.mz-btn--icon-sm { height: 34px; width: 34px; padding: 0; }
-.mz-btn--icon { height: 40px; width: 40px; padding: 0; }
-.mz-btn--icon-lg { height: 48px; width: 48px; padding: 0; }
+.mz-btn--icon-xs { height: var(--mz-control-h-xs); width: var(--mz-control-h-xs); padding: 0; border-radius: var(--mz-radius-sm); }
+.mz-btn--icon-sm { height: var(--mz-control-h-sm); width: var(--mz-control-h-sm); padding: 0; }
+.mz-btn--icon { height: var(--mz-control-h); width: var(--mz-control-h); padding: 0; }
+.mz-btn--icon-lg { height: var(--mz-control-h-lg); width: var(--mz-control-h-lg); padding: 0; }
 
 /* ---- Primary: the convex fill ---- */
 .mz-btn--primary {
