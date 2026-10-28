@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Slot } from 'radix-ui'
 
 import { cn } from '../lib/utils'
-import { ChevronLeftIcon } from '../lib/icons'
+import { ChevronLeftIcon, MenuIcon, PanelLeftIcon } from '../lib/icons'
 import { defaultCommonLabels } from '../locales/defaults'
 import { useLocaleLabels } from './locale-provider'
 import { useIsMobile } from '../lib/use-is-mobile'
@@ -277,21 +277,31 @@ function Sidebar({
   )
 }
 
+/**
+ * The icon says what a press does. A chevron reads as "back", which is right
+ * for folding an open panel away and wrong everywhere else (#22): on a phone
+ * the trigger is the only way into the navigation, so it is the menu; with the
+ * panel collapsed it is the panel, to be opened. `icon` replaces all three.
+ */
 function SidebarTrigger({
   className,
   onClick,
   label: labelProp,
+  icon,
   ...props
-}: React.ComponentProps<'button'> & { label?: string }) {
-  const { toggleSidebar, state } = useSidebar()
+}: React.ComponentProps<'button'> & { label?: string; icon?: React.ReactNode }) {
+  const { toggleSidebar, state, isMobile } = useSidebar()
   const common = useLocaleLabels('common', defaultCommonLabels)
   const label = labelProp ?? common.toggleSidebar
+  const Glyph = isMobile ? MenuIcon : state === 'collapsed' ? PanelLeftIcon : ChevronLeftIcon
   return (
     <button
       type="button"
       data-slot="sidebar-trigger"
       data-state={state}
+      data-mobile={isMobile || undefined}
       aria-label={label}
+      aria-expanded={isMobile ? undefined : state === 'expanded'}
       title={label}
       className={cn('mz-sidebar__trigger mz-focusable', className)}
       onClick={(event) => {
@@ -300,7 +310,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <ChevronLeftIcon />
+      {icon ?? <Glyph className="mz-sidebar__trigger-icon" />}
     </button>
   )
 }

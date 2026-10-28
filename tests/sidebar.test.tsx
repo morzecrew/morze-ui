@@ -214,3 +214,44 @@ describe('Sidebar width variable', () => {
     expect(wrapperWidth(container)).toBe('10px')
   })
 })
+
+// A chevron reads as "back"; on a phone the trigger is the only way into the
+// navigation (#22).
+describe('SidebarTrigger icon', () => {
+  const glyph = () => screen.getByRole('button', { name: /Toggle sidebar/ }).querySelector('svg path')?.getAttribute('d')
+
+  it('folds an open panel with a chevron and opens a closed one with the panel', async () => {
+    render(<Shell storageKey={null} />)
+    const open = glyph()
+    await userEvent.click(screen.getByRole('button', { name: /Toggle sidebar/ }))
+    expect(glyph()).not.toBe(open)
+    expect(screen.getByRole('button', { name: /Toggle sidebar/ })).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('is the menu on a phone', () => {
+    const original = window.matchMedia
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener() {},
+      removeEventListener() {},
+    })) as unknown as typeof window.matchMedia
+    try {
+      render(<Shell storageKey={null} />)
+      const trigger = screen.getByRole('button', { name: /Toggle sidebar/ })
+      expect(trigger).toHaveAttribute('data-mobile', 'true')
+      expect(trigger.querySelector('svg path')?.getAttribute('d')).toBe('M4 6h16M4 12h16M4 18h16')
+    } finally {
+      window.matchMedia = original
+    }
+  })
+
+  it('takes an icon of the host’s', () => {
+    render(
+      <SidebarProvider storageKey={null}>
+        <SidebarTrigger icon={<i data-testid="own" />} />
+      </SidebarProvider>
+    )
+    expect(screen.getByTestId('own')).toBeInTheDocument()
+  })
+})

@@ -790,7 +790,9 @@ on narrow screens and remembers its state between sessions.
 
 `SidebarTrigger` lives in the panel's own header: with `collapsible="icon"`
 (the default) the sidebar never disappears completely — the rail stays, and so
-does the button.
+does the button. Its icon says what a press does: a chevron folds an open
+panel, a panel icon opens a collapsed one, and on a phone — where it is the
+only way into the navigation — it is the menu. `icon` replaces all three.
 
 The exception is **mobile and `offcanvas`**, where the panel leaves together
 with everything inside it, so a second trigger is needed outside. To avoid two

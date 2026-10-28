@@ -52,6 +52,13 @@ export const SpinnerIcon = icon(
 )
 
 export const ChevronLeftIcon = icon(<path d="m15 18-6-6 6-6" />)
+export const MenuIcon = icon(<path d="M4 6h16M4 12h16M4 18h16" />)
+export const PanelLeftIcon = icon(
+  <>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M9 4v16" />
+  </>
+)
 export const ChevronsLeftIcon = icon(
   <>
     <path d="m11 17-5-5 5-5" />

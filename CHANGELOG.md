@@ -141,6 +141,11 @@ issue.
   on the violet and the red and takes the dark label on the emerald, amber and
   blue. The light danger is a step deeper (`212, 48, 79`), the one fill
   neither label cleared. A host that re-pointed a tone re-checks its `-fg`.
+- **`SidebarTrigger` picks its icon by what a press does** (#22): a chevron to
+  fold an open panel, a panel icon to open a collapsed one, a menu on a phone.
+  It was always a left chevron, which on a phone — where it is the only way
+  into the navigation — reads as "back". `icon` overrides it, and the trigger
+  reports `aria-expanded` on the desktop.
 
 ### Fixed
 

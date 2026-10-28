@@ -149,11 +149,13 @@
   cursor: pointer;
   transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease, border-color var(--mz-duration-fast) ease;
 }
-.mz-sidebar__trigger svg { width: 16px; height: 16px; transition: transform var(--mz-duration) var(--mz-ease); }
-.mz-sidebar__trigger[data-state='collapsed'] svg { transform: rotate(180deg); }
-/* The chevron points at the edge the panel collapses towards. */
-.mz-sidebar[data-side='right'] .mz-sidebar__trigger svg { transform: rotate(180deg); }
-.mz-sidebar[data-side='right'] .mz-sidebar__trigger[data-state='collapsed'] svg { transform: none; }
+.mz-sidebar__trigger svg { width: 16px; height: 16px; }
+/* The chevron points at the edge the panel collapses towards, and the panel
+   icon draws its rail on the panel's side. The menu is symmetric, and an icon
+   the host passed is the host's to orient. */
+.mz-sidebar[data-side='right'] .mz-sidebar__trigger:not([data-mobile]) .mz-sidebar__trigger-icon {
+  transform: scaleX(-1);
+}
 .mz-sidebar__trigger:hover {
   background: var(--mz-wash-hover);
   border-color: var(--mz-border);
