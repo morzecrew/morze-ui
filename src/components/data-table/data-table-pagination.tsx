@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select'
-import { resolveLabels, type DataTableLabels } from './labels'
+import { defaultDataTableLabels, type DataTableLabels } from './labels'
 import type { DataTableQuery } from './types'
 import { pageCount } from './utils'
+import { useLocaleLabels, useLocaleTag } from '../locale-provider'
 
 export function DataTablePagination({
   query,
@@ -26,7 +27,7 @@ export function DataTablePagination({
   rowsOnPage,
   pageSizeOptions = [10, 25, 50, 100],
   labels: labelsProp,
-  locale,
+  locale: localeProp,
   onQueryChange,
 }: {
   query: DataTableQuery
@@ -42,7 +43,8 @@ export function DataTablePagination({
   locale?: string
   onQueryChange: (query: DataTableQuery) => void
 }) {
-  const labels = resolveLabels(labelsProp)
+  const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const sizes = pageSizeOptions === false ? [] : pageSizeOptions
   /**
    * `total` is optional — a cursor-paged backend, or one where `COUNT(*)` is

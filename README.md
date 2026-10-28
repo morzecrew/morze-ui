@@ -1028,13 +1028,37 @@ column pinned, it does not reflow into cards.
 
 ## Localisation
 
-Component strings default to English and every one of them can be replaced.
+Component strings default to English. **Install a language once, at the root**,
+and every widget under it — the table, the calendar and the date fields, the
+combobox, the toaster, the sidebar, the close buttons — reads its strings and
+its locale tag from there:
+
+```tsx
+import { MorzeLocaleProvider } from '@morze/ui'
+import ru from '@morze/ui/locales/ru'
+
+<MorzeLocaleProvider locale={ru} tag="ru-RU">
+  <App />
+</MorzeLocaleProvider>
+```
+
+That includes the strings nobody sees until something goes wrong — the
+combobox's loading and failure lines, the clear button's accessible name, the
+calendar's month navigation — which a per-widget override of the visible words
+used to leave in English. `tag` is the BCP 47 tag `Calendar`, the date fields
+and `DataTable` format with. A component's own `labels` / `locale` props still
+win, key by key; a provider inside another overrides only what it names;
+without one, everything stays English. `useMorzeLocale()` hands the bundle and
+tag in force to a widget of your own.
+
+Every string can also be replaced per instance.
 `Dialog`/`Sheet`/`Toaster` take `closeLabel`, `Spinner` takes `label`, `Sidebar`
 takes `mobileTitle` / `mobileDescription`, `SidebarTrigger` takes `label`,
-`BreadcrumbEllipsis` takes `label` and `TabsList` takes `overflowLabel`.
+`BreadcrumbEllipsis` takes `label`, `TabsList` takes `overflowLabel`,
+`NumberInput` takes `labels` and `CommandDialog` takes `title` / `description`.
 
 `Calendar` reads its month, weekday and day names from `Intl` — a `locale` tag
-is enough — and takes a partial `labels` object for the four strings `Intl`
+is enough — and takes a partial `labels` object for the five strings `Intl`
 cannot supply (the nav buttons, the caption selects, the week-number column).
 
 `DataTable` has more strings than the rest, so it takes a partial `labels`
@@ -1074,7 +1098,8 @@ import { dataTable as ru, calendar, common } from '@morze/ui/locales/ru'
 
 `common` carries the strings the rest of the kit takes as individual props
 (`close`, `loading`, `more`, `sidebarNavigation`, `sidebarSections`,
-`toggleSidebar`), `calendar` the four the month grid needs, and `combobox` /
+`toggleSidebar`, `increase`, `decrease`, `commandPalette`,
+`commandPaletteDescription`), `calendar` the five the month grid needs, and `combobox` /
 `datePicker` the handful their own fields draw — the search box's placeholder,
 the empty and failed lines, the clear button:
 
@@ -1086,8 +1111,9 @@ import { combobox, datePicker } from '@morze/ui/locales/ru'
 ```
 
 A bundle is plain data — no React, no styles — so it is safe to import from a
-server component. `@morze/ui/locales/en` is the same shape for English, and
-`MorzeLocale` types a language of your own.
+server component. `@morze/ui/locales/en` is the same shape for English,
+`MorzeLocale` types a language of your own, and `MorzeLocaleBundle` (any part
+of one) is what the provider takes.
 
 ## Accessibility and behaviour
 

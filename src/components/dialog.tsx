@@ -6,6 +6,8 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from '../lib/utils'
 import { overlayClass, panelClass } from '../lib/surfaces'
 import { XIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -42,7 +44,7 @@ function DialogContent({
   size = 'md',
   position = 'center',
   showCloseButton = true,
-  closeLabel = 'Close',
+  closeLabel,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   /**
@@ -61,6 +63,7 @@ function DialogContent({
   showCloseButton?: boolean
   closeLabel?: string
 }) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -75,7 +78,7 @@ function DialogContent({
         {showCloseButton ? (
           <DialogPrimitive.Close data-slot="dialog-close" className="mz-dialog-close mz-focusable">
             <XIcon />
-            <span className="mz-sr-only">{closeLabel}</span>
+            <span className="mz-sr-only">{closeLabel ?? common.close}</span>
           </DialogPrimitive.Close>
         ) : null}
       </DialogPrimitive.Content>

@@ -11,6 +11,8 @@ export { panelClass, overlayClass } from './lib/surfaces'
 
 export { MorzeThemeProvider, useMorzeTheme } from './components/theme-provider'
 export type { MorzeTheme, MorzeThemeProviderProps } from './components/theme-provider'
+export { MorzeLocaleProvider, useMorzeLocale } from './components/locale-provider'
+export type { MorzeLocaleProviderProps } from './components/locale-provider'
 
 export { Button, buttonVariants } from './components/button'
 export type { ButtonProps } from './components/button'
@@ -365,4 +367,4 @@ export type {
 } from './components/data-table'
 
 /** Locale bundles live behind their own entry points: `@morze/ui/locales/ru`. */
-export type { MorzeCommonLabels, MorzeLocale } from './locales/types'
+export type { MorzeCommonLabels, MorzeLocale, MorzeLocaleBundle } from './locales/types'

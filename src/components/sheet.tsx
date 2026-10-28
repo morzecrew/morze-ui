@@ -5,6 +5,8 @@ import { Dialog as SheetPrimitive } from 'radix-ui'
 
 import { cn } from '../lib/utils'
 import { XIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -38,7 +40,7 @@ function SheetContent({
   side = 'right',
   size = 'md',
   showCloseButton = true,
-  closeLabel = 'Close',
+  closeLabel,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left'
@@ -51,6 +53,7 @@ function SheetContent({
   showCloseButton?: boolean
   closeLabel?: string
 }) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -65,7 +68,7 @@ function SheetContent({
         {showCloseButton ? (
           <SheetPrimitive.Close data-slot="sheet-close" className="mz-dialog-close mz-focusable">
             <XIcon />
-            <span className="mz-sr-only">{closeLabel}</span>
+            <span className="mz-sr-only">{closeLabel ?? common.close}</span>
           </SheetPrimitive.Close>
         ) : null}
       </SheetPrimitive.Content>

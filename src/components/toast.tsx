@@ -5,6 +5,8 @@ import { Toast as ToastPrimitive } from 'radix-ui'
 
 import { cn, type Tone } from '../lib/utils'
 import { XIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 /* --------------------------------------------------------------------------
    The queue.
@@ -180,9 +182,10 @@ function ToastAction({ className, ...props }: React.ComponentProps<typeof ToastP
 
 function ToastClose({
   className,
-  label = 'Close',
+  label,
   ...props
 }: React.ComponentProps<typeof ToastPrimitive.Close> & { label?: string }) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <ToastPrimitive.Close
       data-slot="toast-close"
@@ -190,7 +193,7 @@ function ToastClose({
       {...props}
     >
       <XIcon />
-      <span className="mz-sr-only">{label}</span>
+      <span className="mz-sr-only">{label ?? common.close}</span>
     </ToastPrimitive.Close>
   )
 }
@@ -216,7 +219,7 @@ type ToasterProps = {
 function Toaster({
   duration = 5000,
   position = 'bottom-right',
-  closeLabel = 'Close',
+  closeLabel,
   hotkey,
   className,
 }: ToasterProps) {

@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn, type Tone } from '../lib/utils'
 import { CheckIcon, ChevronDownIcon, XIcon } from '../lib/icons'
+import { useLocaleLabels } from './locale-provider'
 import { Badge } from './badge'
 import { Button } from './button'
 import { Input } from './input'
@@ -520,7 +521,7 @@ function Combobox({
   'aria-labelledby': ariaLabelledby,
   ...field
 }: ComboboxProps) {
-  const labels = { ...defaultLabels, ...labelsProp }
+  const labels = useLocaleLabels('combobox', defaultLabels, labelsProp)
   const generatedId = React.useId()
   const triggerId = id ?? generatedId
   const listId = `${generatedId}-list`
@@ -641,7 +642,7 @@ function MultiSelect({
   'aria-labelledby': ariaLabelledby,
   ...field
 }: MultiSelectProps) {
-  const labels = { ...defaultLabels, ...labelsProp }
+  const labels = useLocaleLabels('combobox', defaultLabels, labelsProp)
   const generatedId = React.useId()
   const triggerId = id ?? generatedId
   const listId = `${generatedId}-list`

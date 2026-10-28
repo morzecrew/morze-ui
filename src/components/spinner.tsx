@@ -4,13 +4,17 @@ import * as React from 'react'
 
 import { cn } from '../lib/utils'
 import { SpinnerIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 type SpinnerProps = React.ComponentProps<'span'> & {
   /** Announced by screen readers; pass `null` for a purely decorative spinner. */
   label?: string | null
 }
 
-function Spinner({ className, label = 'Loading', children, ...props }: SpinnerProps) {
+function Spinner({ className, label: labelProp, children, ...props }: SpinnerProps) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
+  const label = labelProp === undefined ? common.loading : labelProp
   return (
     <span
       data-slot="spinner"

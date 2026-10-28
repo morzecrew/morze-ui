@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../lib/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from '../lib/icons'
+import { useLocaleLabels, useLocaleTag } from './locale-provider'
 import {
   addDays,
   addMonths,
@@ -136,7 +137,7 @@ function Calendar({
   defaultMonth,
   onMonthChange,
   numberOfMonths = 1,
-  locale,
+  locale: localeProp,
   weekStartsOn,
   disabled,
   fromDate,
@@ -152,7 +153,8 @@ function Calendar({
   id,
   ...selection
 }: CalendarProps) {
-  const labels = { ...defaultLabels, ...labelsProp }
+  const labels = useLocaleLabels('calendar', defaultLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const today = React.useMemo(() => startOfDay(todayProp ?? new Date()), [todayProp])
 
   const firstDayOfWeek = weekStartsOn ?? localeWeekStart(locale)

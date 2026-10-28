@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { observeResize } from '../../lib/observe-resize'
+import { useLocaleLabels, useLocaleTag } from '../locale-provider'
 import {
   AlertIcon,
   ArrowDownIcon,
@@ -29,7 +30,7 @@ import type {
   RowAttributes,
   RowSelectionState,
 } from './types'
-import { resolveLabels, type DataTableLabels } from './labels'
+import { defaultDataTableLabels, type DataTableLabels } from './labels'
 import {
   activeFilters,
   serializeSort,
@@ -269,11 +270,12 @@ export function DataTable<T>({
   hasMore,
   autoLoadMore = true,
   labels: labelsProp,
-  locale,
+  locale: localeProp,
   caption,
   className,
 }: DataTableProps<T>) {
-  const labels = resolveLabels(labelsProp)
+  const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const rootRef = React.useRef<HTMLDivElement>(null)
   const scrollerRef = React.useRef<HTMLDivElement>(null)
   const [scrolled, setScrolled] = React.useState({ left: false, right: false })

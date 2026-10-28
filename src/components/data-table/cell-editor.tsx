@@ -10,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../select'
-import { resolveLabels, type DataTableLabels } from './labels'
+import { defaultDataTableLabels, type DataTableLabels } from './labels'
+import { useLocaleLabels } from '../locale-provider'
 import type { EditableDef } from './types'
 
 /**
@@ -36,7 +37,7 @@ export function CellEditor<T>({
   labels?: Partial<DataTableLabels>
   onDone: () => void
 }) {
-  const labels = resolveLabels(labelsProp)
+  const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
   const initial = def.value(row)
   const [value, setValue] = React.useState(initial)
   const [saving, setSaving] = React.useState(false)

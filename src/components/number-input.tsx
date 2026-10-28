@@ -4,6 +4,8 @@ import * as React from 'react'
 
 import { cn, type Tone } from '../lib/utils'
 import { ChevronDownIcon, ChevronUpIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 /* --------------------------------------------------------------------------
    A number field (K-11).
@@ -74,6 +76,7 @@ function NumberInput({
   onBlur,
   ...props
 }: NumberInputProps) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   const [internal, setInternal] = React.useState<number | undefined>(defaultValue)
   // `null` is how a controlled host spells "empty"; `undefined` is how this
   // component reports one, so the two meet here.
@@ -163,7 +166,7 @@ function NumberInput({
             // can get out of.
             tabIndex={-1}
             className="mz-number__stepper"
-            aria-label={labels?.increase ?? 'Increase'}
+            aria-label={labels?.increase ?? common.increase}
             disabled={disabled || (max !== undefined && (current ?? 0) >= max)}
             onClick={() => nudge(1)}
           >
@@ -173,7 +176,7 @@ function NumberInput({
             type="button"
             tabIndex={-1}
             className="mz-number__stepper"
-            aria-label={labels?.decrease ?? 'Decrease'}
+            aria-label={labels?.decrease ?? common.decrease}
             disabled={disabled || (min !== undefined && (current ?? 0) <= min)}
             onClick={() => nudge(-1)}
           >

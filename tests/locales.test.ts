@@ -36,6 +36,9 @@ describe('locale bundles', () => {
     for (const key of Object.keys(en.datePicker) as (keyof typeof en.datePicker)[]) {
       expect(render(ru.datePicker[key]), key).not.toBe(render(en.datePicker[key]))
     }
+    for (const key of Object.keys(en.common) as (keyof typeof en.common)[]) {
+      expect(render(ru.common[key]), key).not.toBe(render(en.common[key]))
+    }
   })
 
   it('keeps the English bundle equal to the defaults', () => {

@@ -7,7 +7,8 @@ import { Button } from '../button'
 import { Input } from '../input'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { Separator } from '../separator'
-import { resolveLabels, type DataTableLabels } from './labels'
+import { defaultDataTableLabels, type DataTableLabels } from './labels'
+import { useLocaleLabels } from '../locale-provider'
 import type { ColumnLayout, DataTableColumn } from './types'
 
 type Props<T> = {
@@ -80,7 +81,7 @@ export function ColumnManager<T>({
   onReset,
   labels: labelsProp,
 }: Props<T>) {
-  const labels = resolveLabels(labelsProp)
+  const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
   const [dragging, setDragging] = React.useState<string | null>(null)
   const [dropTarget, setDropTarget] = React.useState<string | null>(null)
   const [query, setQuery] = React.useState('')

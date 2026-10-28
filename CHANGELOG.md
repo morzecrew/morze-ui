@@ -70,6 +70,19 @@ on GitHub, one entry per issue.
   script sets. erp copied the resolved theme into `data-mz-theme` from a bridge
   component and duplicated next-themes' storage read in an inline script in
   `index.html`; neither is needed now.
+- **`MorzeLocaleProvider`** (#12) installs a language once for the whole app:
+  `<MorzeLocaleProvider locale={ru} tag="ru-RU">`. `Combobox`, `MultiSelect`,
+  `Calendar`, `DatePicker`, `DateRangePicker`, `DataTable` (with its pager,
+  filters, column manager and cell editor), `Toaster`, `Sidebar`,
+  `SidebarTrigger` / `SidebarRail`, `Dialog` / `Sheet`, `Spinner`,
+  `BreadcrumbEllipsis`, `TabsList`, `NumberInput` and `CommandDialog` read
+  their strings — and the date and number widgets their BCP 47 tag — from it.
+  A component's own `labels` / `locale` still win key by key, a nested
+  provider overrides only what it names, and an app without one stays English.
+  `useMorzeLocale()` exposes the bundle and tag in force. erp passed `common`
+  to three components by hand, and its five `Combobox` instances overrode
+  `search` and `empty` only — so Russian users saw "Loading" and "The options
+  could not be loaded".
 
 ### Changed
 
@@ -97,6 +110,12 @@ on GitHub, one entry per issue.
   `--mz-info`. Set the colour in any syntax and everything follows; the
   `--mz-*-rgb` triplets still carry the defaults, so a theme written against
   them keeps working.
+- **`MorzeCommonLabels` has four more keys** (#12): `increase` / `decrease`
+  (`NumberInput`'s steppers) and `commandPalette` /
+  `commandPaletteDescription` (`CommandDialog`'s accessible name), so the last
+  English defaults are in the bundles too. A language typed against
+  `MorzeLocale` fails to compile until it has them — which is the point of the
+  type.
 
 ### Fixed
 

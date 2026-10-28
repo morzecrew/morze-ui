@@ -1,6 +1,11 @@
 /**
  * Russian.
  *
+ *   import ru from '@morze/ui/locales/ru'
+ *   <MorzeLocaleProvider locale={ru} tag="ru-RU">…</MorzeLocaleProvider>
+ *
+ * or one section for one widget:
+ *
  *   import { dataTable as ru } from '@morze/ui/locales/ru'
  *   <DataTable labels={ru} locale="ru-RU" … />
  *
@@ -121,6 +126,10 @@ export const common: MorzeCommonLabels = {
   sidebarNavigation: 'Навигация',
   sidebarSections: 'Разделы приложения',
   toggleSidebar: 'Свернуть или развернуть меню',
+  increase: 'Увеличить',
+  decrease: 'Уменьшить',
+  commandPalette: 'Палитра команд',
+  commandPaletteDescription: 'Найдите команду, чтобы выполнить её',
 }
 
 export const ru: MorzeLocale = { dataTable, calendar, combobox, datePicker, common }

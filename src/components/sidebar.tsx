@@ -5,6 +5,8 @@ import { Slot } from 'radix-ui'
 
 import { cn } from '../lib/utils'
 import { ChevronLeftIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 import { useIsMobile } from '../lib/use-is-mobile'
 import { Input } from './input'
 import { Separator } from './separator'
@@ -222,13 +224,14 @@ function Sidebar({
   side = 'left',
   variant = 'inset',
   collapsible = 'icon',
-  mobileTitle = 'Navigation',
-  mobileDescription = 'Application sections',
+  mobileTitle,
+  mobileDescription,
   className,
   children,
   ...props
 }: SidebarProps) {
   const { isMobile, state, openMobile, setOpenMobile, registerSidebar } = useSidebar()
+  const common = useLocaleLabels('common', defaultCommonLabels)
 
   React.useLayoutEffect(() => {
     registerSidebar({ collapsible, variant })
@@ -250,8 +253,8 @@ function Sidebar({
           className={cn('mz-sidebar--mobile', className)}
         >
           <SheetHeader className="mz-sr-only">
-            <SheetTitle>{mobileTitle}</SheetTitle>
-            <SheetDescription>{mobileDescription}</SheetDescription>
+            <SheetTitle>{mobileTitle ?? common.sidebarNavigation}</SheetTitle>
+            <SheetDescription>{mobileDescription ?? common.sidebarSections}</SheetDescription>
           </SheetHeader>
           <div className="mz-sidebar__inner">{children}</div>
         </SheetContent>
@@ -277,10 +280,12 @@ function Sidebar({
 function SidebarTrigger({
   className,
   onClick,
-  label = 'Toggle sidebar',
+  label: labelProp,
   ...props
 }: React.ComponentProps<'button'> & { label?: string }) {
   const { toggleSidebar, state } = useSidebar()
+  const common = useLocaleLabels('common', defaultCommonLabels)
+  const label = labelProp ?? common.toggleSidebar
   return (
     <button
       type="button"
@@ -303,15 +308,16 @@ function SidebarTrigger({
 /** Thin strip along the sidebar edge — click anywhere on it to toggle. */
 function SidebarRail({
   className,
-  label = 'Toggle sidebar',
+  label,
   ...props
 }: React.ComponentProps<'button'> & { label?: string }) {
   const { toggleSidebar } = useSidebar()
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <button
       type="button"
       data-slot="sidebar-rail"
-      aria-label={label}
+      aria-label={label ?? common.toggleSidebar}
       tabIndex={-1}
       className={cn('mz-sidebar__rail', className)}
       onClick={toggleSidebar}

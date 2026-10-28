@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { cn, type Tone } from '../lib/utils'
 import { CalendarIcon, XIcon } from '../lib/icons'
+import { useLocaleLabels, useLocaleTag } from './locale-provider'
 import { toISODate } from '../lib/date'
 import { Calendar, type CalendarProps, type DateMatcher, type DateRange } from './calendar'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
@@ -154,7 +155,7 @@ function DatePicker({
   defaultValue,
   onChange,
   format,
-  locale,
+  locale: localeProp,
   disabledDates,
   numberOfMonths = 1,
   labels: labelsProp,
@@ -162,7 +163,8 @@ function DatePicker({
   name,
   ...field
 }: DatePickerProps) {
-  const labels = { ...defaultLabels, ...labelsProp }
+  const labels = useLocaleLabels('datePicker', defaultLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const [open, setOpen] = React.useState(false)
   const [internal, setInternal] = React.useState<Date | undefined>(defaultValue)
   const value = controlled ?? internal
@@ -236,7 +238,7 @@ function DateRangePicker({
   format,
   presets,
   separator = ' – ',
-  locale,
+  locale: localeProp,
   disabledDates,
   numberOfMonths = 2,
   labels: labelsProp,
@@ -244,7 +246,8 @@ function DateRangePicker({
   name,
   ...field
 }: DateRangePickerProps) {
-  const labels = { ...defaultLabels, ...labelsProp }
+  const labels = useLocaleLabels('datePicker', defaultLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const [open, setOpen] = React.useState(false)
   const [internal, setInternal] = React.useState<DateRange | undefined>(defaultValue)
   const value = controlled ?? internal

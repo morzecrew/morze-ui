@@ -4,6 +4,8 @@ import * as React from 'react'
 
 import { cn } from '../lib/utils'
 import { SearchIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from './dialog'
 
 /* --------------------------------------------------------------------------
@@ -324,8 +326,8 @@ export type CommandDialogProps = React.ComponentProps<typeof Dialog> & {
 }
 
 function CommandDialog({
-  title = 'Command palette',
-  description = 'Search for a command to run',
+  title,
+  description,
   showTitle = false,
   shortcut = 'k',
   open: controlled,
@@ -336,6 +338,7 @@ function CommandDialog({
   children,
   ...props
 }: CommandDialogProps) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   const [internal, setInternal] = React.useState(false)
   const open = controlled ?? internal
   const setOpen = (next: boolean) => {
@@ -367,8 +370,12 @@ function CommandDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen} {...props}>
       <DialogContent size="lg" position={position} className={cn('mz-command-dialog', className)}>
-        <DialogTitle className={showTitle ? undefined : 'mz-sr-only'}>{title}</DialogTitle>
-        <DialogDescription className="mz-sr-only">{description}</DialogDescription>
+        <DialogTitle className={showTitle ? undefined : 'mz-sr-only'}>
+          {title ?? common.commandPalette}
+        </DialogTitle>
+        <DialogDescription className="mz-sr-only">
+          {description ?? common.commandPaletteDescription}
+        </DialogDescription>
         <Command filter={filter}>{children}</Command>
       </DialogContent>
     </Dialog>

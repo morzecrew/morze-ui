@@ -5,6 +5,8 @@ import { Slot } from 'radix-ui'
 
 import { cn } from '../lib/utils'
 import { ChevronRightIcon, EllipsisIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
@@ -76,9 +78,10 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
 /** Collapsed middle of a long trail. Pair it with a menu to reveal the rest. */
 function BreadcrumbEllipsis({
   className,
-  label = 'More',
+  label,
   ...props
 }: React.ComponentProps<'span'> & { label?: string }) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <span
       data-slot="breadcrumb-ellipsis"
@@ -87,7 +90,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <EllipsisIcon />
-      <span className="mz-sr-only">{label}</span>
+      <span className="mz-sr-only">{label ?? common.more}</span>
     </span>
   )
 }

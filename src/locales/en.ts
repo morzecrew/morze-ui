@@ -10,6 +10,7 @@ import { defaultDataTableLabels } from '../components/data-table/labels'
 import type { CalendarLabels } from '../components/calendar'
 import type { ComboboxLabels } from '../components/combobox'
 import type { DatePickerLabels } from '../components/date-picker'
+import { defaultCommonLabels } from './defaults'
 import type { MorzeCommonLabels, MorzeLocale } from './types'
 
 export const dataTable = defaultDataTableLabels
@@ -41,14 +42,7 @@ export const datePicker: DatePickerLabels = {
   open: 'Open the calendar',
 }
 
-export const common: MorzeCommonLabels = {
-  close: 'Close',
-  loading: 'Loading',
-  more: 'More',
-  sidebarNavigation: 'Navigation',
-  sidebarSections: 'Application sections',
-  toggleSidebar: 'Toggle sidebar',
-}
+export const common: MorzeCommonLabels = defaultCommonLabels
 
 export const en: MorzeLocale = { dataTable, calendar, combobox, datePicker, common }
 export default en

@@ -6,6 +6,8 @@ import { Tabs as TabsPrimitive } from 'radix-ui'
 import { cn, type Tone } from '../lib/utils'
 import { observeResize } from '../lib/observe-resize'
 import { ChevronDownIcon, EllipsisIcon } from '../lib/icons'
+import { defaultCommonLabels } from '../locales/defaults'
+import { useLocaleLabels } from './locale-provider'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './dropdown-menu'
 
 function Tabs({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
@@ -76,10 +78,12 @@ function TabsListWithMenu({
   className,
   variant = 'default',
   tone,
-  overflowLabel = 'More',
+  overflowLabel: overflowLabelProp,
   children,
   ...props
 }: Omit<TabsListProps, 'overflow'>) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
+  const overflowLabel = overflowLabelProp ?? common.more
   const items = React.useMemo(
     () => React.Children.toArray(children).filter(React.isValidElement),
     [children]

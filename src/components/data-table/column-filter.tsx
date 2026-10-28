@@ -13,7 +13,8 @@ import { RadioGroup, RadioGroupItem } from '../radio-group'
 import { Toggle } from '../toggle'
 import { Calendar } from '../calendar'
 import { fromISODate, toISODate } from '../../lib/date'
-import { defaultDataTableLabels, resolveLabels, type DataTableLabels } from './labels'
+import { defaultDataTableLabels, type DataTableLabels } from './labels'
+import { useLocaleLabels, useLocaleTag } from '../locale-provider'
 import type { ColumnFilterDef, FilterValue, TextFilterOp } from './types'
 import { isFilterActive } from './utils'
 
@@ -37,9 +38,10 @@ export function ColumnFilter({
   value,
   onApply,
   labels: labelsProp,
-  locale,
+  locale: localeProp,
 }: Props) {
-  const labels = resolveLabels(labelsProp)
+  const labels = useLocaleLabels('dataTable', defaultDataTableLabels, labelsProp)
+  const locale = useLocaleTag(localeProp)
   const [open, setOpen] = React.useState(false)
   const [draft, setDraft] = React.useState<FilterValue | undefined>(value)
 
