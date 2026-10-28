@@ -631,7 +631,8 @@ export function DataTable<T>({
                     data-col={column.id}
                     data-pinned={pinned}
                     data-pin-edge={pinEdgeOf(column.id)}
-                    data-align={column.align}
+                    data-align={alignOf(column)}
+                    data-numeric={column.numeric || undefined}
                     // Only a sortable column claims the attribute: to assistive
                     // tech `none` means "sortable, not sorted yet", not "cannot".
                     aria-sort={
@@ -740,7 +741,8 @@ export function DataTable<T>({
                               data-col={column.id}
                               data-pinned={pinned}
                               data-pin-edge={pinEdgeOf(column.id)}
-                              data-align={column.align}
+                              data-align={alignOf(column)}
+                              data-numeric={column.numeric || undefined}
                               data-editable={editableHere ? true : undefined}
                               className={cn('mz-dt__td', column.className)}
                               style={pinStyle(pinned, offsets.get(column.id))}
@@ -787,7 +789,8 @@ export function DataTable<T>({
           data-col={column.id}
           data-pinned={pinned}
           data-pin-edge={pinEdgeOf(column.id)}
-          data-align={column.align}
+          data-align={alignOf(column)}
+          data-numeric={column.numeric || undefined}
           className={cn('mz-dt__td', column.className)}
           style={pinStyle(pinned, offsets.get(column.id))}
         >
@@ -808,7 +811,8 @@ export function DataTable<T>({
           data-col={column.id}
           data-pinned={pinned}
           data-pin-edge={pinEdgeOf(column.id)}
-          data-align={column.align}
+          data-align={alignOf(column)}
+          data-numeric={column.numeric || undefined}
           className={cn('mz-dt__tf', column.className)}
           style={pinStyle(pinned, offsets.get(column.id))}
         >
@@ -1278,6 +1282,11 @@ function filtersKey(filters: DataTableFilters): string {
 
 /** How many picked options a chip spells out before it says "+N". */
 const CHIP_VALUES = 3
+
+/** A numeric column sits on the end edge unless it says otherwise. */
+function alignOf(column: { align?: 'left' | 'center' | 'right'; numeric?: boolean }) {
+  return column.align ?? (column.numeric ? 'right' : undefined)
+}
 
 /**
  * An ISO day as the reader's locale writes it. The value on the wire is

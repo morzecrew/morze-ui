@@ -84,6 +84,16 @@
   border-bottom: 1px solid var(--mz-border);
 }
 
+/* A column of figures. Tabular digits, because the kit's default face (Golos
+   Text) and most UI faces set proportional ones: a right-aligned column only
+   lined up where the OS fallback happened to be tabular (#17). */
+.mz-table__th[data-numeric],
+.mz-table__td[data-numeric] {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.mz-table__th[data-numeric] .mz-table__sort { justify-content: flex-end; }
+
 /* One row state for both tables — see --mz-row-hover. No transition, for the
    reason the grid has none: a sticky or pinned cell repaints on a different
    schedule from a plain one, so a fade arrives across the row in instalments. */

@@ -350,6 +350,13 @@
   background: var(--mz-surface);
   vertical-align: middle;
 }
+/* Right-aligned is a column of figures in practice, and `numeric` says so
+   outright: tabular digits, or the places only line up in a face whose digits
+   happen to be tabular already (#17). The footer already had them. */
+.mz-dt__td[data-align='right'],
+.mz-dt__td[data-numeric],
+.mz-dt__th[data-numeric],
+.mz-dt__tf[data-numeric] { font-variant-numeric: tabular-nums; }
 .mz-dt__td[data-align='right'] { text-align: end; }
 .mz-dt__td[data-align='center'] { text-align: center; }
 .mz-dt__td--control { padding: 0; text-align: center; }

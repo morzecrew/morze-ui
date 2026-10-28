@@ -189,7 +189,7 @@ export {
   TableCell,
   TableCaption,
 } from './components/table'
-export type { TableHeadProps } from './components/table'
+export type { TableHeadProps, TableCellProps } from './components/table'
 
 export { ScrollArea, ScrollBar } from './components/scroll-area'
 

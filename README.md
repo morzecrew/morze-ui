@@ -843,7 +843,7 @@ const columns: DataTableColumn<Order>[] = [
     cell: (row) => <b>{row.number}</b> },
   { id: 'client', header: 'Client', sortable: true,
     filter: { type: 'select', options: clients } },
-  { id: 'sum', header: 'Total', align: 'right', sortable: true,
+  { id: 'sum', header: 'Total', numeric: true, sortable: true,
     accessor: (row) => formatMoney(row.sum),
     filter: { type: 'number-range', step: 10_000 } },
 ]
@@ -871,6 +871,11 @@ What it does:
   within: `maxHeight`, `height`, or `fill` for a table that should take the
   room its flex parent has. Without one the scroller grows with its content and
   never scrolls at all.
+- **Figures line up.** `numeric: true` right-aligns a column and sets it in
+  tabular digits; a right-aligned column gets the digits too. Golos Text, the
+  kit's default face, has proportional digits, so without this a column only
+  lined up where the OS fallback happened to be tabular. The plain `Table` takes
+  `numeric` on `TableHead` and `TableCell`.
 - **`frame="plain"`** drops the scroller's border, radius and shadow, for a
   table already inside a `Card` or a panel where the two frames doubled up.
 - **Global search** — `search` (or `{ placeholder, debounce }`) puts a box in

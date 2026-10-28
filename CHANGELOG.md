@@ -95,6 +95,12 @@ issue.
   every text / ground pair the kit draws to 4.5:1: the three text steps on
   every ramp step, each tone's label on its fill, each tone's text on the page
   and on its own wash.
+- **Numeric columns** (#17): `numeric: true` on a `DataTableColumn` (it implies
+  right alignment) and `numeric` on `TableHead` / `TableCell`. Both set
+  `font-variant-numeric: tabular-nums`, as does any right-aligned grid cell —
+  only the footer, the pager and the chart tooltip had it, and Golos Text sets
+  proportional digits, so a right-aligned column of 300 figures did not line
+  up.
 
 ### Changed
 

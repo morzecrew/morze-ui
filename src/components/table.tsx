@@ -65,6 +65,8 @@ type TableHeadProps = React.ComponentProps<'th'> & {
   onSort?: (event: React.MouseEvent<HTMLButtonElement>) => void
   /** Accessible name for the control — "Sort by Amount". */
   sortLabel?: string
+  /** A column of figures: end-aligned, tabular digits. Set it on the cells too. */
+  numeric?: boolean
 }
 
 /**
@@ -82,6 +84,7 @@ function TableHead({
   sorted = false,
   onSort,
   sortLabel,
+  numeric = false,
   children,
   ...props
 }: TableHeadProps) {
@@ -89,6 +92,7 @@ function TableHead({
     <th
       data-slot="table-head"
       data-sortable={sortable || undefined}
+      data-numeric={numeric || undefined}
       aria-sort={
         sortable ? (sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none') : undefined
       }
@@ -109,8 +113,20 @@ function TableHead({
   )
 }
 
-function TableCell({ className, ...props }: React.ComponentProps<'td'>) {
-  return <td data-slot="table-cell" className={cn('mz-table__td', className)} {...props} />
+type TableCellProps = React.ComponentProps<'td'> & {
+  /** A figure: end-aligned, in tabular digits so the places line up. */
+  numeric?: boolean
+}
+
+function TableCell({ className, numeric = false, ...props }: TableCellProps) {
+  return (
+    <td
+      data-slot="table-cell"
+      data-numeric={numeric || undefined}
+      className={cn('mz-table__td', className)}
+      {...props}
+    />
+  )
 }
 
 function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) {
@@ -120,4 +136,4 @@ function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) 
 }
 
 export { Table, TableHeader, TableBody, TableFooter, TableRow, TableHead, TableCell, TableCaption }
-export type { TableHeadProps }
+export type { TableHeadProps, TableCellProps }

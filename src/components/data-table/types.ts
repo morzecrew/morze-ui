@@ -118,6 +118,12 @@ export type DataTableColumn<T> = {
   minWidth?: number
   maxWidth?: number
   align?: 'left' | 'center' | 'right'
+  /**
+   * A column of figures: right-aligned (unless `align` says otherwise) and
+   * set in tabular digits, so the places line up down the column whatever
+   * the face's own digits are.
+   */
+  numeric?: boolean
   sortable?: boolean
   filter?: ColumnFilterDef
   /** Sticks the column to an edge while the body scrolls sideways. */

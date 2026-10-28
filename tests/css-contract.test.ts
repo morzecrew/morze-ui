@@ -1176,4 +1176,17 @@ describe('the 2026-10 audit', () => {
     expect(group).toContain('font-size:12px')
     expect(group).toContain('color:var(--mz-text-dim)')
   })
+
+  it('sets numeric columns in tabular digits (#17)', () => {
+    for (const selector of [
+      '.mz-table__td[data-numeric]',
+      '.mz-dt__td[data-numeric]',
+      '.mz-dt__td[data-align=right]',
+    ]) {
+      const rule = [...css.matchAll(/([^{}]+)\{([^}]*)\}/g)].find(
+        ([, sel, body]) => sel!.split(',').includes(selector) && body!.includes('tabular-nums')
+      )
+      expect(rule, selector).toBeTruthy()
+    }
+  })
 })
