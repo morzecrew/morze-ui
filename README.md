@@ -325,7 +325,9 @@ What this kit adds on top:
   shared by buttons, inputs and toggles, so controls line up in a row. With
   `asChild` the loading indicator is grafted inside the child element and the
   blocked state is expressed through `aria-disabled`, since a link has no
-  `disabled`.
+  `disabled`. The heights are floors (`min-height` plus vertical padding), so
+  `wrap` — a label allowed to break over lines — grows the button instead of
+  clipping it.
 - `Toggle` / `ToggleGroup` — `variant`: `default` `outline`; `size`: `xs` (28px)
   `sm` (34) `md` (40, default) `lg` (48), the same scale the buttons run on;
   `tone`. `ToggleGroup` also

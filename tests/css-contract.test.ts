@@ -648,7 +648,7 @@ describe('typography contracts', () => {
   })
 
   it('keeps the button compact while the label still has air', () => {
-    expect(css).toContain('.mz-btn--md{height:40px;padding:0 20px')
+    expect(css).toContain('.mz-btn--md{min-height:40px;padding:8px 20px')
     // The height scale stays shared with the fields, or controls stop lining up.
     expect(css).toContain('.mz-input--sm{height:34px')
   })
@@ -1071,5 +1071,19 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     expect(css).toMatch(
       /\.mz-scroll-area\[data-orientation=vertical\]>\.mz-scroll-area__viewport>div\{display:block!important\}/
     )
+  })
+
+  it('lets a button grow for a label that wraps (#8)', () => {
+    // A floor plus vertical padding: one line lands on the 34/40/48 scale,
+    // two lines grow. A fixed height collapsed under `height: auto`.
+    for (const [size, floor] of [['xs', 28], ['sm', 34], ['md', 40], ['lg', 48]] as const) {
+      const rule = css.match(new RegExp(`\\.mz-btn--${size}\\{([^}]*)\\}`))?.[1] ?? ''
+      expect(rule, size).toContain(`min-height:${floor}px`)
+      expect(rule, size).not.toMatch(/(^|;)height:/)
+      expect(rule, size).toMatch(/padding:[1-9]\d*px /)
+    }
+    // A link is text, not a control: it must not inherit the floor.
+    expect(css).toMatch(/\.mz-btn--link\{[^}]*min-height:0/)
+    expect(css).toMatch(/\.mz-btn--wrap\{[^}]*white-space:normal/)
   })
 })

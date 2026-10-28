@@ -29,6 +29,10 @@ const buttonVariants = cva('mz-btn mz-focusable', {
       icon: 'mz-btn--icon',
       'icon-lg': 'mz-btn--icon-lg',
     },
+    wrap: {
+      true: 'mz-btn--wrap',
+      false: '',
+    },
   },
   defaultVariants: {
     variant: 'primary',
@@ -43,6 +47,11 @@ type ButtonProps = React.ComponentProps<'button'> &
     tone?: Tone
     /** Swaps the label for a spinner and blocks interaction. */
     loading?: boolean
+    /**
+     * Lets the label break over several lines; the button grows to fit
+     * rather than clipping it. Its size stays the floor.
+     */
+    wrap?: boolean
   }
 
 /*
@@ -95,6 +104,7 @@ function Button({
   asChild = false,
   tone,
   loading = false,
+  wrap = false,
   disabled,
   'aria-disabled': ariaDisabled,
   onClick,
@@ -135,7 +145,7 @@ function Button({
       data-size={size}
       data-tone={tone}
       data-loading={loading || undefined}
-      className={cn(buttonVariants({ variant, size }), className)}
+      className={cn(buttonVariants({ variant, size, wrap }), className)}
       {...state}
       aria-busy={loading || undefined}
       onClick={soft ? refuse : onClick}

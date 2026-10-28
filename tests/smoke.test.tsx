@@ -27,6 +27,18 @@ describe('Button', () => {
     expect(btn).toHaveAttribute('data-tone', 'accent')
   })
 
+  it('lets the label wrap only when asked (#8)', () => {
+    render(
+      <>
+        <Button>One line</Button>
+        <Button wrap>Two lines</Button>
+      </>
+    )
+    expect(screen.getByRole('button', { name: 'One line' })).not.toHaveClass('mz-btn--wrap')
+    expect(screen.getByRole('button', { name: 'Two lines' })).toHaveClass('mz-btn--wrap')
+    expect(buttonVariants({ wrap: true })).toContain('mz-btn--wrap')
+  })
+
   it('keeps the accessible name while loading', () => {
     render(
       <Button loading>

@@ -17,6 +17,23 @@ changes among them, and the only record left is six commits that say
 What erp-frontend still had to work around on top of 0.5.0 — issues #3 – #12
 on GitHub, one entry per issue.
 
+### Added
+
+- **`Button` — `wrap`** (#8). The label may break over lines and the button
+  grows to fit; `buttonVariants({ wrap: true })` carries it onto anything
+  styled as a button. erp put the padding back by hand on a trigger that
+  lists the chosen records (`h-auto min-h-10 py-2 whitespace-normal`).
+
+### Changed
+
+- **Button sizes are a floor, not a fixed height** (#8). `xs` … `lg` set
+  `min-height` (28/34/40/48px) and vertical padding that adds up to under it,
+  instead of `height` with side padding only. A one-line button measures what
+  it did; `height: auto` no longer collapses a wrapping one to a single line.
+  A host that *shrank* a button with a smaller `height` than its size now
+  picks the smaller `size` (or sets `min-height` too). The `icon-*` sizes stay
+  square and fixed.
+
 ### Fixed
 
 - **A vertical `ScrollArea` lets its content truncate** (#4). Radix wraps the

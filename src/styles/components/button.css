@@ -60,11 +60,26 @@
    Side padding gives the label a little air without stretching the button: the
    landing's ~2em is right for a 57px hero button and too wide for a 40px one in
    a toolbar. The heights stay on the 34/40/48 scale the inputs, selects and
-   toggles share, so controls keep lining up in a row. */
-.mz-btn--xs { height: 28px; padding: 0 12px; font-size: 12px; gap: 0.4em; border-radius: var(--mz-radius-sm); }
-.mz-btn--sm { height: 34px; padding: 0 16px; font-size: 13px; }
-.mz-btn--md { height: 40px; padding: 0 20px; font-size: 14px; }
-.mz-btn--lg { height: 48px; padding: 0 24px; font-size: 15px; }
+   toggles share, so controls keep lining up in a row.
+
+   A floor, not a fixed height: one line of label plus the vertical padding
+   comes in under each step, so a single-line button sits exactly on the scale
+   and a label that wraps grows the button instead of spilling out of it. With
+   a fixed `height` and no vertical padding, `height: auto` collapsed a
+   wrapping button to one line height (#8). */
+.mz-btn--xs { min-height: 28px; padding: 4px 12px; font-size: 12px; gap: 0.4em; border-radius: var(--mz-radius-sm); }
+.mz-btn--sm { min-height: 34px; padding: 6px 16px; font-size: 13px; }
+.mz-btn--md { min-height: 40px; padding: 8px 20px; font-size: 14px; }
+.mz-btn--lg { min-height: 48px; padding: 10px 24px; font-size: 15px; }
+
+/* `wrap`: the label may break over lines — a selection summary, a narrow
+   column. Off by default because a button label that wraps is usually a
+   layout that ran out of room, and one line is the better failure there. */
+.mz-btn--wrap {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
 
 .mz-btn--icon-xs { height: 28px; width: 28px; padding: 0; border-radius: var(--mz-radius-sm); }
 .mz-btn--icon-sm { height: 34px; width: 34px; padding: 0; }
@@ -203,6 +218,7 @@
 /* ---- Link ---- */
 .mz-btn--link {
   height: auto;
+  min-height: 0;
   padding: 0;
   background: none;
   border: none;
