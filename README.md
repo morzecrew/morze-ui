@@ -107,6 +107,40 @@ colour from the tokens). By default `data-mz-theme` is written to `<html>`, so
 portalled dialogs and menus follow the theme too. `target="element"` scopes the
 theme to the wrapper instead.
 
+**An application that already has a theme switch drives the provider** rather
+than the other way round. A `dark` or `light` class on `<html>` — what
+`next-themes` and Tailwind's class strategy write — selects the kit's palette
+by itself, so next-themes' own pre-paint script already gets the first frame
+right, and nothing has to copy its answer into `data-mz-theme`. Hand the
+resolved theme to the provider so `useMorzeTheme()` agrees with it; given
+`theme`, the provider keeps no state and touches no storage, and `setTheme`
+only calls `onThemeChange`:
+
+```tsx
+import { ThemeProvider, useTheme } from 'next-themes'
+
+function KitTheme({ children }: { children: React.ReactNode }) {
+  const { resolvedTheme, setTheme } = useTheme()
+  return (
+    <MorzeThemeProvider
+      theme={resolvedTheme === 'light' ? 'light' : 'dark'}
+      onThemeChange={setTheme}
+      attribute="class"
+    >
+      {children}
+    </MorzeThemeProvider>
+  )
+}
+
+<ThemeProvider attribute="class"><KitTheme>…</KitTheme></ThemeProvider>
+```
+
+`attribute="class"` makes the provider write the same class next-themes does
+instead of `data-mz-theme`, so the two never disagree on `<html>`. It is also
+the switch for a kit-owned theme in a Tailwind app: the provider's class is
+what `dark:` utilities read. Only the root element is matched — `.light`
+elsewhere in the page is somebody else's class.
+
 ## Tones
 
 Every active component accepts `tone`, which re-points the fill, the glow

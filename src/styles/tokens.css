@@ -6,9 +6,17 @@
    on the edges of a control now, never washed across its face. Every sheen is
    kept as a `none` hook, so a host can put the gloss back in one place.
    Dark is the default theme; light is opt-in via [data-mz-theme="light"].
+
+   A `dark` / `light` class on <html> selects the palette too: that is how
+   next-themes and Tailwind's class strategy say it, and an application that
+   already has a theme switch should not have to copy its answer into a second
+   attribute — nor run its own script before first paint to do it in time.
+   Only on the root element: `.light` is too common a class name to theme
+   whatever else in the page happens to wear it.
    ========================================================================== */
 
 :root,
+:root.dark,
 [data-mz-theme='dark'],
 .mz-theme-dark {
   color-scheme: dark;
@@ -243,6 +251,7 @@
 }
 
 [data-mz-theme='light'],
+:root.light,
 .mz-theme-light {
   color-scheme: light;
 

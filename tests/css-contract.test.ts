@@ -1120,4 +1120,20 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     expect(rules.length, name).toBeGreaterThan(0)
     expect(rules.some((rule) => rule[1]!.includes(declaration)), name).toBe(true)
   })
+
+  it('takes the theme from a dark / light class on <html> (#3)', () => {
+    // next-themes and Tailwind's class strategy say the theme this way, and
+    // their own pre-paint script sets it in time — so the palette has to
+    // follow the class, not only the kit's attribute. On the root only: a
+    // `.light` anywhere else in the page is somebody else's class.
+    // The theme block is the one that declares the tint; its selector list is
+    // what precedes it. (color-scheme itself is compiled into lightningcss's
+    // own variables, so it is no anchor.)
+    const lists = [...css.matchAll(/(?:^|\})([^{}]+)\{[^}]*--mz-tint:/g)].map((m) => m[1]!.split(','))
+    const light = lists.find((list) => list.includes('[data-mz-theme=light]'))
+    const dark = lists.find((list) => list.includes('[data-mz-theme=dark]'))
+    expect(light).toContain(':root.light')
+    expect(dark).toContain(':root.dark')
+    expect(css).not.toMatch(/(^|[},])\.light[,{]/)
+  })
 })

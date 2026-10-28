@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -15,6 +15,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
   buttonVariants,
+  useMorzeTheme,
   inputVariants,
   overlayClass,
   panelClass,
@@ -234,6 +235,77 @@ describe('MorzeThemeProvider', () => {
       )
     ).not.toThrow()
     if (original) Object.defineProperty(window, 'localStorage', original)
+  })
+
+  // An application with its own theme switch had to copy the answer into
+  // `data-mz-theme` itself, and read next-themes' storage before paint (#3).
+  describe('driven by the application', () => {
+    function Probe() {
+      const { theme, resolvedTheme, setTheme } = useMorzeTheme()
+      return (
+        <button type="button" onClick={() => setTheme('dark')}>
+          {theme}/{resolvedTheme}
+        </button>
+      )
+    }
+
+    afterEach(() => {
+      document.documentElement.removeAttribute('data-mz-theme')
+      document.documentElement.classList.remove('dark', 'light')
+      window.localStorage.removeItem('morze-ui-theme')
+    })
+
+    it('paints the theme it is given and keeps no storage of its own', async () => {
+      window.localStorage.setItem('morze-ui-theme', 'dark')
+      const onThemeChange = vi.fn()
+      const { rerender } = render(
+        <MorzeThemeProvider theme="light" onThemeChange={onThemeChange}>
+          <Probe />
+        </MorzeThemeProvider>
+      )
+      const probe = screen.getByRole('button')
+      // The stored 'dark' is somebody else's business now.
+      expect(probe).toHaveTextContent('light/light')
+      expect(document.documentElement).toHaveAttribute('data-mz-theme', 'light')
+
+      await userEvent.click(probe)
+      expect(onThemeChange).toHaveBeenCalledWith('dark')
+      // Reported, not applied: the value comes back through `theme` or not at all.
+      expect(probe).toHaveTextContent('light/light')
+      expect(window.localStorage.getItem('morze-ui-theme')).toBe('dark')
+
+      rerender(
+        <MorzeThemeProvider theme="dark" onThemeChange={onThemeChange}>
+          <Probe />
+        </MorzeThemeProvider>
+      )
+      expect(probe).toHaveTextContent('dark/dark')
+      expect(document.documentElement).toHaveAttribute('data-mz-theme', 'dark')
+    })
+
+    it('still reports a change when it owns the theme itself', async () => {
+      const onThemeChange = vi.fn()
+      render(
+        <MorzeThemeProvider defaultTheme="light" storageKey={null} onThemeChange={onThemeChange}>
+          <Probe />
+        </MorzeThemeProvider>
+      )
+      await userEvent.click(screen.getByRole('button'))
+      expect(onThemeChange).toHaveBeenCalledWith('dark')
+      expect(screen.getByRole('button')).toHaveTextContent('dark/dark')
+    })
+
+    it('writes the class next-themes and Tailwind read, when asked', () => {
+      document.documentElement.classList.add('dark')
+      render(
+        <MorzeThemeProvider theme="light" attribute="class">
+          <span>x</span>
+        </MorzeThemeProvider>
+      )
+      expect(document.documentElement).toHaveClass('light')
+      expect(document.documentElement).not.toHaveClass('dark')
+      expect(document.documentElement).not.toHaveAttribute('data-mz-theme')
+    })
   })
 })
 

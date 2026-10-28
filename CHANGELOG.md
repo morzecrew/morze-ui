@@ -51,6 +51,15 @@ on GitHub, one entry per issue.
   pointer-capture stand-ins wherever the environment has none, and returns the
   teardown; `@morze/ui/testing/setup` does it on import, for `setupFiles`. erp
   carried its own copy of these stubs in three test files.
+- **`MorzeThemeProvider` can be driven by the application** (#3). `theme`
+  makes it controlled — no state, no storage, `setTheme` only calls
+  `onThemeChange` — and `attribute="class"` makes it write a `dark` / `light`
+  class on `<html>` instead of `data-mz-theme`. The palettes match that class
+  on the root element too, so an app on `next-themes` (or Tailwind's class
+  strategy) gets the kit's palette from the class next-themes' own pre-paint
+  script sets. erp copied the resolved theme into `data-mz-theme` from a bridge
+  component and duplicated next-themes' storage read in an inline script in
+  `index.html`; neither is needed now.
 
 ### Changed
 
@@ -61,6 +70,11 @@ on GitHub, one entry per issue.
   A host that *shrank* a button with a smaller `height` than its size now
   picks the smaller `size` (or sets `min-height` too). The `icon-*` sizes stay
   square and fixed.
+- **A `dark` / `light` class on `<html>` selects the palette** (#3), and wins
+  over `data-mz-theme` on the same element. A host that had `class="dark"` on
+  `<html>` for its own reasons and the kit deliberately light through
+  `data-mz-theme="light"` now gets the dark palette; set the attribute on a
+  wrapper (`target="element"`) instead.
 
 ### Fixed
 

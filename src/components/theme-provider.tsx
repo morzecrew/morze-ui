@@ -43,61 +43,94 @@ type MorzeThemeProviderProps = {
   children: React.ReactNode
   /** Initial theme. Defaults to the Morze dark palette. */
   defaultTheme?: MorzeTheme
-  /** localStorage key; pass `null` to disable persistence. */
+  /**
+   * The theme, owned by the application — `next-themes`' `resolvedTheme`, a
+   * store of its own. Given one, the provider keeps no state and touches no
+   * storage: it paints what it is told, and `setTheme` only reports through
+   * `onThemeChange`.
+   */
+  theme?: MorzeTheme
+  /** Called by `setTheme`, controlled or not. */
+  onThemeChange?: (theme: MorzeTheme) => void
+  /**
+   * localStorage key; pass `null` to disable persistence. Never read or
+   * written while `theme` is controlled.
+   */
   storageKey?: string | null
   /**
-   * Where `data-mz-theme` is written. `html` themes the whole document (and is
+   * Where the theme is written. `html` themes the whole document (and is
    * what you want when portalled dialogs and menus should follow the theme);
    * `element` scopes the theme to the wrapper this provider renders.
    */
   target?: 'html' | 'element'
+  /**
+   * What is written on `<html>`: `data-mz-theme="dark|light"` (default), or a
+   * `dark` / `light` class — the convention of `next-themes` and Tailwind's
+   * class strategy, which the kit's palettes match on `<html>` as well. An
+   * `element` target always uses the data attribute.
+   */
+  attribute?: 'data-mz-theme' | 'class'
   className?: string
 }
 
 function MorzeThemeProvider({
   children,
   defaultTheme = 'dark',
+  theme: controlled,
+  onThemeChange,
   storageKey = 'morze-ui-theme',
   target = 'html',
+  attribute = 'data-mz-theme',
   className,
 }: MorzeThemeProviderProps) {
   // Both the server and the first client render start from defaultTheme; the
   // stored/system preference is applied after mount. Reading storage during
   // render would make the markup disagree with the server and break hydration.
-  const [theme, setThemeState] = React.useState<MorzeTheme>(defaultTheme)
-  const [resolved, setResolved] = React.useState<'dark' | 'light'>(
-    defaultTheme === 'system' ? 'dark' : defaultTheme
-  )
+  const [internal, setInternal] = React.useState<MorzeTheme>(defaultTheme)
+  const theme = controlled ?? internal
+  const [systemResolved, setSystemResolved] = React.useState<'dark' | 'light'>('dark')
+  const resolved = theme === 'system' ? systemResolved : theme
 
+  const isControlled = controlled !== undefined
   React.useEffect(() => {
+    if (isControlled) return
     const stored = readStored(storageKey)
-    if (stored) setThemeState(stored)
-  }, [storageKey])
+    if (stored) setInternal(stored)
+  }, [storageKey, isControlled])
 
   React.useEffect(() => {
-    if (theme !== 'system') {
-      setResolved(theme)
-      return
-    }
-    setResolved(systemTheme())
+    if (theme !== 'system') return
+    setSystemResolved(systemTheme())
     if (typeof window.matchMedia !== 'function') return
     const mql = window.matchMedia('(prefers-color-scheme: light)')
-    const onChange = () => setResolved(systemTheme())
+    const onChange = () => setSystemResolved(systemTheme())
     mql.addEventListener('change', onChange)
     return () => mql.removeEventListener('change', onChange)
   }, [theme])
 
   React.useEffect(() => {
     if (target !== 'html' || typeof document === 'undefined') return
-    document.documentElement.setAttribute('data-mz-theme', resolved)
-  }, [resolved, target])
+    const root = document.documentElement
+    if (attribute === 'class') {
+      root.classList.remove(resolved === 'dark' ? 'light' : 'dark')
+      root.classList.add(resolved)
+    } else {
+      root.setAttribute('data-mz-theme', resolved)
+    }
+  }, [resolved, target, attribute])
 
+  const onThemeChangeRef = React.useRef(onThemeChange)
+  onThemeChangeRef.current = onThemeChange
   const setTheme = React.useCallback(
     (next: MorzeTheme) => {
-      setThemeState(next)
+      onThemeChangeRef.current?.(next)
+      // Controlled: the application owns the theme and its storage, and the
+      // new value arrives back through `theme` — or does not, if it says no.
+      if (isControlled) return
+      setInternal(next)
       writeStored(storageKey, next)
     },
-    [storageKey]
+    [storageKey, isControlled]
   )
 
   const value = React.useMemo(
