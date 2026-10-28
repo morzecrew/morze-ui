@@ -1063,3 +1063,13 @@ describe('two ways to say no (K-07)', () => {
     expect(native).toContain('pointer-events:none')
   })
 })
+
+describe('what erp-frontend still worked around (#3 – #12)', () => {
+  it('lets a vertical ScrollArea truncate (#4)', () => {
+    // Radix's inline `display: table` grows the content box to its widest
+    // child; only !important gets past an inline style.
+    expect(css).toMatch(
+      /\.mz-scroll-area\[data-orientation=vertical\]>\.mz-scroll-area__viewport>div\{display:block!important\}/
+    )
+  })
+})

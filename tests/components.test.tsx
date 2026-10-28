@@ -58,6 +58,7 @@ import {
   RadioGroup,
   RadioGroupItem,
   ScrollArea,
+  ScrollBar,
   Select,
   SelectContent,
   SelectItem,
@@ -231,6 +232,40 @@ describe('ScrollArea', () => {
     const bar = container.querySelector('[data-slot="scroll-area-scrollbar"]')
     expect(bar).toHaveClass('mz-scrollbar')
     expect(bar).toHaveAttribute('data-orientation', 'vertical')
+  })
+
+  // Radix's `display: table` content box grows to its widest child, so a long
+  // line in a vertical list never truncated (#4). The CSS keys off the root's
+  // orientation; what is assertable without layout is that it is set right.
+  it('is vertical unless a horizontal bar is asked for', () => {
+    const area = (node: React.ReactNode) =>
+      render(node).container.querySelector('[data-slot="scroll-area"]')
+    expect(area(<ScrollArea>x</ScrollArea>)).toHaveAttribute('data-orientation', 'vertical')
+    expect(
+      area(
+        <ScrollArea>
+          x<ScrollBar orientation="horizontal" />
+        </ScrollArea>
+      )
+    ).toHaveAttribute('data-orientation', 'both')
+    expect(area(<ScrollArea orientation="both">x</ScrollArea>)).toHaveAttribute(
+      'data-orientation',
+      'both'
+    )
+  })
+
+  it('draws the bars its orientation names', () => {
+    const bars = (orientation: 'vertical' | 'horizontal' | 'both') =>
+      [
+        ...render(
+          <ScrollArea type="always" orientation={orientation}>
+            x
+          </ScrollArea>
+        ).container.querySelectorAll('[data-slot="scroll-area-scrollbar"]'),
+      ].map((bar) => bar.getAttribute('data-orientation'))
+    expect(bars('vertical')).toEqual(['vertical'])
+    expect(bars('horizontal')).toEqual(['horizontal'])
+    expect(bars('both')).toEqual(['vertical', 'horizontal'])
   })
 })
 

@@ -443,6 +443,11 @@ What this kit adds on top:
   element back for a synchronised header or a virtualiser.
 - `ScrollArea` — the kit's scrollbar in place of the platform's, so a pane
   looks scrollable on macOS too. `viewportRef` reaches the scrolling element.
+  It is vertical unless told otherwise, and a vertical area holds its content
+  to its own width, so `truncate` in a list ends in "…" instead of widening
+  the column. `orientation="both"` (or `"horizontal"`) lets the content grow
+  sideways and draws the horizontal bar; rendering a horizontal `ScrollBar`
+  among the children still works and implies `both`.
 
 ```tsx
 <ToggleGroup type="single" defaultValue="week" appearance="segmented">

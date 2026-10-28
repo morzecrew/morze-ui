@@ -12,6 +12,22 @@ between 0.2.0 and 0.3.7 the package went out eleven times, with real API
 changes among them, and the only record left is six commits that say
 `bump x.y.z`.
 
+## [Unreleased]
+
+What erp-frontend still had to work around on top of 0.5.0 — issues #3 – #12
+on GitHub, one entry per issue.
+
+### Fixed
+
+- **A vertical `ScrollArea` lets its content truncate** (#4). Radix wraps the
+  content in an inline `display: table; min-width: 100%` box, which grows to
+  its widest child — so a long title pushed the list wider instead of ending
+  in "…", and erp reached past the kit with `[&>div]:block!`. A vertical area
+  now sets that box back to `block`. `ScrollArea` takes `orientation`
+  (`vertical` | `horizontal` | `both`); left out, it is `both` when a
+  horizontal `ScrollBar` is among the children and `vertical` otherwise, so
+  an existing two-way area keeps scrolling sideways.
+
 ## [0.5.0] — 2026-09-13
 
 The P2 half of the 2026-09 review (`docs/review-2026-09.md`), which closes it:

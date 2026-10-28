@@ -13,6 +13,14 @@
   border-radius: inherit;
   outline: none;
 }
+/* Radix wraps the content in `display: table; min-width: 100%`, inline, so it
+   grows to the widest child — a long line pushed the column wider instead of
+   ending in an ellipsis. Nothing scrolls sideways in a vertical area, so the
+   wrapper goes back to a block held to the viewport's width. The !important is
+   the only way past an inline style. */
+.mz-scroll-area[data-orientation='vertical'] > .mz-scroll-area__viewport > div {
+  display: block !important;
+}
 
 .mz-scrollbar {
   display: flex;
