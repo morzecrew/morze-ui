@@ -99,6 +99,9 @@
   /* The label colour that goes with the fill — see --mz-primary-fg. A tone
      re-points both, so a filled control never has to know which it wears. */
   --mz-tone-fg: var(--mz-primary-fg);
+  /* The tone as text — see --mz-primary-text. A fill colour is not a text
+     colour: the light emerald read at 2.8:1. */
+  --mz-tone-text: var(--mz-primary-text);
 
   /* The toned fill as a plain colour: hover and press just darken it, and
      background-color animates where a gradient could not. */
@@ -164,6 +167,16 @@
   --mz-cap: var(--mz-cap-plain);
   --mz-cap-edge: var(--mz-cap-plain-edge);
 }
+
+/* Tone-coloured text for a host's own markup — a delta in a KPI, a status
+   word — cut to read as text in either theme (#15). The fill colours are not:
+   #10af7a on a white card is 2.8:1. */
+.mz-text-primary { color: var(--mz-primary-text); }
+.mz-text-accent { color: var(--mz-accent-text); }
+.mz-text-success { color: var(--mz-success-text); }
+.mz-text-danger { color: var(--mz-danger-text); }
+.mz-text-warning { color: var(--mz-warning-text); }
+.mz-text-info { color: var(--mz-info-text); }
 
 /* Focus is always an outline so it never fights the layered box-shadows. */
 .mz-focusable:focus-visible {

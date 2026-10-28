@@ -2,13 +2,13 @@
    Tone overrides.
    Imported last so an explicit `tone` prop always wins over a component's
    own default (including variant defaults such as .mz-btn--destructive).
-   Each tone re-points the fill and the label colour that goes with it in one
-   go — a filled control never has to know which foreground it wears.
+   Each tone re-points the fill, the label colour that goes with it and its
+   text cut in one go — a control never has to know which it wears.
    ========================================================================== */
 
-[data-tone='primary'] { --mz-tone: var(--mz-primary); --mz-tone-fg: var(--mz-primary-fg); }
-[data-tone='accent'] { --mz-tone: var(--mz-accent); --mz-tone-fg: var(--mz-accent-fg); }
-[data-tone='danger'] { --mz-tone: var(--mz-danger); --mz-tone-fg: var(--mz-danger-fg); }
-[data-tone='warning'] { --mz-tone: var(--mz-warning); --mz-tone-fg: var(--mz-warning-fg); }
-[data-tone='info'] { --mz-tone: var(--mz-info); --mz-tone-fg: var(--mz-info-fg); }
-[data-tone='success'] { --mz-tone: var(--mz-success); --mz-tone-fg: var(--mz-success-fg); }
+[data-tone='primary'] { --mz-tone: var(--mz-primary); --mz-tone-fg: var(--mz-primary-fg); --mz-tone-text: var(--mz-primary-text); }
+[data-tone='accent'] { --mz-tone: var(--mz-accent); --mz-tone-fg: var(--mz-accent-fg); --mz-tone-text: var(--mz-accent-text); }
+[data-tone='danger'] { --mz-tone: var(--mz-danger); --mz-tone-fg: var(--mz-danger-fg); --mz-tone-text: var(--mz-danger-text); }
+[data-tone='warning'] { --mz-tone: var(--mz-warning); --mz-tone-fg: var(--mz-warning-fg); --mz-tone-text: var(--mz-warning-text); }
+[data-tone='info'] { --mz-tone: var(--mz-info); --mz-tone-fg: var(--mz-info-fg); --mz-tone-text: var(--mz-info-text); }
+[data-tone='success'] { --mz-tone: var(--mz-success); --mz-tone-fg: var(--mz-success-fg); --mz-tone-text: var(--mz-success-text); }

@@ -157,10 +157,23 @@ and the focus ring:
 `info`. A tone is the `--mz-tone` custom property, so a one-off value works
 too, in any colour syntax: `style={{ '--mz-tone': '#ff6482' }}`. Every glow,
 wash and rim the kit draws in a tone is a `color-mix()` cut of that one colour.
-Each tone also names the label colour on its fill (`--mz-primary-fg` …
-`--mz-info-fg`, read through `--mz-tone-fg`). Every shipped tone uses white; a
-pale tone of your own — a pastel yellow, a mint — sets `--mz-tone-fg` alongside
-`--mz-tone`, or re-points one `--mz-<tone>-fg` for the whole kit.
+Each tone also names two colours that go with it:
+
+- **the label on its fill**, `--mz-<tone>-fg` (read through `--mz-tone-fg`):
+  white on a deep fill, `--mz-on-fill` — a near-black leaning the brand's way —
+  on a light one. Every dark-theme fill is light, so dark labels throughout;
+  in light, white on the violet and the red, dark on the emerald, amber and
+  blue.
+- **the tone as text**, `--mz-<tone>-text` (read through `--mz-tone-text`): a
+  soft badge's label, an active tab, a link, an error line. A fill colour is
+  not a text colour — the light emerald read 2.8:1 on white — so each one is
+  cut darker (light) or lighter (dark) until it reads. `.mz-text-success` …
+  `.mz-text-info` put it on your own markup.
+
+Every pair is held to WCAG AA (4.5:1) by `tests/contrast.test.ts`, resolved
+from the tokens. A tone of your own sets `--mz-tone-fg` and `--mz-tone-text`
+alongside `--mz-tone`; re-pointing a whole tone re-points its `-fg` and
+`-text` with it, since only you know how light your colour is.
 
 **Re-skinning the kit is one colour per tone**, per theme: `--mz-primary`,
 `--mz-accent`, `--mz-success`, `--mz-danger`, `--mz-warning`, `--mz-info`, and
@@ -368,6 +381,7 @@ a breaking change and is listed under **Breaking** in the changelog.
 | `mz-input` (`--sm`, `--lg`) | `inputVariants({ size })` | the field look, for an element that should read as an input |
 | `mz-focusable` | — | the offset focus outline everything you press wears |
 | `mz-sr-only` | — | visually hidden, still read |
+| `mz-text-<tone>` | — | a tone as text that passes AA (`primary`, `accent`, `success`, `danger`, `warning`, `info`) |
 
 Alongside them, `buttonVariants` / `badgeVariants` / `toggleVariants` put the
 look of those components on any element, and the sidebar's helpers

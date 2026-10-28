@@ -23,7 +23,7 @@
 .mz-label:has(+ :disabled) { opacity: 0.5; }
 /* A label over a field that failed validation. The colour is the whole of the
    signal here — the message under the field carries the reason. */
-.mz-label--error { color: var(--mz-danger); }
+.mz-label--error { color: var(--mz-danger-text); }
 
 .mz-field {
   display: flex;
@@ -38,7 +38,7 @@
 }
 .mz-field__error {
   font-size: 12px;
-  color: var(--mz-danger);
+  color: var(--mz-danger-text);
 }
 
 .mz-input,
@@ -92,6 +92,7 @@
 .mz-input[aria-invalid='true'],
 .mz-textarea[aria-invalid='true'] {
   --mz-tone: var(--mz-danger);
+  --mz-tone-text: var(--mz-danger-text);
   border-color: color-mix(in srgb, var(--mz-danger) 60%, transparent);
 }
 

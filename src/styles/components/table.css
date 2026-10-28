@@ -75,7 +75,7 @@
 }
 .mz-table__sort-icon svg { width: 13px; height: 13px; }
 .mz-table__sort-icon:not([data-active]) svg { width: 15px; height: 15px; stroke-width: 2.25; }
-.mz-table__sort-icon[data-active] { opacity: 1; color: var(--mz-tone); }
+.mz-table__sort-icon[data-active] { opacity: 1; color: var(--mz-tone-text); }
 .mz-table__sort:hover .mz-table__sort-icon { opacity: 0.9; }
 
 .mz-table__td {

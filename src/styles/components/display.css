@@ -85,7 +85,7 @@
   margin-bottom: -1px;
 }
 .mz-tabs-list--line .mz-tabs-trigger[data-state='active'] {
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   border-bottom-color: var(--mz-tone);
   background: none;
   box-shadow: var(--mz-glow-panel);
@@ -133,7 +133,7 @@
 .mz-tabs-overflow__caret { width: 13px; height: 13px; opacity: 0.7; }
 /* The active tab is inside the menu: the row would otherwise read as if
    nothing at all were selected. */
-.mz-tabs-overflow[data-active] { color: var(--mz-tone); }
+.mz-tabs-overflow[data-active] { color: var(--mz-tone-text); }
 .mz-tabs-overflow[data-state='open'] { color: var(--mz-text); background: var(--mz-face); }
 @media (max-width: 640px) {
   .mz-tabs-overflow__label { display: none; }
@@ -217,7 +217,7 @@
    sign in the light theme, where a "highlight" cut from the ink is a shadow. */
 .mz-badge--soft {
   background: color-mix(in srgb, var(--mz-tone) 14%, transparent);
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   border-color: color-mix(in srgb, var(--mz-tone) 32%, transparent);
 }
 .mz-badge--outline {
@@ -245,7 +245,7 @@
   font-size: 14px;
 }
 .mz-alert:has(> svg) { grid-template-columns: 18px 1fr; gap: 2px 12px; }
-.mz-alert > svg { width: 17px; height: 17px; translate: 0 2px; color: var(--mz-tone); }
+.mz-alert > svg { width: 17px; height: 17px; translate: 0 2px; color: var(--mz-tone-text); }
 .mz-alert-title { grid-column-start: 2; font-weight: 700; line-height: 1.35; }
 .mz-alert-description { grid-column-start: 2; font-size: 13px; color: var(--mz-text-dim); }
 
@@ -272,7 +272,7 @@
   outline: none;
   transition: color var(--mz-duration) ease;
 }
-.mz-accordion-trigger:hover { color: var(--mz-tone); }
+.mz-accordion-trigger:hover { color: var(--mz-tone-text); }
 .mz-accordion-trigger__icon {
   flex-shrink: 0;
   width: 26px;

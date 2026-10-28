@@ -84,6 +84,17 @@ issue.
   to three components by hand, and its five `Combobox` instances overrode
   `search` and `empty` only — so Russian users saw "Loading" and "The options
   could not be loaded".
+- **`--mz-<tone>-text` and `.mz-text-<tone>`** (#15) — each tone as a text
+  colour, per theme, and the helper class for a host's own markup. Soft
+  badges, active tabs and nav items, links, menu checks, the table's chips and
+  sort arrows and every error line read it (through `--mz-tone-text`) instead
+  of the fill colour, which measured 2.45:1 (emerald) to 4.30:1 (violet) on a
+  soft badge's wash.
+- **`tests/contrast.test.ts`** (#14) resolves the tokens the way the browser
+  does — `var()` through the theme block, `color-mix()` in sRGB — and holds
+  every text / ground pair the kit draws to 4.5:1: the three text steps on
+  every ramp step, each tone's label on its fill, each tone's text on the page
+  and on its own wash.
 
 ### Changed
 
@@ -117,6 +128,13 @@ issue.
   English defaults are in the bundles too. A language typed against
   `MorzeLocale` fails to compile until it has them — which is the point of the
   type.
+- **The label on a tone's fill follows how light the fill is** (#16). White on
+  every tone measured 3.04:1 on the dark primary — every primary button and
+  active nav item — and 1.67:1 on the amber. Dark-theme fills now carry
+  `--mz-on-fill`, a brand-leaning near-black (5.8:1 and up); light keeps white
+  on the violet and the red and takes the dark label on the emerald, amber and
+  blue. The light danger is a step deeper (`212, 48, 79`), the one fill
+  neither label cleared. A host that re-pointed a tone re-checks its `-fg`.
 
 ### Fixed
 
@@ -150,6 +168,10 @@ issue.
 - **The sidebar's group label is 12px in the dim text** (#19), not 11px in the
   muted one: 11px is under the floor every reference system keeps, and the
   muted grey measured 3.64:1 on the light rail.
+- **The muted text passes AA in both themes** (#14). Light was 4.33:1 on a card
+  and 3.64:1 on the page under the sidebar; it is cut from `#6a6a6a` now
+  (5.46 / 4.59:1). Dark passed on the page but fell to 4.19:1 on an elevated
+  panel — a dialog, a menu — and moves from `#808080` to `#8a8a8a` (4.68:1).
 
 ## [0.5.0] — 2026-09-13
 

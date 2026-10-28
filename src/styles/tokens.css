@@ -69,10 +69,13 @@
 
   /* ---- Text ----
      Same recipe as the landing's #ECECF5 / #A3A0B8: white and grey pulled a
-     step toward the brand. Muted stays above 4:1 on an elevated panel. */
+     step toward the brand. Every step clears 4.5:1 (WCAG AA) on every ramp
+     step it is drawn on, the elevated panel included — #808080 under the
+     muted line fell to 4.19:1 on a dialog (#14). tests/contrast.test.ts holds
+     all three to it. */
   --mz-text: color-mix(in srgb, #f2f2f2 92%, var(--mz-tint));
   --mz-text-dim: color-mix(in srgb, #a6a6a6 86%, var(--mz-tint));
-  --mz-text-muted: color-mix(in srgb, #808080 88%, var(--mz-tint));
+  --mz-text-muted: color-mix(in srgb, #8a8a8a 88%, var(--mz-tint));
 
   /* ---- Tones ----
      Each tone is one colour, and everything translucent the kit draws from it
@@ -102,20 +105,37 @@
   --mz-info: rgb(var(--mz-info-rgb));
   --mz-success: rgb(var(--mz-success-rgb));
 
-  /* The label on each tone's fill. White on every tone the kit ships: the
-     fills are saturated enough that a label reads by weight and hue, and one
-     label colour across a toolbar of buttons, badges and checkmarks matters
-     more than the last point of contrast on the amber (1.7:1 against white in
-     this theme — a decision, recorded in FIXES.md). The threshold is the
-     host's to set: a pale tone — a pastel yellow, a mint — re-points its own
-     -fg to the ink. Every filled control reads the resolved --mz-tone-fg,
-     never a literal, so that is one edit per tone. */
-  --mz-primary-fg: #ffffff;
-  --mz-accent-fg: #ffffff;
-  --mz-success-fg: #ffffff;
-  --mz-danger-fg: #ffffff;
-  --mz-warning-fg: #ffffff;
-  --mz-info-fg: #ffffff;
+  /* The label on each tone's fill. It was white on every tone, on the theory
+     that one label colour across a toolbar mattered more than the last point
+     of contrast — but the dark fills are light pastels, and white measured
+     3.04:1 on the primary and 1.67:1 on the amber: every primary button and
+     active nav item failed AA (#16). Every dark fill is light enough for a
+     dark label, so the one-colour toolbar survives here — it is just the
+     other colour: --mz-on-fill, a near-black leaning the brand's way, which
+     clears 5.8:1 on the primary and more on the rest.
+
+     A host that re-points a tone re-points its -fg with it: the right label
+     depends on how light the fill is, and only the host knows that. Every
+     filled control reads the resolved --mz-tone-fg, never a literal, so that
+     is one edit per tone. */
+  --mz-on-fill: color-mix(in srgb, #0a0a12 90%, var(--mz-tint));
+  --mz-primary-fg: var(--mz-on-fill);
+  --mz-accent-fg: var(--mz-on-fill);
+  --mz-success-fg: var(--mz-on-fill);
+  --mz-danger-fg: var(--mz-on-fill);
+  --mz-warning-fg: var(--mz-on-fill);
+  --mz-info-fg: var(--mz-on-fill);
+
+  /* Each tone as text — a badge's label, an active tab, a link, an error
+     line. The fills are tuned to be filled; as text on a 14% wash of
+     themselves the primary and the danger fell under 4.5:1 here, so those two
+     are lifted toward white. The rest already clear it (#15). */
+  --mz-primary-text: color-mix(in srgb, var(--mz-primary) 80%, #ffffff);
+  --mz-accent-text: var(--mz-accent);
+  --mz-success-text: var(--mz-success);
+  --mz-danger-text: color-mix(in srgb, var(--mz-danger) 80%, #ffffff);
+  --mz-warning-text: var(--mz-warning);
+  --mz-info-text: var(--mz-info);
 
   /* ---- The convex recipe ----
      Every active element (button, toggle, checkbox, radio, switch, slider,
@@ -301,14 +321,18 @@
 
   --mz-text: color-mix(in srgb, #141414 92%, var(--mz-tint));
   --mz-text-dim: color-mix(in srgb, #545454 88%, var(--mz-tint));
-  /* #8a8a8a fell to 2.98:1 on the tinted page with a mid-lightness brand. */
-  --mz-text-muted: color-mix(in srgb, #7c7c7c 90%, var(--mz-tint));
+  /* #8a8a8a fell to 2.98:1 on the tinted page with a mid-lightness brand, and
+     the #7c7c7c that replaced it still only reached 4.33:1 on a white card and
+     3.64:1 on the page under the sidebar (#14). */
+  --mz-text-muted: color-mix(in srgb, #6a6a6a 90%, var(--mz-tint));
 
   /* See the dark block: the triplets carry the defaults, the colours are
      what the kit reads. */
   --mz-primary-rgb: 124, 74, 232;
   --mz-accent-rgb: 16, 175, 122;
-  --mz-danger-rgb: 226, 60, 92;
+  /* A step deeper than the #e23c5c it was: white on that measured 4.17:1, and
+     so did the dark label — neither could be the label of a delete button. */
+  --mz-danger-rgb: 212, 48, 79;
   --mz-warning-rgb: 202, 138, 4;
   --mz-info-rgb: 14, 145, 214;
   --mz-success-rgb: 16, 175, 122;
@@ -320,14 +344,26 @@
   --mz-info: rgb(var(--mz-info-rgb));
   --mz-success: rgb(var(--mz-success-rgb));
 
-  /* White throughout here too; see the dark block. The light tones are the
-     deeper cut, so the amber lands at 2.9:1 and the rest above 3:1. */
+  /* See the dark block. Light is where the fills part ways: the violet and
+     the red are deep enough for white (5.3:1, 4.8:1), the emerald, the amber
+     and the blue are not (2.8, 2.9, 3.5:1) and take the dark label instead. */
+  --mz-on-fill: color-mix(in srgb, #0a0a12 90%, var(--mz-tint));
   --mz-primary-fg: #ffffff;
-  --mz-accent-fg: #ffffff;
-  --mz-success-fg: #ffffff;
+  --mz-accent-fg: var(--mz-on-fill);
+  --mz-success-fg: var(--mz-on-fill);
   --mz-danger-fg: #ffffff;
-  --mz-warning-fg: #ffffff;
-  --mz-info-fg: #ffffff;
+  --mz-warning-fg: var(--mz-on-fill);
+  --mz-info-fg: var(--mz-on-fill);
+
+  /* See the dark block. Light runs the other way: every tone is cut toward
+     black until it reads as text on its own wash and on the page. #10af7a on
+     white was 2.82:1. */
+  --mz-primary-text: color-mix(in srgb, var(--mz-primary) 78%, #000000);
+  --mz-accent-text: color-mix(in srgb, var(--mz-accent) 60%, #000000);
+  --mz-success-text: color-mix(in srgb, var(--mz-success) 60%, #000000);
+  --mz-danger-text: color-mix(in srgb, var(--mz-danger) 74%, #000000);
+  --mz-warning-text: color-mix(in srgb, var(--mz-warning) 60%, #000000);
+  --mz-info-text: color-mix(in srgb, var(--mz-info) 65%, #000000);
 
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);

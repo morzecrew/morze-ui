@@ -34,7 +34,7 @@
   padding: 0 5px;
   border-radius: var(--mz-radius-sm);
   background: color-mix(in srgb, var(--mz-tone) 22%, transparent);
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   font-size: 11px;
   font-weight: 700;
 }
@@ -61,7 +61,7 @@
   white-space: nowrap;
 }
 .mz-dt__chip > span { overflow: hidden; text-overflow: ellipsis; }
-.mz-dt__chip b { font-weight: 600; color: var(--mz-tone); }
+.mz-dt__chip b { font-weight: 600; color: var(--mz-tone-text); }
 .mz-dt__chip button {
   display: grid;
   place-content: center;
@@ -216,7 +216,7 @@
    came out visibly smaller and finer than the sorted one. A larger box and a
    heavier stroke put the two on equal footing. */
 .mz-dt__sort-icon:not([data-active]) svg { width: 15px; height: 15px; stroke-width: 2.25; }
-.mz-dt__sort-icon[data-active] { opacity: 1; color: var(--mz-tone); }
+.mz-dt__sort-icon[data-active] { opacity: 1; color: var(--mz-tone-text); }
 .mz-dt__sort-icon b { font-size: 10px; font-weight: 700; }
 .mz-dt__sort:hover .mz-dt__sort-icon { opacity: 0.9; }
 
@@ -272,7 +272,7 @@
    invisible on the light theme's white header. */
 .mz-dt__filter[data-active],
 .mz-dt__filter[data-active]:hover {
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   background: color-mix(in srgb, var(--mz-tone) 16%, transparent);
   border-color: color-mix(in srgb, var(--mz-tone) 45%, transparent);
 }
@@ -380,7 +380,7 @@
   background: color-mix(in srgb, var(--mz-surface), var(--mz-danger) 14%);
   border: 1px solid color-mix(in srgb, var(--mz-danger) 40%, transparent);
   box-shadow: var(--mz-shadow-2);
-  color: var(--mz-danger);
+  color: var(--mz-danger-text);
   font-size: 12px;
   white-space: normal;
 }
@@ -411,7 +411,7 @@
 }
 .mz-dt__expand svg { width: 13px; height: 13px; }
 .mz-dt__expand:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
-.mz-dt__expand[data-open] { transform: rotate(90deg); color: var(--mz-tone); }
+.mz-dt__expand[data-open] { transform: rotate(90deg); color: var(--mz-tone-text); }
 
 .mz-dt__row--expanded > .mz-dt__td { background: var(--mz-bg-2); }
 .mz-dt__td--expanded { padding: 14px var(--mz-dt-cell-x); white-space: normal; }
@@ -453,7 +453,7 @@
 }
 .mz-dt__state svg { width: 30px; height: 30px; opacity: 0.6; }
 .mz-dt__state p { margin: 0; font-size: 14px; }
-.mz-dt__state[data-tone='danger'] { color: var(--mz-danger); }
+.mz-dt__state[data-tone='danger'] { color: var(--mz-danger-text); }
 
 /* Load-more footer. It sits inside the scroller — the element an infinite
    scroll has to observe — so it trails the last row rather than the viewport. */
@@ -676,7 +676,7 @@
 .mz-dt__icon-btn svg { width: 13px; height: 13px; }
 .mz-dt__icon-btn:hover:not(:disabled) { background: var(--mz-wash-hover); color: var(--mz-text); }
 .mz-dt__icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.mz-dt__icon-btn[data-active] { color: var(--mz-tone); }
+.mz-dt__icon-btn[data-active] { color: var(--mz-tone-text); }
 
 /* The needle points at the edge the column is pinned to, so the three states
    of the pin button differ by more than a colour the unpinned one cannot show. */

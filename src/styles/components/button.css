@@ -164,7 +164,7 @@
    colour. */
 .mz-btn--outline:hover {
   transform: scale(var(--mz-hover-scale));
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   border-color: var(--mz-tone);
 }
 .mz-btn--outline:hover::before { opacity: 1; }
@@ -191,6 +191,7 @@
 /* ---- Destructive: primary recipe on the danger tone ---- */
 .mz-btn--destructive {
   --mz-tone: var(--mz-danger);
+  --mz-tone-text: var(--mz-danger-text);
   --mz-tone-fg: var(--mz-danger-fg);
   background-color: var(--mz-fill);
   background-image: var(--mz-fill-sheen);
@@ -222,7 +223,7 @@
   padding: 0;
   background: none;
   border: none;
-  color: var(--mz-tone);
+  color: var(--mz-tone-text);
   text-transform: none;
   letter-spacing: normal;
   font-family: inherit;
