@@ -31,6 +31,14 @@ on GitHub, one entry per issue.
   built its global search from its own overlay and panel, and re-did the
   backdrop click and the close button with them. Focus trapping, Escape and
   `aria-modal` are the centred dialog's.
+- **Surface classes are public API** (#6): `mz-panel`, `mz-dialog-overlay`,
+  `mz-input`, `mz-focusable` and `mz-sr-only` are documented in the README
+  (*Surface classes*), and from here on a rename of any of them is listed under
+  **Breaking**. `panelClass`, `overlayClass` and `inputVariants({ size })` name
+  them in code, the way `buttonVariants` already did; `Input` and `Dialog`
+  draw from the same helpers. erp composed its global search from
+  `mz-dialog-overlay` and `mz-panel`, and a field-like trigger from
+  `mz-input mz-focusable`, with nothing saying either was safe to use.
 
 ### Changed
 

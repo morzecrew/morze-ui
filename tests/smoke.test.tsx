@@ -15,6 +15,9 @@ import {
   ToggleGroup,
   ToggleGroupItem,
   buttonVariants,
+  inputVariants,
+  overlayClass,
+  panelClass,
 } from '../src'
 
 describe('Button', () => {
@@ -231,5 +234,14 @@ describe('MorzeThemeProvider', () => {
       )
     ).not.toThrow()
     if (original) Object.defineProperty(window, 'localStorage', original)
+  })
+})
+
+describe('surface helpers (#6)', () => {
+  it('names the classes a host composes its own surface from', () => {
+    expect(panelClass).toBe('mz-panel')
+    expect(overlayClass).toBe('mz-dialog-overlay')
+    expect(inputVariants()).toContain('mz-input')
+    expect(inputVariants({ size: 'lg' })).toContain('mz-input--lg')
   })
 })

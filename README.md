@@ -299,6 +299,37 @@ overriding them moved nothing — they are gone as of 0.4. `--mz-face-fill` and
 
 The full list lives in `dist/morze-ui-tokens.css`.
 
+## Surface classes
+
+A few of the kit's classes are what an application reaches for when it builds
+a surface of its own — a search panel with its own animation, a trigger that
+has to read as a field. These are **public API**, like the tokens: a rename is
+a breaking change and is listed under **Breaking** in the changelog.
+
+| Class | Helper | What it gives |
+| --- | --- | --- |
+| `mz-panel` | `panelClass` | the frosted floating surface of dialogs, menus and popovers |
+| `mz-dialog-overlay` | `overlayClass` | the dialog backdrop: fixed, full viewport, the veil and its blur |
+| `mz-input` (`--sm`, `--lg`) | `inputVariants({ size })` | the field look, for an element that should read as an input |
+| `mz-focusable` | — | the offset focus outline everything you press wears |
+| `mz-sr-only` | — | visually hidden, still read |
+
+Alongside them, `buttonVariants` / `badgeVariants` / `toggleVariants` put the
+look of those components on any element, and the sidebar's helpers
+(`mz-sidebar-hide-collapsed`, `mz-sidebar-push`, `mz-sidebar-layout--grid`)
+are described under [Sidebar](#sidebar).
+
+```tsx
+import { inputVariants, panelClass, cn } from '@morze/ui'
+
+// A popover trigger that looks like the field it stands in for.
+<button className={cn(inputVariants(), 'mz-focusable')}>{summary}</button>
+<div className={cn(panelClass, 'my-search-panel')}>…</div>
+```
+
+Before composing a panel by hand, check `DialogContent` — `position="top"`
+covers the usual reason for one (a search panel that grows downward).
+
 ## Components
 
 | Input and actions | Navigation | Output | Overlays |

@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import { cn } from '../lib/utils'
+import { overlayClass, panelClass } from '../lib/surfaces'
 import { XIcon } from '../lib/icons'
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -29,7 +30,7 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
-      className={cn('mz-dialog-overlay', className)}
+      className={cn(overlayClass, className)}
       {...props}
     />
   )
@@ -67,7 +68,7 @@ function DialogContent({
         data-slot="dialog-content"
         data-size={size}
         data-position={position}
-        className={cn('mz-panel mz-dialog-content', className)}
+        className={cn(panelClass, 'mz-dialog-content', className)}
         {...props}
       >
         {children}

@@ -7,6 +7,7 @@
 
 export { cn } from './lib/utils'
 export type { Tone } from './lib/utils'
+export { panelClass, overlayClass } from './lib/surfaces'
 
 export { MorzeThemeProvider, useMorzeTheme } from './components/theme-provider'
 export type { MorzeTheme, MorzeThemeProviderProps } from './components/theme-provider'
@@ -23,7 +24,7 @@ export { Switch } from './components/switch'
 export type { SwitchProps } from './components/switch'
 export { Slider } from './components/slider'
 
-export { Input } from './components/input'
+export { Input, inputVariants } from './components/input'
 export type { InputProps } from './components/input'
 export { Textarea } from './components/textarea'
 export type { TextareaProps } from './components/textarea'

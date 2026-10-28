@@ -1106,4 +1106,18 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
     expect(css).toMatch(/@keyframes mz-dialog-top-in\{[^@]*to\{[^}]*translate\(-50%(,\s*0)?\)/)
     expect(css).toContain('.mz-dialog-content[data-position=top][data-state=open]{animation-name:mz-dialog-top-in}')
   })
+
+  // Hosts compose their own surfaces from these, so a rename breaks them
+  // without a type error anywhere (#6). The list is the README's.
+  it.each([
+    ['mz-panel', 'backdrop-filter:var(--mz-glass-filter)'],
+    ['mz-dialog-overlay', 'background:var(--mz-overlay)'],
+    ['mz-input', 'box-shadow:var(--mz-well-inset)'],
+    ['mz-focusable', 'outline'],
+    ['mz-sr-only', 'position:absolute'],
+  ])('keeps the public surface class .%s', (name, declaration) => {
+    const rules = [...css.matchAll(new RegExp(`\\.${name}(?![\\w-])[^{]*\\{([^}]*)\\}`, 'g'))]
+    expect(rules.length, name).toBeGreaterThan(0)
+    expect(rules.some((rule) => rule[1]!.includes(declaration)), name).toBe(true)
+  })
 })
