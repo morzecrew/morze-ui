@@ -82,6 +82,48 @@ describe('auto-fit against a real container', () => {
     host.remove()
   })
 
+  // Six columns declared at 1060px scrolled in a 970px box under three short
+  // rows (#25). They give way first, each down to what its header needs.
+  it('shrinks toward the headers before it scrolls', async () => {
+    const six: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Counterparty', accessor: (r) => r.name, width: 220 },
+      { id: 'sum', header: 'Total', accessor: (r) => r.sum, width: 160, numeric: true },
+      { id: 'note', header: 'Note', accessor: (r) => r.note, width: 240 },
+      { id: 'a', header: 'Warehouse', accessor: () => 'Main', width: 160 },
+      { id: 'b', header: 'Manager', accessor: () => 'Ivanova', width: 140 },
+      { id: 'c', header: 'Status', accessor: () => 'Open', width: 140 },
+    ]
+    const scroller = (host: HTMLElement) => host.querySelector<HTMLElement>('.mz-dt__scroller')!
+    const table = (autoFit?: true | 'grow-only') => (
+      <DataTable
+        columns={six}
+        data={rows.slice(0, 3)}
+        rowKey={(r) => r.id}
+        total={3}
+        autoFit={autoFit}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    )
+
+    const fitted = mountIn(970, table())
+    await settle()
+    const box = scroller(fitted.host)
+    expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth)
+    // No header is cut: every caption still fits its cell.
+    for (const label of fitted.host.querySelectorAll<HTMLElement>('.mz-dt__th-label')) {
+      expect(label.scrollWidth, label.textContent ?? '').toBeLessThanOrEqual(label.clientWidth)
+    }
+    fitted.unmount()
+    fitted.host.remove()
+
+    const grow = mountIn(970, table('grow-only'))
+    await settle()
+    expect(scroller(grow.host).scrollWidth).toBeGreaterThan(scroller(grow.host).clientWidth)
+    grow.unmount()
+    grow.host.remove()
+  })
+
   it('redistributes into the same width when a column is hidden', async () => {
     // The half of the auto-fit fix happy-dom cannot reach: hiding a column has
     // to hand its width to the others, not leave a gap at the right edge.
@@ -328,6 +370,9 @@ describe('right to left (G-13)', () => {
         query={emptyQuery}
         onQueryChange={vi.fn()}
         maxHeight={240}
+        // These specs need a table wider than its box; a shrinking fit would
+        // take the sideways scroll they measure away.
+        autoFit="grow-only"
       />
     ))
     mounted.host.dir = 'rtl'

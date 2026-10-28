@@ -102,11 +102,14 @@ export type DataTableProps<T> = {
    */
   columnManager?: boolean
   /**
-   * Stretches the columns to fill the container on mount and on container
-   * resize, so there is no dead space at the right edge. Columns the user
-   * resized by hand keep their width. `false` uses the declared widths as-is.
+   * Fits the columns to the container on mount and on container resize:
+   * stretches them so there is no dead space at the end edge, and shrinks
+   * them — each down to its `minWidth`, or what its header needs — before the
+   * table scrolls sideways. Columns the user resized by hand keep their
+   * width. `grow-only` never shrinks (a row of declared widths wider than the
+   * box scrolls); `false` uses the declared widths as-is.
    */
-  autoFit?: boolean
+  autoFit?: boolean | 'grow-only'
   density?: 'compact' | 'normal' | 'relaxed'
   /**
    * Sticks the header while the body scrolls. It needs the scroller to have a
@@ -351,7 +354,7 @@ export function DataTable<T>({
       recentFits.current = recent
       if (recent.some((entry) => Math.abs(available - entry.width) < 1)) return
       recent.push({ width: available, at: now })
-      fitTo(available)
+      fitTo(available, { shrink: autoFit !== 'grow-only', headerMin: headerMinWidths(scroller) })
     }
     run()
     return observeResize(scroller, run)
@@ -1287,6 +1290,26 @@ function filtersKey(filters: DataTableFilters): string {
 
 /** How many picked options a chip spells out before it says "+N". */
 const CHIP_VALUES = 3
+
+/**
+ * What each header needs to show its caption in full: the cell's padding, the
+ * label at its natural width, and whatever sits beside it (the sort arrow, the
+ * filter button). The floor a column shrinks to when it has no `minWidth`.
+ * Zero for every column in a DOM without layout, which leaves the 72px floor.
+ */
+function headerMinWidths(scroller: HTMLElement): Record<string, number> {
+  const out: Record<string, number> = {}
+  for (const th of scroller.querySelectorAll<HTMLElement>('th[data-col]')) {
+    const inner = th.querySelector<HTMLElement>('.mz-dt__th-inner')
+    const label = th.querySelector<HTMLElement>('.mz-dt__th-label')
+    if (!inner || !label || !th.clientWidth) continue
+    const parts = [...inner.children].map((child) => child.getBoundingClientRect())
+    const used = Math.max(...parts.map((r) => r.right)) - Math.min(...parts.map((r) => r.left))
+    const truncated = label.scrollWidth - label.clientWidth
+    out[th.dataset.col!] = Math.ceil(th.clientWidth - inner.clientWidth + used + truncated) + 1
+  }
+  return out
+}
 
 /** A numeric column sits on the end edge unless it says otherwise. */
 function alignOf(column: { align?: 'left' | 'center' | 'right'; numeric?: boolean }) {

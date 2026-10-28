@@ -979,10 +979,13 @@ What it does:
   dead space at the right edge. The maths runs off the declared `width` values
   (they act as proportions), re-runs when the container resizes and always
   produces the same result for the same width — resizing the window back and
-  forth does not drift the layout. When even the declared widths do not fit,
-  they are used as-is and horizontal scrolling kicks in. Turn it off with
-  `autoFit={false}`, or per column with `flex: false` (handy for narrow icon or
-  action columns). `minWidth` and `maxWidth` are honoured and the surplus is
+  forth does not drift the layout. When the declared widths do not fit, the
+  columns give way in proportion, each down to its `minWidth` — or, without
+  one, to what its header needs to show its caption in full — and horizontal
+  scrolling starts only past that. `autoFit="grow-only"` keeps the declared
+  widths when they are too wide and scrolls; `autoFit={false}` turns fitting
+  off, and `flex: false` exempts one column (handy for narrow icon or action
+  columns). `minWidth` and `maxWidth` are honoured and the surplus is
   redistributed across the rest.
 - **Mouse resize — spreadsheet style**: the column follows the cursor one to
   one, its neighbours do not move, spare space stays at the right, and the

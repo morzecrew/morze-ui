@@ -177,6 +177,14 @@ issue.
   headings, a menu label, a key cap — is 12px; the large controls and the
   15px titles (popover, empty state, number field) are 16px. The card title
   takes a 24px line, the alert title 20px.
+- **DataTable auto-fit shrinks before it scrolls** (#25). When the declared
+  widths are wider than the box, the flexible columns now give way in
+  proportion, each down to its `minWidth` or — without one — to what its header
+  needs (measured: padding, caption, sort arrow, filter button), and the table
+  scrolls only past that. A six-column table declared at 1060px used to scroll
+  in a 970px box under three short rows. `autoFit="grow-only"` is the old
+  behaviour; `useColumnLayout().fitTo(width, { shrink, headerMin })` takes the
+  same choice.
 
 ### Fixed
 

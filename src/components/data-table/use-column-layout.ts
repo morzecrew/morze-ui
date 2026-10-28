@@ -209,14 +209,22 @@ export function useColumnLayout<T>({
    * dead space at the right edge on a wide screen. Widths are always derived
    * from the declared ones rather than the current ones, so the result depends
    * only on the container: growing and shrinking the window returns to the
-   * same layout instead of drifting. When even the declared widths do not fit,
-   * they are used as-is and the table scrolls sideways.
+   * same layout instead of drifting.
+   *
+   * When the declared widths do not fit, the flexible columns give way in
+   * proportion, each down to its floor — `minWidth`, else what its header
+   * needs (`headerMin`, measured by the table), else 72px — and the table
+   * scrolls only past that (#25). `shrink: false` is the old behaviour: the
+   * declared widths as-is, and a scrollbar under three short rows.
    *
    * The result lands in the fit overlay, not in the layout — see `fitted`.
    * Stable identity: the DataTable observes the container with it as an
    * effect dependency.
    */
-  const fitTo = React.useCallback((available: number) => {
+  const fitTo = React.useCallback((
+    available: number,
+    { shrink = true, headerMin = {} }: { shrink?: boolean; headerMin?: Record<string, number> } = {}
+  ) => {
     const current = baseRef.current
     const columnsById = byIdRef.current
     const shown = current.order
@@ -238,12 +246,42 @@ export function useColumnLayout<T>({
     const target = available - fixedTotal
 
     const next: Record<string, number> = {}
+    // The least a column may be: its own `minWidth`, else what its header
+    // needs, never under 72px — and never more than it was declared, unless
+    // `minWidth` says so.
+    const floorOf = (c: DataTableColumn<T>) =>
+      c.minWidth ?? Math.min(baseOf(c), Math.max(headerMin[c.id] ?? 0, DEFAULT_MIN))
+    const startOf = (c: DataTableColumn<T>) => Math.max(baseOf(c), c.minWidth ?? 0)
 
-    // Not enough room even at the declared widths — fall back to them and
-    // let the scroller do its job.
-    if (target <= flexBaseTotal) {
+    if (target <= flexBaseTotal && !shrink) {
+      // The declared widths as they are, and the scroller does the rest.
       for (const column of flexible) {
         next[column.id] = Math.max(baseOf(column), column.minWidth ?? DEFAULT_MIN)
+      }
+    } else if (target <= flexBaseTotal) {
+      // Every flexible column gives up the same share of its width; one that
+      // reaches its floor stops there and the rest cover what it could not
+      // give. Past every floor, the table scrolls.
+      for (const column of flexible) next[column.id] = startOf(column)
+      let excess = flexible.reduce((sum, c) => sum + next[c.id]!, 0) - target
+      let giving = flexible.filter((c) => next[c.id]! > floorOf(c))
+      while (excess > 0.5 && giving.length) {
+        const pool = giving.reduce((sum, c) => sum + next[c.id]!, 0)
+        const share = Math.min(1, excess / pool)
+        for (const column of giving) {
+          const width = Math.max(next[column.id]! * (1 - share), floorOf(column))
+          excess -= next[column.id]! - width
+          next[column.id] = width
+        }
+        giving = giving.filter((c) => next[c.id]! > floorOf(c) + 0.01)
+      }
+      // Rounded without losing the sum when it fits: the widest column
+      // absorbs the rounding error.
+      for (const column of flexible) next[column.id] = Math.round(next[column.id]!)
+      if (excess <= 0.5) {
+        const drift = target - flexible.reduce((sum, c) => sum + next[c.id]!, 0)
+        const widest = flexible.reduce((a, b) => (next[b.id]! > next[a.id]! ? b : a))
+        next[widest.id] = next[widest.id]! + drift
       }
     } else {
       let remaining = target

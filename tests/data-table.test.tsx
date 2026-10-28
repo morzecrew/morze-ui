@@ -398,9 +398,32 @@ describe('column auto-fit', () => {
     expect(total).toBe(500)
   })
 
-  it('falls back to the declared widths when they do not fit', () => {
+  // Declared widths summing to 1060 in a 970px box scrolled under three
+  // short rows (#25).
+  it('shrinks the columns in proportion before it scrolls', () => {
+    const { result } = renderHook(() => useColumnLayout({ columns: fitColumns }))
+    act(() => result.current.fitTo(350))
+    const widths = fitColumns.map((c) => result.current.widthOf(c.id))
+    expect(widths.reduce((a, b) => a + b)).toBe(350)
+    // `c` is at its own minWidth; `b` gave up more than `a` because it had more.
+    expect(widths[2]).toBe(150)
+    expect(widths[0]).toBeLessThan(100)
+    expect(widths[1]).toBeLessThan(200)
+    expect(200 - widths[1]!).toBeGreaterThan(100 - widths[0]!)
+  })
+
+  it('stops at each column’s floor and lets the table scroll past it', () => {
     const { result } = renderHook(() => useColumnLayout({ columns: fitColumns }))
     act(() => result.current.fitTo(200))
+    // 72px when nothing measured the header, `minWidth` where one is given.
+    expect(fitColumns.map((c) => result.current.widthOf(c.id))).toEqual([72, 72, 150])
+    act(() => result.current.fitTo(200, { headerMin: { a: 90 } }))
+    expect(result.current.widthOf('a')).toBe(90)
+  })
+
+  it('keeps the declared widths when shrinking is off', () => {
+    const { result } = renderHook(() => useColumnLayout({ columns: fitColumns }))
+    act(() => result.current.fitTo(200, { shrink: false }))
     expect(result.current.widthOf('a')).toBe(100)
     expect(result.current.widthOf('b')).toBe(200)
   })
