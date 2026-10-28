@@ -50,7 +50,7 @@
   background: transparent;
   color: var(--mz-text-dim);
   font-family: var(--mz-label-font);
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   font-weight: var(--mz-label-weight);
   letter-spacing: var(--mz-label-tracking);
   text-transform: var(--mz-label-transform);
@@ -172,8 +172,8 @@
   align-items: start;
   gap: 4px 12px;
 }
-.mz-card-title { font-family: var(--mz-font-display); font-size: 16px; font-weight: 700; line-height: 1.3; }
-.mz-card-description { grid-column: 1; font-size: 13px; color: var(--mz-text-dim); }
+.mz-card-title { font-family: var(--mz-font-display); font-size: var(--mz-text-lg); font-weight: 700; line-height: var(--mz-leading-lg); }
+.mz-card-description { grid-column: 1; font-size: var(--mz-text-sm); color: var(--mz-text-dim); }
 .mz-card-action { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
 .mz-card-content { flex: 1; }
 .mz-card-footer { display: flex; align-items: center; gap: 10px; }
@@ -189,7 +189,7 @@
   padding: 3px 9px;
   border-radius: var(--mz-radius-sm);
   border: 1px solid transparent;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   line-height: 1.4;
   /* A badge is a label, so a long one is cut with an ellipsis rather than
@@ -242,12 +242,12 @@
   border: 1px solid color-mix(in srgb, var(--mz-tone) 32%, transparent);
   box-shadow: var(--mz-glow-panel);
   color: var(--mz-text);
-  font-size: 14px;
+  font-size: var(--mz-text-md);
 }
 .mz-alert:has(> svg) { grid-template-columns: 18px 1fr; gap: 2px 12px; }
 .mz-alert > svg { width: 17px; height: 17px; translate: 0 2px; color: var(--mz-tone-text); }
-.mz-alert-title { grid-column-start: 2; font-weight: 700; line-height: 1.35; }
-.mz-alert-description { grid-column-start: 2; font-size: 13px; color: var(--mz-text-dim); }
+.mz-alert-title { grid-column-start: 2; font-weight: 700; line-height: var(--mz-leading-md); }
+.mz-alert-description { grid-column-start: 2; font-size: var(--mz-text-sm); color: var(--mz-text-dim); }
 
 /* ------------------------------- Accordion ------------------------------ */
 .mz-accordion { display: flex; flex-direction: column; }
@@ -266,7 +266,7 @@
   cursor: pointer;
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--mz-text-lg);
   font-weight: 600;
   text-align: left;
   outline: none;
@@ -305,7 +305,7 @@
 }
 .mz-accordion-content {
   overflow: hidden;
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   color: var(--mz-text-dim);
 }
 .mz-accordion-content[data-state='open'] { animation: mz-accordion-down 0.24s var(--mz-ease); }
@@ -353,7 +353,7 @@
   box-shadow: inset 0 1px 0 var(--mz-face-top), 0 1px 1px var(--mz-face-bottom);
   color: var(--mz-text-dim);
   font-family: inherit;
-  font-size: 11px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -375,8 +375,8 @@
 }
 .mz-empty__media { display: grid; place-content: center; color: var(--mz-text-muted); }
 .mz-empty__media svg { width: 30px; height: 30px; opacity: 0.6; }
-.mz-empty__title { margin: 0; font-size: 15px; font-weight: 600; color: var(--mz-text); }
-.mz-empty__description { margin: 0; max-width: 42ch; font-size: 14px; }
+.mz-empty__title { margin: 0; font-size: var(--mz-text-lg); font-weight: 600; color: var(--mz-text); }
+.mz-empty__description { margin: 0; max-width: 42ch; font-size: var(--mz-text-md); }
 .mz-empty__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 
 /* ------------------------------- Progress ------------------------------- */
@@ -459,7 +459,7 @@
   background-image: var(--mz-fill-sheen);
   box-shadow: inset 0 1px 0 var(--mz-convex-top), inset 0 -1px 0 var(--mz-convex-bottom);
   color: var(--mz-tone-fg);
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;

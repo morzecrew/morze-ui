@@ -228,6 +228,21 @@ load the webfont in the host if you want it:
 Set the font on `body`, not only inside the app shell: dialogs, menus and
 tooltips are portalled to `<body>` and inherit from there.
 
+**Sizes come from a five-step scale**, so a denser or a larger UI is one
+override rather than ninety, and your own headings can line up with the kit's:
+
+| Step | Size / leading | Used by |
+| --- | --- | --- |
+| `--mz-text-xs` / `--mz-leading-xs` | 12 / 16 | hints, badges, counters, captions |
+| `--mz-text-sm` / `--mz-leading-sm` | 13 / 18 | labels, table headers, menus, small controls |
+| `--mz-text-md` / `--mz-leading-md` | 14 / 20 | body, fields, buttons, table cells |
+| `--mz-text-lg` / `--mz-leading-lg` | 16 / 24 | large controls, card and popover titles |
+| `--mz-text-xl` / `--mz-leading-xl` | 18 / 24 | dialog titles |
+
+```css
+:root { --mz-text-md: 13px; --mz-text-sm: 12px; }   /* one step denser */
+```
+
 The **leading** is the kit's own, though: `--mz-line` (1.45) is applied at zero
 specificity to every `mz-` element, so a landing-style `line-height: 1.7` on
 your body does not inflate a dialog description or a field hint. For the same

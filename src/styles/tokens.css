@@ -490,6 +490,31 @@
      description and a field hint inside a dense UI. */
   --mz-line: 1.45;
 
+  /* The type scale. Every size the kit sets is one of these five steps — it
+     used to be eight literals (10 to 18px) across some ninety declarations,
+     so a host could not move the UI to a denser or a larger base, nor line
+     its own headings up with the kit's (#13). Each step has a leading for the
+     places that set one (a title, a label); running text keeps --mz-line.
+
+     The values are the kit's own, so nothing moves by default: 12/13/14 are
+     the body steps the kit always ran, 16 took over the 15px large controls
+     and the 15/16px titles, 18 is the dialog title. They sit on the scale the
+     reference systems share (Carbon, Atlassian, Primer, Material 3 body-
+     medium at 14/20); for their 20/28 step, set --mz-text-xl and
+     --mz-leading-xl. A denser UI is a one-line change:
+
+       :root { --mz-text-md: 13px; --mz-text-sm: 12px; } */
+  --mz-text-xs: 12px;
+  --mz-leading-xs: 16px;
+  --mz-text-sm: 13px;
+  --mz-leading-sm: 18px;
+  --mz-text-md: 14px;
+  --mz-leading-md: 20px;
+  --mz-text-lg: 16px;
+  --mz-leading-lg: 24px;
+  --mz-text-xl: 18px;
+  --mz-leading-xl: 24px;
+
   /* Control labels: plain sentence case in the application's font. */
   --mz-label-font: inherit;
   --mz-label-transform: none;
@@ -500,7 +525,7 @@
      sits between the 12 the hand-laid table ran and the 14 the grid did: at
      12 a 44px grid row has a caption too small to aim a sort click at, at 14
      a dense summary table's header stops reading as a header. */
-  --mz-th-font-size: 13px;
+  --mz-th-font-size: var(--mz-text-sm);
   --mz-th-weight: 600;
 
   /* ---- Geometry ----

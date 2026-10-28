@@ -16,7 +16,7 @@
   text-align: left;
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   white-space: nowrap;
   border-radius: var(--mz-radius);
   /* The same flat face every raised control wears, under the sheen hook, and
@@ -33,10 +33,10 @@
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease;
 }
-.mz-select-trigger--sm { height: 34px; font-size: 13px; padding: 0 8px 0 10px; }
+.mz-select-trigger--sm { height: 34px; font-size: var(--mz-text-sm); padding: 0 8px 0 10px; }
 /* The 34/40/48 scale the buttons, inputs and toggles share. Without `lg` a
    select could not stand in a row with an `inputSize="lg"` field. */
-.mz-select-trigger--lg { height: 48px; font-size: 15px; padding: 0 12px 0 14px; }
+.mz-select-trigger--lg { height: 48px; font-size: var(--mz-text-lg); padding: 0 12px 0 14px; }
 /* Raised, so hover lifts the face and leaves the rim alone — the same answer
    the secondary button gives. The tone used to arrive here too, which made
    the trigger the one control in a form row that lit up in colour while the
@@ -110,7 +110,7 @@
   padding: 8px 10px 8px 30px;
   border-radius: var(--mz-radius-sm);
   color: var(--mz-text);
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   line-height: 1.2;
   cursor: pointer;
   user-select: none;
@@ -154,7 +154,7 @@
 
 .mz-menu-label {
   padding: 8px 10px 6px;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   color: var(--mz-text-muted);
 }
@@ -169,7 +169,7 @@
 .mz-menu-shortcut {
   margin-left: auto;
   font-family: var(--mz-font-mono);
-  font-size: 11px;
+  font-size: var(--mz-text-xs);
   letter-spacing: 0.06em;
   color: var(--mz-text-muted);
 }
@@ -200,8 +200,8 @@
 .mz-popover-content[data-state='open'] { animation: mz-panel-in 0.16s var(--mz-ease); }
 .mz-popover-content[data-state='closed'] { animation: mz-panel-out 0.12s var(--mz-ease); }
 .mz-popover-header { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.mz-popover-title { font-size: 15px; font-weight: 700; }
-.mz-popover-description { font-size: 13px; color: var(--mz-text-dim); }
+.mz-popover-title { font-size: var(--mz-text-lg); font-weight: 700; }
+.mz-popover-description { font-size: var(--mz-text-sm); color: var(--mz-text-dim); }
 
 /* -------------------------------- Dialog -------------------------------- */
 .mz-dialog-overlay {
@@ -279,8 +279,8 @@
 }
 
 .mz-dialog-header { display: flex; flex-direction: column; gap: 6px; text-align: left; }
-.mz-dialog-title { font-family: var(--mz-font-display); font-size: 18px; font-weight: 700; line-height: 1.3; }
-.mz-dialog-description { font-size: 14px; color: var(--mz-text-dim); }
+.mz-dialog-title { font-family: var(--mz-font-display); font-size: var(--mz-text-xl); font-weight: 700; line-height: var(--mz-leading-xl); }
+.mz-dialog-description { font-size: var(--mz-text-md); color: var(--mz-text-dim); }
 .mz-dialog-footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
 .mz-dialog-close {
   position: absolute;
@@ -322,7 +322,7 @@
     var(--mz-glow-panel),
     inset 0 1px 0 var(--mz-convex-top);
   color: var(--mz-tone-fg);
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   line-height: 1.35;
   text-shadow: var(--mz-convex-text-shadow);
   /* Radix publishes the anchor corner on the popper wrapper and it
@@ -366,7 +366,7 @@
   background: transparent;
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 15px;
+  font-size: var(--mz-text-lg);
   outline: none;
 }
 .mz-command__input::placeholder { color: var(--mz-text-muted); }
@@ -383,6 +383,6 @@
 .mz-command__empty {
   padding: 28px 16px;
   color: var(--mz-text-muted);
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   text-align: center;
 }

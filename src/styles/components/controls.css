@@ -231,13 +231,13 @@
   height: 28px;
   min-width: 28px;
   padding: 0 10px;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   gap: 0.4em;
   border-radius: var(--mz-radius-sm);
 }
-.mz-toggle--sm { height: 34px; min-width: 34px; padding: 0 12px; font-size: 13px; }
-.mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: 14px; }
-.mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: 15px; }
+.mz-toggle--sm { height: 34px; min-width: 34px; padding: 0 12px; font-size: var(--mz-text-sm); }
+.mz-toggle--md { height: 40px; min-width: 40px; padding: 0 14px; font-size: var(--mz-text-md); }
+.mz-toggle--lg { height: 48px; min-width: 48px; padding: 0 20px; font-size: var(--mz-text-lg); }
 
 /* The secondary button's face, in the same two lines: flat colour, sheen hook. */
 .mz-toggle--outline {

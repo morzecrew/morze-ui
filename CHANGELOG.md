@@ -106,6 +106,13 @@ issue.
   both `ChartLegendContent` (which only ever drew a dot) and
   `ChartTooltipContent` (where it overrides the tooltip's own `indicator`). The
   line key is 12×2px.
+- **A type scale** (#13): `--mz-text-xs` … `--mz-text-xl` (12, 13, 14, 16,
+  18px) with a `--mz-leading-*` for each (16, 18, 20, 24, 24px). Every size the
+  kit sets reads a step — there were ninety-odd `font-size` literals across
+  eight sizes, so a compact or large-text UI was ninety overrides — and the
+  titles and the label take the step's leading. `--mz-th-font-size` and the
+  table's `--mz-dt-font` point at the scale. The only literals left are glyphs
+  sized to their box: an avatar's initials and the sort-order digit.
 
 ### Changed
 
@@ -155,6 +162,11 @@ issue.
   keeps the count and drops "1 / 1" and the four disabled buttons that sat
   under a three-row table. `pagination="always"` keeps them;
   `DataTablePagination` takes the same choice as `nav="auto" | "always"`.
+- **11px and 15px are off the scale** (#13). What was 11px — counters in a
+  table chip and a sidebar badge, the calendar's weekday and week-number
+  headings, a menu label, a key cap — is 12px; the large controls and the
+  15px titles (popover, empty state, number field) are 16px. The card title
+  takes a 24px line, the alert title 20px.
 
 ### Fixed
 

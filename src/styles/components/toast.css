@@ -36,9 +36,9 @@
 .mz-toast:not([data-tone]) { border-left-color: var(--mz-border-strong); }
 
 .mz-toast__body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.mz-toast__title { font-size: 14px; font-weight: 600; color: var(--mz-text); }
+.mz-toast__title { font-size: var(--mz-text-md); font-weight: 600; color: var(--mz-text); }
 .mz-toast__description {
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   color: var(--mz-text-dim);
   overflow-wrap: anywhere;
 }
@@ -52,7 +52,7 @@
   background: var(--mz-face);
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   font-weight: 500;
   cursor: pointer;
   transition: background var(--mz-duration) ease;

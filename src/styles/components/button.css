@@ -67,10 +67,10 @@
    and a label that wraps grows the button instead of spilling out of it. With
    a fixed `height` and no vertical padding, `height: auto` collapsed a
    wrapping button to one line height (#8). */
-.mz-btn--xs { min-height: 28px; padding: 4px 12px; font-size: 12px; gap: 0.4em; border-radius: var(--mz-radius-sm); }
-.mz-btn--sm { min-height: 34px; padding: 6px 16px; font-size: 13px; }
-.mz-btn--md { min-height: 40px; padding: 8px 20px; font-size: 14px; }
-.mz-btn--lg { min-height: 48px; padding: 10px 24px; font-size: 15px; }
+.mz-btn--xs { min-height: 28px; padding: 4px 12px; font-size: var(--mz-text-xs); gap: 0.4em; border-radius: var(--mz-radius-sm); }
+.mz-btn--sm { min-height: 34px; padding: 6px 16px; font-size: var(--mz-text-sm); }
+.mz-btn--md { min-height: 40px; padding: 8px 20px; font-size: var(--mz-text-md); }
+.mz-btn--lg { min-height: 48px; padding: 10px 24px; font-size: var(--mz-text-lg); }
 
 /* `wrap`: the label may break over lines — a selection summary, a narrow
    column. Off by default because a button label that wraps is usually a

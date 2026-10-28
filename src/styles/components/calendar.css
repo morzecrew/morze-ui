@@ -7,7 +7,7 @@
   display: inline-block;
   padding: 12px;
   color: var(--mz-text);
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   user-select: none;
 }
 
@@ -46,7 +46,7 @@
   align-items: center;
   /* Room for the arrows, so a long month name never runs under them. */
   padding-right: 64px;
-  font-size: 14px;
+  font-size: var(--mz-text-md);
   font-weight: 600;
 }
 .mz-calendar__caption-text::first-letter { text-transform: uppercase; }
@@ -60,7 +60,7 @@
   background: var(--mz-face);
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   font-weight: 600;
   cursor: pointer;
 }
@@ -72,7 +72,7 @@
   width: 34px;
   padding: 0 0 2px;
   color: var(--mz-text-muted);
-  font-size: 11px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -81,7 +81,7 @@
 .mz-calendar__weeknum {
   width: 26px;
   color: var(--mz-text-muted);
-  font-size: 11px;
+  font-size: var(--mz-text-xs);
   text-align: center;
 }
 
@@ -98,7 +98,7 @@
   background: transparent;
   color: var(--mz-text);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   outline: none;
@@ -213,7 +213,7 @@
   background: transparent;
   color: var(--mz-text-dim);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   cursor: pointer;
   transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
 }

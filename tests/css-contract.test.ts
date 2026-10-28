@@ -649,7 +649,7 @@ describe('typography contracts', () => {
   })
 
   it('keeps the button compact while the label still has air', () => {
-    expect(css).toContain('.mz-btn--md{min-height:40px;padding:8px 20px')
+    expect(css).toMatch(/\.mz-btn--md\{[^}]*min-height:40px[^}]*padding:8px 20px/)
     // The height scale stays shared with the fields, or controls stop lining up.
     expect(css).toContain('.mz-input--sm{height:34px')
   })
@@ -1167,13 +1167,13 @@ describe('the 2026-10 audit', () => {
   it('gives a label a line box and the label weight (#18)', () => {
     const label = css.match(/\.mz-label\{([^}]*)\}/)?.[1] ?? ''
     expect(label).toContain('font-weight:var(--mz-label-weight)')
-    expect(label).toContain('line-height:18px')
+    expect(label).toContain('line-height:var(--mz-leading-sm)')
     expect(label).not.toContain('line-height:1;')
   })
 
   it('keeps the sidebar group label above the floor (#19)', () => {
     const group = css.match(/\.mz-sidebar__group-label\{([^}]*)\}/)?.[1] ?? ''
-    expect(group).toContain('font-size:12px')
+    expect(group).toContain('font-size:var(--mz-text-xs)')
     expect(group).toContain('color:var(--mz-text-dim)')
   })
 
@@ -1187,6 +1187,20 @@ describe('the 2026-10 audit', () => {
         ([, sel, body]) => sel!.split(',').includes(selector) && body!.includes('tabular-nums')
       )
       expect(rule, selector).toBeTruthy()
+    }
+  })
+
+  it('sizes every piece of text from the scale (#13)', () => {
+    // Ninety-odd literals across eight sizes meant a denser or a larger UI
+    // was ninety overrides. Three glyph sizes are tied to the box they sit in
+    // — an avatar's initials, the sort-order digit — and are the exemptions.
+    const literals = [...css.matchAll(/([^{}]+)\{[^}]*font-size:(\d+)px/g)].map((m) => m[1]!.trim())
+    expect(literals.sort()).toEqual(
+      ['.mz-avatar--lg .mz-avatar__fallback', '.mz-avatar--sm .mz-avatar__fallback', '.mz-dt__sort-icon b'].sort()
+    )
+    for (const [step, size] of [['xs', 12], ['sm', 13], ['md', 14], ['lg', 16], ['xl', 18]] as const) {
+      expect(css).toContain(`--mz-text-${step}:${size}px`)
+      expect(css).toMatch(new RegExp(`--mz-leading-${step}:\\d+px`))
     }
   })
 })

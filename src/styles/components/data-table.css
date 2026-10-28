@@ -6,14 +6,14 @@
 .mz-dt {
   --mz-dt-row-h: 44px;
   --mz-dt-cell-x: 14px;
-  --mz-dt-font: 14px;
+  --mz-dt-font: var(--mz-text-md);
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
   color: var(--mz-text);
 }
-.mz-dt[data-density='compact'] { --mz-dt-row-h: 36px; --mz-dt-cell-x: 10px; --mz-dt-font: 13px; }
+.mz-dt[data-density='compact'] { --mz-dt-row-h: 36px; --mz-dt-cell-x: 10px; --mz-dt-font: var(--mz-text-sm); }
 .mz-dt[data-density='relaxed'] { --mz-dt-row-h: 56px; --mz-dt-cell-x: 18px; }
 
 /* -------------------------------- Toolbar ------------------------------- */
@@ -35,7 +35,7 @@
   border-radius: var(--mz-radius-sm);
   background: color-mix(in srgb, var(--mz-tone) 22%, transparent);
   color: var(--mz-tone-text);
-  font-size: 11px;
+  font-size: var(--mz-text-xs);
   font-weight: 700;
 }
 
@@ -53,7 +53,7 @@
   background: color-mix(in srgb, var(--mz-tone) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--mz-tone) 30%, transparent);
   color: var(--mz-text);
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   /* A long value list is truncated in `describeFilter`, but a single long
      value still has to stop somewhere short of the row's width. */
   max-width: 22rem;
@@ -71,7 +71,7 @@
   border-radius: 4px;
   background: transparent;
   color: var(--mz-text-dim);
-  font-size: 15px;
+  font-size: var(--mz-text-lg);
   line-height: 1;
   cursor: pointer;
   transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
@@ -388,7 +388,7 @@
   border: 1px solid color-mix(in srgb, var(--mz-danger) 40%, transparent);
   box-shadow: var(--mz-shadow-2);
   color: var(--mz-danger-text);
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   white-space: normal;
 }
 
@@ -459,7 +459,7 @@
   text-align: center;
 }
 .mz-dt__state svg { width: 30px; height: 30px; opacity: 0.6; }
-.mz-dt__state p { margin: 0; font-size: 14px; }
+.mz-dt__state p { margin: 0; font-size: var(--mz-text-md); }
 .mz-dt__state[data-tone='danger'] { color: var(--mz-danger-text); }
 
 /* Load-more footer. It sits inside the scroller — the element an infinite
@@ -500,7 +500,7 @@
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   color: var(--mz-text-dim);
 }
 .mz-dt__pagination-size { display: flex; align-items: center; gap: 8px; }
@@ -531,7 +531,7 @@
   box-shadow: var(--mz-shadow-3), inset 0 1px 0 var(--mz-glass-edge);
   animation: mz-panel-in 0.18s var(--mz-ease);
 }
-.mz-dt__bulkbar-count { font-size: 13px; font-weight: 600; white-space: nowrap; }
+.mz-dt__bulkbar-count { font-size: var(--mz-text-sm); font-weight: 600; white-space: nowrap; }
 .mz-dt__bulkbar-actions { display: flex; align-items: center; gap: 8px; }
 
 /* --------------------------- Header popovers ---------------------------- */
@@ -559,12 +559,12 @@
 }
 .mz-dt__filter-head {
   margin-bottom: 10px;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   color: var(--mz-text-muted);
 }
 .mz-dt__filter-options { display: flex; flex-direction: column; gap: 8px; max-height: 13rem; overflow: auto; }
-.mz-dt__filter-option { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.mz-dt__filter-option { display: flex; align-items: center; gap: 8px; font-size: var(--mz-text-sm); cursor: pointer; }
 .mz-dt__filter-stack { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 /* The operator row above a text filter: `contains` is not what a backend
    always means by a text match, and a host that offers `equals` had no way to
@@ -576,15 +576,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   color: var(--mz-text-muted);
 }
 .mz-dt__filter-presets { display: flex; flex-wrap: wrap; gap: 6px; }
-.mz-dt__filter-empty { padding: 6px 2px; font-size: 12px; color: var(--mz-text-muted); }
+.mz-dt__filter-empty { padding: 6px 2px; font-size: var(--mz-text-xs); color: var(--mz-text-muted); }
 .mz-dt__filter-range { display: flex; align-items: center; gap: 8px; }
 /* The unit a number range is in, as a suffix inside the field's row rather
    than a legend above it: `1 000 – 5 000 ₽` is the whole of the constraint. */
-.mz-dt__filter-unit { flex-shrink: 0; font-size: 12px; color: var(--mz-text-muted); }
+.mz-dt__filter-unit { flex-shrink: 0; font-size: var(--mz-text-xs); color: var(--mz-text-muted); }
 .mz-dt__filter-field { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; }
 .mz-dt__filter-range--stacked { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; }
 .mz-dt__filter-dash { color: var(--mz-text-muted); }
@@ -603,7 +603,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 4px 8px;
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   font-weight: 600;
   color: var(--mz-text-muted);
 }
@@ -623,7 +623,7 @@
   gap: 8px;
   padding: 5px 6px;
   border-radius: var(--mz-radius-sm);
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   cursor: grab;
   transition: background var(--mz-duration-fast) ease, opacity var(--mz-duration-fast) ease;
 }
@@ -659,7 +659,7 @@
 .mz-dt__columns-empty {
   margin: 0;
   padding: 14px 6px;
-  font-size: 13px;
+  font-size: var(--mz-text-sm);
   color: var(--mz-text-muted);
   text-align: center;
 }
@@ -675,7 +675,7 @@
   border-radius: var(--mz-radius-sm);
   background: transparent;
   color: var(--mz-text-dim);
-  font-size: 12px;
+  font-size: var(--mz-text-xs);
   line-height: 1;
   cursor: pointer;
   transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
