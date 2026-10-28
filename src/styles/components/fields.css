@@ -9,8 +9,12 @@
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  font-weight: 600;
-  line-height: 1;
+  /* The control labels' weight, not a heading's: at 600 a column of field
+     labels competed with the card title over them. And a real line box — at
+     `line-height: 1` the box was 13px tall, so a label that wrapped drew its
+     second line through its first (#18). */
+  font-weight: var(--mz-label-weight);
+  line-height: 18px;
   color: var(--mz-text-dim);
   user-select: none;
   cursor: default;
@@ -24,7 +28,9 @@
 .mz-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  /* 6, not 8: the label's 18px line box adds its own half-leading above the
+     field, so the gap a reader sees stays at the 8px it was. */
+  gap: 6px;
 }
 .mz-field__hint {
   font-size: 12px;

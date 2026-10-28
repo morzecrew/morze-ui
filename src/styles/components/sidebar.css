@@ -218,9 +218,11 @@
   align-items: center;
   height: 26px;
   padding: 0 8px;
-  font-size: 11px;
+  /* 12px and the dim text, not 11px muted: the smallest size in the kit's
+     scale, and the muted grey fell to 3.6:1 on the light rail (#19). */
+  font-size: 12px;
   font-weight: 600;
-  color: var(--mz-text-muted);
+  color: var(--mz-text-dim);
   white-space: nowrap;
   opacity: 1;
   transition: opacity var(--mz-duration-fast) ease;

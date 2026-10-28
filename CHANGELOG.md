@@ -14,8 +14,9 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
-What erp-frontend still had to work around on top of 0.5.0 — issues #3 – #12
-on GitHub, one entry per issue.
+What erp-frontend still had to work around on top of 0.5.0 (issues #3 – #12),
+and what a UX audit of a BI app built on it found (#13 – #25) — one entry per
+issue.
 
 ### Breaking
 
@@ -141,6 +142,14 @@ on GitHub, one entry per issue.
   `useIsMobile` / the `system` theme called `matchMedia` — so a jsdom test
   threw before its first assertion. Each call is guarded now; without the API
   the component simply stops re-measuring.
+- **A wrapped `Label` no longer draws over itself** (#18). It had
+  `line-height: 1`, a 13px box for 13px text, so a second line landed on the
+  first; it is 18px now. Its weight is `--mz-label-weight` (500) rather than
+  600, which competed with the headings above a form. `Field`'s gap is 6px,
+  so the space a reader sees under the label is the 8px it was.
+- **The sidebar's group label is 12px in the dim text** (#19), not 11px in the
+  muted one: 11px is under the floor every reference system keeps, and the
+  muted grey measured 3.64:1 on the light rail.
 
 ## [0.5.0] — 2026-09-13
 

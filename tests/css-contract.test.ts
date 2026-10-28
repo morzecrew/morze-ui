@@ -1157,4 +1157,21 @@ describe('what erp-frontend still worked around (#3 – #12)', () => {
       }
     }
   })
+
+})
+
+/** A UX audit of a BI app on 0.5.0: contrast, type, density (#13 – #25). */
+describe('the 2026-10 audit', () => {
+  it('gives a label a line box and the label weight (#18)', () => {
+    const label = css.match(/\.mz-label\{([^}]*)\}/)?.[1] ?? ''
+    expect(label).toContain('font-weight:var(--mz-label-weight)')
+    expect(label).toContain('line-height:18px')
+    expect(label).not.toContain('line-height:1;')
+  })
+
+  it('keeps the sidebar group label above the floor (#19)', () => {
+    const group = css.match(/\.mz-sidebar__group-label\{([^}]*)\}/)?.[1] ?? ''
+    expect(group).toContain('font-size:12px')
+    expect(group).toContain('color:var(--mz-text-dim)')
+  })
 })
