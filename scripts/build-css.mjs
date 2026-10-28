@@ -1,5 +1,5 @@
 import { bundle } from 'lightningcss'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -28,3 +28,15 @@ function build(entry, out) {
 console.log('building css:')
 build('src/styles/index.css', 'dist/morze-ui.css')
 build('src/styles/tokens.css', 'dist/morze-ui-tokens.css')
+
+// The opt-in face (#24). Its url()s are relative, so the files sit beside the
+// stylesheet under dist/fonts — copied from the fontsource package, which is
+// a devDependency: the woff2 ship inside this package, not as a dependency of
+// it. The licence travels with them.
+const fontSource = resolve(root, 'node_modules/@fontsource-variable/golos-text')
+mkdirSync(resolve(root, 'dist/fonts'), { recursive: true })
+for (const file of readdirSync(resolve(fontSource, 'files'))) {
+  if (file.endsWith('.woff2')) copyFileSync(resolve(fontSource, 'files', file), resolve(root, 'dist/fonts', file))
+}
+copyFileSync(resolve(fontSource, 'LICENSE'), resolve(root, 'dist/fonts/OFL.txt'))
+build('src/styles/fonts.css', 'dist/morze-ui-fonts.css')

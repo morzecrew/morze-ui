@@ -474,9 +474,10 @@
      inherits its font, so the host's face (Golos Text on morze.tech) reaches
      the buttons and the table without a single override. This stack is the
      fallback, applied at .mz-root and by whoever sets a font on <body> —
-     Golos Text first, so a standalone install already reads as Morze. Nothing
-     is downloaded: load the webfont in the host, or leave the system fallback.
-     */
+     Golos Text first, so a standalone install already reads as Morze. The
+     main stylesheet downloads nothing; `@morze/ui/fonts.css` ships the face
+     self-hosted (#24), and MorzeThemeProvider warns in development when the
+     first family here is not available. */
   --mz-font-sans: 'Golos Text', ui-sans-serif, system-ui, -apple-system,
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --mz-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,

@@ -216,14 +216,22 @@ same face as the text around them — the kit never renders a label in a font th
 page does not use. Control labels are plain sentence case.
 
 `--mz-font-sans` is the fallback, applied to `.mz-root`: `'Golos Text'` (the
-face morze.tech uses) with a system stack behind it. Nothing is downloaded —
-load the webfont in the host if you want it:
+face morze.tech uses) with a system stack behind it. The main stylesheet
+downloads nothing; **the face ships with the kit, opt-in**:
 
-```html
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400..700&display=swap"
-      rel="stylesheet" />
+```tsx
+import '@morze/ui/fonts.css'   // Golos Text, self-hosted: Latin and Cyrillic, 400–900
 ```
+
+It is one variable woff2 per script (about 100 kB together, each fetched only
+when the page uses its characters), with `font-display: swap`, registered as
+`'Golos Text'` so the token picks it up as is. The licence (SIL OFL 1.1) is in
+`dist/fonts/OFL.txt`. Loading it from Google Fonts instead works the same way.
+
+Without either, the browser falls back to whatever the OS has — Segoe UI, SF,
+Noto Sans — and that face's digits decide whether a column of figures lines
+up. `MorzeThemeProvider` says so once in the development console when the
+first family in the stack is not available.
 
 Set the font on `body`, not only inside the app shell: dialogs, menus and
 tooltips are portalled to `<body>` and inherit from there.

@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import { warnIfFontMissing } from '../lib/font-check'
+
 export type MorzeTheme = 'dark' | 'light' | 'system'
 export type MorzeDensity = 'default' | 'comfortable' | 'compact'
 
@@ -134,6 +136,13 @@ function MorzeThemeProvider({
     return () => root.removeAttribute('data-mz-density')
   }, [density, target])
 
+  // Development only, once per page: the default face is declared but only
+  // the host can load it, and a missing one fails without a sound.
+  const rootRef = React.useRef<HTMLDivElement>(null)
+  React.useEffect(() => {
+    if (rootRef.current) warnIfFontMissing(rootRef.current)
+  }, [])
+
   const onThemeChangeRef = React.useRef(onThemeChange)
   onThemeChangeRef.current = onThemeChange
   const setTheme = React.useCallback(
@@ -156,6 +165,7 @@ function MorzeThemeProvider({
   return (
     <ThemeContext.Provider value={value}>
       <div
+        ref={rootRef}
         data-slot="morze-root"
         data-mz-theme={target === 'element' ? resolved : undefined}
         data-mz-density={target === 'element' && density !== 'default' ? density : undefined}

@@ -123,6 +123,15 @@ issue.
   `tests/density.browser.test.tsx`). `--mz-card-title-size` and
   `--mz-card-title-weight` set the card title. Only `DataTable` had a density
   before, so a dense app mixed 34 and 40px controls in one toolbar.
+- **`@morze/ui/fonts.css`** (#24) — Golos Text, self-hosted and opt-in: one
+  variable woff2 per script (Latin, Latin Extended, Cyrillic, Cyrillic
+  Extended; weights 400–900), `font-display: swap`, under the family name
+  `--mz-font-sans` already asks for. The files and their licence (SIL OFL 1.1)
+  ship in `dist/fonts/`, copied from `@fontsource-variable/golos-text` at
+  build time. The token named a face the package never shipped, so a host
+  that forgot to load it got the OS's face without a word. `MorzeThemeProvider`
+  now also warns once in development when the first family in the stack is
+  not available.
 
 ### Changed
 
