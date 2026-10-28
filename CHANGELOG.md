@@ -39,6 +39,13 @@ on GitHub, one entry per issue.
   draw from the same helpers. erp composed its global search from
   `mz-dialog-overlay` and `mz-panel`, and a field-like trigger from
   `mz-input mz-focusable`, with nothing saying either was safe to use.
+- **`--mz-sidebar-width`** (#9) — the room the sidebar currently takes: the
+  panel, the icon rail, `0px` off-canvas or on mobile, plus the margin round a
+  floating panel. `SidebarProvider` sets it on its wrapper (as an expression
+  over `--mz-sidebar-w` / `--mz-sidebar-w-icon`) and on `<html>` (resolved, for
+  portalled content), and removes it from `<html>` on unmount. erp read
+  `useSidebar()` and wrote the variable itself, with `16rem` / `3.5rem`
+  hardcoded.
 
 ### Changed
 

@@ -737,6 +737,22 @@ function MobileTrigger() {
 The default height is `100dvh`. When the sidebar lives inside a panel rather
 than owning the page, set `--mz-sidebar-h: 100%` on `SidebarProvider`.
 
+**`--mz-sidebar-width`** is the room the sidebar currently takes, for layout
+outside it that has to line up with its edge — a fixed overlay, a sticky
+scrollbar, a toast region: the full panel when expanded, the icon rail when
+collapsed to one, `0px` for a panel put away off-canvas or on mobile (plus the
+16px of margin round a `floating` panel). It is set on `SidebarProvider` as an
+expression over `--mz-sidebar-w` / `--mz-sidebar-w-icon`, so re-sizing the
+panel moves it too, and on `<html>` as the resolved length for portalled
+content:
+
+```css
+.my-bottom-bar { position: fixed; left: var(--mz-sidebar-width, 0px); right: 0; }
+```
+
+It changes at once, while the panel animates its width over `--mz-duration`;
+add the same transition where the motion should match.
+
 **`Sheet`** is exported separately — a dialog anchored to an edge of the screen
 (`side`: `top | right | bottom | left`), and what the mobile sidebar uses.
 

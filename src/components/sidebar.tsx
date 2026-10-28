@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip'
 
 const STORAGE_KEY = 'morze-ui-sidebar'
 const SHORTCUT = 'b'
+const WIDTH_VAR = '--mz-sidebar-width'
 
 type SidebarContextValue = {
   /** `expanded` | `collapsed` — what is painted, mobile aside. */
@@ -24,6 +25,31 @@ type SidebarContextValue = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  /** How the mounted `Sidebar` collapses and sits — see `sidebarWidth`. */
+  registerSidebar: (shape: SidebarShape | null) => void
+}
+
+type SidebarShape = {
+  collapsible: 'offcanvas' | 'icon' | 'none'
+  variant: 'sidebar' | 'floating' | 'inset'
+}
+
+/** `Sidebar`'s own defaults: what the provider assumes before one mounts. */
+const DEFAULT_SHAPE: SidebarShape = { collapsible: 'icon', variant: 'inset' }
+
+/**
+ * The room the sidebar takes in the layout, as a CSS length, mirroring the
+ * widths sidebar.css draws: the full panel, the icon rail, or nothing (an
+ * offcanvas panel put away, a mobile sheet, no sidebar at all). A floating
+ * panel adds the 8px margin either side of it.
+ */
+function sidebarWidth(shape: SidebarShape | null, open: boolean, isMobile: boolean) {
+  if (!shape) return '0px'
+  let width: string
+  if (shape.collapsible === 'none' || (!isMobile && open)) width = 'var(--mz-sidebar-w)'
+  else if (!isMobile && shape.collapsible === 'icon') width = 'var(--mz-sidebar-w-icon)'
+  else return '0px'
+  return shape.variant === 'floating' ? `calc(${width} + 16px)` : width
 }
 
 const SidebarContext = React.createContext<SidebarContextValue | null>(null)
@@ -71,9 +97,14 @@ function SidebarProvider({
   className,
   style,
   children,
+  ref,
   ...props
 }: SidebarProviderProps) {
   const isMobile = useIsMobile(mobileBreakpoint)
+  // `undefined` until a Sidebar reports in — assumed to be the default one, so
+  // the server markup already carries the right width — and `null` once the
+  // only one has gone.
+  const [shape, setShape] = React.useState<SidebarShape | null | undefined>(undefined)
   const [openMobile, setOpenMobile] = React.useState(false)
   // Server and first client render both start from defaultOpen; the stored
   // preference lands in an effect so hydration cannot mismatch.
@@ -126,9 +157,28 @@ function SidebarProvider({
       setOpenMobile,
       isMobile,
       toggleSidebar,
+      registerSidebar: setShape,
     }),
     [open, setOpen, openMobile, isMobile, toggleSidebar]
   )
+
+  // The sidebar's current width, for layout outside it that has to line up
+  // with its edge — a fixed overlay, a sticky scrollbar, a toast region. On
+  // the wrapper it is an expression over the kit's own width tokens, so a
+  // host that re-sizes the panel moves this with it. Portalled content does
+  // not sit under the wrapper, so <html> gets the resolved length as well.
+  const width = sidebarWidth(shape === undefined ? DEFAULT_SHAPE : shape, open, isMobile)
+  const wrapperRef = React.useRef<HTMLDivElement>(null)
+  React.useLayoutEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+    const root = document.documentElement
+    const resolved = getComputedStyle(wrapper).getPropertyValue(WIDTH_VAR).trim()
+    root.style.setProperty(WIDTH_VAR, resolved || width)
+    return () => {
+      root.style.removeProperty(WIDTH_VAR)
+    }
+  })
 
   return (
     <SidebarContext.Provider value={value}>
@@ -136,7 +186,12 @@ function SidebarProvider({
         data-slot="sidebar-wrapper"
         data-state={value.state}
         className={cn('mz-sidebar-layout', className)}
-        style={style}
+        style={{ [WIDTH_VAR]: width, ...style } as React.CSSProperties}
+        ref={(node) => {
+          wrapperRef.current = node
+          if (typeof ref === 'function') return ref(node)
+          if (ref) ref.current = node
+        }}
         {...props}
       >
         {children}
@@ -173,7 +228,12 @@ function Sidebar({
   children,
   ...props
 }: SidebarProps) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile, registerSidebar } = useSidebar()
+
+  React.useLayoutEffect(() => {
+    registerSidebar({ collapsible, variant })
+    return () => registerSidebar(null)
+  }, [registerSidebar, collapsible, variant])
 
   // On a narrow screen the sidebar is an overlay, not a column: collapsing to
   // a rail would eat the little width that is left.

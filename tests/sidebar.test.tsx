@@ -141,3 +141,76 @@ describe('Sidebar layout', () => {
     expect(container.querySelector('[data-slot="sidebar"]')).toHaveAttribute('data-variant', 'floating')
   })
 })
+
+// Layout outside the sidebar that lines up with its edge used to work the
+// width out itself, with the kit's numbers hardcoded (#9).
+describe('Sidebar width variable', () => {
+  const wrapperWidth = (container: HTMLElement) =>
+    (container.querySelector('[data-slot="sidebar-wrapper"]') as HTMLElement).style.getPropertyValue(
+      '--mz-sidebar-width'
+    )
+  const htmlWidth = () => document.documentElement.style.getPropertyValue('--mz-sidebar-width')
+
+  function Layout(props: React.ComponentProps<typeof Sidebar> & { open?: boolean }) {
+    const { open, ...sidebar } = props
+    return (
+      <SidebarProvider storageKey={null} open={open}>
+        <Sidebar {...sidebar}>
+          <SidebarContent />
+        </Sidebar>
+      </SidebarProvider>
+    )
+  }
+
+  it('follows the panel through expanded and the icon rail', async () => {
+    const { container } = render(<Shell storageKey={null} />)
+    expect(wrapperWidth(container)).toBe('var(--mz-sidebar-w)')
+    expect(htmlWidth()).not.toBe('')
+    await userEvent.click(screen.getByRole('button', { name: /Toggle sidebar/ }))
+    expect(wrapperWidth(container)).toBe('var(--mz-sidebar-w-icon)')
+  })
+
+  it('is zero for a panel put away off-canvas', () => {
+    const { container } = render(<Layout collapsible="offcanvas" open={false} />)
+    expect(wrapperWidth(container)).toBe('0px')
+  })
+
+  it('counts the margin round a floating panel', () => {
+    const { container } = render(<Layout variant="floating" />)
+    expect(wrapperWidth(container)).toBe('calc(var(--mz-sidebar-w) + 16px)')
+  })
+
+  it('stays the full width for a panel that cannot collapse', () => {
+    const { container } = render(<Layout collapsible="none" open={false} />)
+    expect(wrapperWidth(container)).toBe('var(--mz-sidebar-w)')
+  })
+
+  it('assumes the default sidebar until one reports in, so the server is right', () => {
+    const { container } = render(
+      <SidebarProvider storageKey={null}>
+        <main />
+      </SidebarProvider>
+    )
+    expect(wrapperWidth(container)).toBe('var(--mz-sidebar-w)')
+  })
+
+  it('drops to zero when the sidebar goes, and leaves <html> clean on unmount', () => {
+    const shell = (withSidebar: boolean) => (
+      <SidebarProvider storageKey={null}>{withSidebar ? <Sidebar /> : null}</SidebarProvider>
+    )
+    const { container, rerender, unmount } = render(shell(true))
+    rerender(shell(false))
+    expect(wrapperWidth(container)).toBe('0px')
+    unmount()
+    expect(htmlWidth()).toBe('')
+  })
+
+  it('lets the host override it on the provider', () => {
+    const { container } = render(
+      <SidebarProvider storageKey={null} style={{ ['--mz-sidebar-width' as string]: '10px' }}>
+        <Sidebar />
+      </SidebarProvider>
+    )
+    expect(wrapperWidth(container)).toBe('10px')
+  })
+})
