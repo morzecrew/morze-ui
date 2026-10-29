@@ -98,8 +98,18 @@ export function useColumnLayout<T>({
   }, [persistKey])
 
   // A column added or removed in code must not be stranded by a stale layout.
+  // An order nobody has touched — still the previous column set's own order —
+  // follows the new set outright: another period, another grain, and the
+  // host's order is the one that holds. A user's or a saved order is kept,
+  // and new columns join it next to their neighbours in `columns` (#39).
+  const previousBaseline = React.useRef(baseline)
   React.useEffect(() => {
-    setInternal((current) => merge(baseline, current, baseline))
+    const before = previousBaseline.current
+    previousBaseline.current = baseline
+    setInternal((current) => {
+      const merged = merge(baseline, current, baseline)
+      return sameSequence(current.order, before.order) ? { ...merged, order: baseline.order } : merged
+    })
   }, [baseline])
 
   // The layout as the host or storage holds it, before auto-fit has its say.
@@ -414,10 +424,15 @@ export function useColumnLayout<T>({
 
 function merge(base: ColumnLayout, patch: Partial<ColumnLayout>, fallback: ColumnLayout): ColumnLayout {
   const known = new Set(fallback.order)
-  const order = [
-    ...(patch.order ?? base.order).filter((id) => known.has(id)),
-    ...fallback.order.filter((id) => !(patch.order ?? base.order).includes(id)),
-  ]
+  const order = (patch.order ?? base.order).filter((id) => known.has(id))
+  // A column the layout has not seen goes in after the column it follows in
+  // `columns`, or first if nothing before it is there. Appending them all at
+  // the end put a new month after the forecast weeks it should precede.
+  fallback.order.forEach((id, index) => {
+    if (order.includes(id)) return
+    const before = fallback.order.slice(0, index).reverse().find((prev) => order.includes(prev))
+    order.splice(before === undefined ? 0 : order.indexOf(before) + 1, 0, id)
+  })
   return {
     order,
     hidden: (patch.hidden ?? base.hidden).filter((id) => known.has(id)),
@@ -434,6 +449,10 @@ function overlayFit(layout: ColumnLayout, fitted: Record<string, number>): Colum
   )
   if (!entries.length) return layout
   return { ...layout, widths: { ...layout.widths, ...Object.fromEntries(entries) } }
+}
+
+function sameSequence(a: string[], b: string[]) {
+  return a.length === b.length && a.every((id, index) => id === b[index])
 }
 
 function sameWidths(a: Record<string, number>, b: Record<string, number>) {

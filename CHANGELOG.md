@@ -146,6 +146,11 @@ ran into after it (#26 – #41) — one entry per issue.
 - **DataTable — `toolbarEnd`** (#28), content at the end of the toolbar row,
   before the Columns button; and the start group now grows, so a host action
   in `toolbar` can be pushed to the end with an auto margin.
+- **DataTable — `scrollerRef` and `initialScroll`** (#29). `scrollerRef` is the
+  table's scrolling element, which hosts reached with
+  `querySelector('.mz-dt__scroller')`; `initialScroll="end"` opens a table
+  wider than its box at its last columns — once, before paint, the right way
+  round in RTL.
 
 ### Changed
 
@@ -272,6 +277,12 @@ ran into after it (#26 – #41) — one entry per issue.
   start. A plain (unsortable) header carries its full caption in `title`.
   The report's «зращено» did not reproduce in headless Chrome; these close the
   routes by which it can happen.
+- **DataTable — a changed column set keeps the host's order** (#39). When the
+  `columns` ids changed (months instead of weeks), the layout kept the order of
+  the ids it had seen and put the new ones last, so months landed after the
+  forecast weeks. An order nobody touched now follows `columns`; a user's or a
+  saved order is kept, and new columns join it after their neighbour in
+  `columns` instead of at the end.
 
 ## [0.5.0] — 2026-09-13
 

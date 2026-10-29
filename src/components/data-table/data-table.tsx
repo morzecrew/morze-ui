@@ -101,6 +101,18 @@ export type DataTableProps<T> = {
    */
   toolbarEnd?: React.ReactNode
   /**
+   * The table's own scrolling element — for a host that scrolls it, reads its
+   * position or syncs another pane to it. `.mz-dt__scroller` is not API.
+   */
+  scrollerRef?: React.Ref<HTMLDivElement>
+  /**
+   * Where a table wider than its box opens: at its first columns (`start`,
+   * default) or its last (`end`) — a statement with the latest month on the
+   * end edge. Applied once, when the table first overflows; the reader's own
+   * scrolling is left alone after that.
+   */
+  initialScroll?: 'start' | 'end'
+  /**
    * `false` drops the Columns button — for a table whose layout the host
    * fixes, or drives from its own UI. The layout itself still works: `layout`,
    * `onLayoutChange` and `persistKey` are unaffected.
@@ -269,6 +281,8 @@ export function DataTable<T>({
   persistKey = null,
   toolbar,
   toolbarEnd,
+  scrollerRef: scrollerRefProp,
+  initialScroll = 'start',
   columnManager = true,
   autoFit = true,
   density = 'normal',
@@ -375,6 +389,21 @@ export function DataTable<T>({
     // and nothing about the container has changed, so nothing else would
     // trigger the fit that has to follow.
   }, [autoFit, fitTo, selectable, renderExpanded, hiddenKey, orderKey, fitEpoch])
+
+  // Opening at the end: once, the first time there is anything to scroll.
+  // After layout and before paint, so the reader never sees the start first;
+  // a fit that later narrows the row leaves the browser clamping to the new
+  // end, which is still the end. `scrollLeft` counts down from zero in an
+  // RTL scroller, so the end is the most negative offset there.
+  const openedAtEnd = React.useRef(false)
+  React.useLayoutEffect(() => {
+    const scroller = scrollerRef.current
+    if (initialScroll !== 'end' || openedAtEnd.current || !scroller) return
+    const max = scroller.scrollWidth - scroller.clientWidth
+    if (max <= 0) return
+    openedAtEnd.current = true
+    scroller.scrollLeft = getComputedStyle(scroller).direction === 'rtl' ? -max : max
+  })
 
   // Edge shadows tell the reader there is more table beyond the viewport.
   React.useEffect(() => {
@@ -933,7 +962,11 @@ export function DataTable<T>({
       )}
 
       <div
-        ref={scrollerRef}
+        ref={(node) => {
+          scrollerRef.current = node
+          if (typeof scrollerRefProp === 'function') return scrollerRefProp(node)
+          if (scrollerRefProp) scrollerRefProp.current = node
+        }}
         className="mz-dt__scroller"
         data-scrolled-start={scrolled.left || undefined}
         data-scrolled-end={scrolled.right || undefined}

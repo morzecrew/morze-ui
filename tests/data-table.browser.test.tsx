@@ -167,6 +167,40 @@ describe('auto-fit against a real container', () => {
     host.remove()
   })
 
+  // A P&L opens on its latest month, at the end edge; hosts reached in with
+  // querySelector('.mz-dt__scroller') to get there (#29).
+  it('opens scrolled to its last columns, and hands the scroller over', async () => {
+    const months: DataTableColumn<Row>[] = Array.from({ length: 12 }, (_, i) => ({
+      id: `m${i}`,
+      header: `Month ${i + 1}`,
+      accessor: (r: Row) => r.sum,
+      width: 140,
+      minWidth: 140,
+    }))
+    let scroller: HTMLDivElement | null = null
+    const { host, unmount } = mountIn(500, (
+      <DataTable
+        columns={months}
+        data={rows.slice(0, 3)}
+        rowKey={(r) => r.id}
+        total={3}
+        initialScroll="end"
+        scrollerRef={(node) => {
+          scroller = node
+        }}
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    ))
+    await settle()
+    expect(scroller).toBe(host.querySelector('.mz-dt__scroller'))
+    const box = scroller!
+    expect(box.scrollWidth).toBeGreaterThan(box.clientWidth)
+    expect(box.scrollLeft).toBeGreaterThanOrEqual(box.scrollWidth - box.clientWidth - 1)
+    unmount()
+    host.remove()
+  })
+
   it('redistributes into the same width when a column is hidden', async () => {
     // The half of the auto-fit fix happy-dom cannot reach: hiding a column has
     // to hand its width to the others, not leave a gap at the right edge.

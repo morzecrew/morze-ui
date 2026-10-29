@@ -968,6 +968,14 @@ What it does:
   resets the page, reaches the URL through `useTableQuery` as `q`, and arrives
   at the backend in the same request as the filters. A box wired in through
   `toolbar` does none of those.
+- **Opening at the end** — `initialScroll="end"` opens a table wider than its
+  box scrolled to its last columns (a statement with the latest month on the
+  right), once, before it paints. `scrollerRef` hands over the scrolling
+  element itself; `.mz-dt__scroller` is an internal class, not API.
+- **A changed column set keeps your order** — when `columns` changes (months
+  instead of weeks), an order nobody touched follows the new `columns`; an
+  order the reader changed or a saved layout restored is kept, and new columns
+  join it beside their neighbours rather than at the end.
 - **Toolbar** — `toolbar` sits at the start of the row, after the search;
   `toolbarEnd` at the end, before the Columns button — an export, a view
   switch.

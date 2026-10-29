@@ -421,6 +421,28 @@ describe('column auto-fit', () => {
     expect(result.current.widthOf('a')).toBe(90)
   })
 
+  // Weeks swapped for months: the layout kept the ids it had seen and put
+  // the unseen ones last, so the months landed after the forecast (#39).
+  it('follows a changed column set when nobody touched the order', () => {
+    const cols = (ids: string[]) => ids.map((id) => ({ id, header: id }))
+    const { result, rerender } = renderHook(({ columns }) => useColumnLayout({ columns }), {
+      initialProps: { columns: cols(['name', 'w1', 'w2', 'forecast']) },
+    })
+    rerender({ columns: cols(['name', 'm1', 'm2', 'forecast']) })
+    expect(result.current.layout.order).toEqual(['name', 'm1', 'm2', 'forecast'])
+  })
+
+  it('keeps a user’s order, and slots new columns in beside their neighbours', () => {
+    const cols = (ids: string[]) => ids.map((id) => ({ id, header: id }))
+    const { result, rerender } = renderHook(({ columns }) => useColumnLayout({ columns }), {
+      initialProps: { columns: cols(['name', 'w1', 'forecast']) },
+    })
+    act(() => result.current.moveTo('forecast', 'name'))
+    expect(result.current.layout.order).toEqual(['forecast', 'name', 'w1'])
+    rerender({ columns: cols(['name', 'm1', 'm2', 'forecast']) })
+    expect(result.current.layout.order).toEqual(['forecast', 'name', 'm1', 'm2'])
+  })
+
   it('keeps the declared widths when shrinking is off', () => {
     const { result } = renderHook(() => useColumnLayout({ columns: fitColumns }))
     act(() => result.current.fitTo(200, { shrink: false }))
