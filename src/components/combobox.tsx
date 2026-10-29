@@ -32,6 +32,12 @@ export type ComboboxOption = {
   disabled?: boolean
   /** A second line under the label — a code, a city, a balance. */
   hint?: React.ReactNode
+  /**
+   * The heading the option is listed under. Groups appear in the order their
+   * first option does, each option under its own heading; a heading whose
+   * options the search has filtered away goes with them.
+   */
+  group?: string
 }
 
 export type ComboboxLabels = {
@@ -201,8 +207,37 @@ function useOptionList({
     )
   }, [options, needle])
 
-  if (!async) return { shown: local, loading: false, failed: false, waiting: false }
-  return { shown: remote.options, loading: remote.loading, failed: remote.failed, waiting }
+  const shownLocal = React.useMemo(() => byGroup(local), [local])
+  const shownRemote = React.useMemo(() => byGroup(remote.options), [remote.options])
+  if (!async) return { shown: shownLocal, loading: false, failed: false, waiting: false }
+  return { shown: shownRemote, loading: remote.loading, failed: remote.failed, waiting }
+}
+
+/** Runs of options that share a group, with the index each run starts at. */
+function sections(options: ComboboxOption[]) {
+  const out: { group: string | undefined; start: number; options: ComboboxOption[] }[] = []
+  options.forEach((option, index) => {
+    const last = out[out.length - 1]
+    if (last && last.group === option.group) last.options.push(option)
+    else out.push({ group: option.group, start: index, options: [option] })
+  })
+  return out
+}
+
+/**
+ * Options gathered under their groups, in the order each group first appears.
+ * Done to the list itself rather than only to what is drawn, so the arrow
+ * keys, Home and End walk the rows in the order the reader sees them.
+ */
+function byGroup(options: ComboboxOption[]): ComboboxOption[] {
+  if (!options.some((option) => option.group)) return options
+  const groups = new Map<string | undefined, ComboboxOption[]>()
+  for (const option of options) {
+    const bucket = groups.get(option.group)
+    if (bucket) bucket.push(option)
+    else groups.set(option.group, [option])
+  }
+  return [...groups.values()].flat()
 }
 
 /**
@@ -351,35 +386,52 @@ function OptionPanel({
         }
         className="mz-combobox__list"
       >
-        {shown.map((option, index) => {
-          const selected = isSelected(option)
+        {sections(shown).map(({ group, start, options }) => {
+          const rows = options.map((option, offset) => {
+            const index = start + offset
+            const selected = isSelected(option)
+            return (
+              <li
+                key={option.value}
+                id={`${listId}-o-${index}`}
+                role="option"
+                aria-selected={selected}
+                aria-disabled={option.disabled || undefined}
+                // The menu's own highlight attributes, so the row lights up the
+                // way every other list in the kit does, under both the pointer
+                // and the keyboard — and only once, because the pointer moves
+                // the same highlight the arrows move.
+                data-highlighted={index === active ? '' : undefined}
+                data-state={selected ? 'checked' : undefined}
+                data-disabled={option.disabled ? '' : undefined}
+                className="mz-item mz-combobox__option"
+                onPointerMove={() => !option.disabled && index !== active && setActive(index)}
+                onClick={() => !option.disabled && onPick(option)}
+              >
+                <span className="mz-item__indicator">{selected ? <CheckIcon /> : null}</span>
+                {renderOption ? (
+                  renderOption(option, { selected, active: index === active })
+                ) : (
+                  <span className="mz-combobox__text">
+                    <span className="mz-combobox__label">{option.label}</span>
+                    {option.hint ? <span className="mz-combobox__hint">{option.hint}</span> : null}
+                  </span>
+                )}
+              </li>
+            )
+          })
+          if (group === undefined) return rows
+          // A listbox owns its groups, each named by its heading; the heading
+          // is not an option, so the arrows and the reader both pass over it.
+          const headingId = `${listId}-g-${start}`
           return (
-            <li
-              key={option.value}
-              id={`${listId}-o-${index}`}
-              role="option"
-              aria-selected={selected}
-              aria-disabled={option.disabled || undefined}
-              // The menu's own highlight attributes, so the row lights up the
-              // way every other list in the kit does, under both the pointer
-              // and the keyboard — and only once, because the pointer moves
-              // the same highlight the arrows move.
-              data-highlighted={index === active ? '' : undefined}
-              data-state={selected ? 'checked' : undefined}
-              data-disabled={option.disabled ? '' : undefined}
-              className="mz-item mz-combobox__option"
-              onPointerMove={() => !option.disabled && index !== active && setActive(index)}
-              onClick={() => !option.disabled && onPick(option)}
-            >
-              <span className="mz-item__indicator">{selected ? <CheckIcon /> : null}</span>
-              {renderOption ? (
-                renderOption(option, { selected, active: index === active })
-              ) : (
-                <span className="mz-combobox__text">
-                  <span className="mz-combobox__label">{option.label}</span>
-                  {option.hint ? <span className="mz-combobox__hint">{option.hint}</span> : null}
-                </span>
-              )}
+            <li key={`group-${start}`} role="presentation" className="mz-combobox__section">
+              <div id={headingId} role="presentation" className="mz-combobox__group-label">
+                {group}
+              </div>
+              <ul role="group" aria-labelledby={headingId} className="mz-combobox__group">
+                {rows}
+              </ul>
             </li>
           )
         })}

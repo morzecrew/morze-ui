@@ -562,7 +562,9 @@ What this kit adds on top:
   whose option the current answer no longer contains, and ignores an older
   request that answers after a newer one. The multi-select collapses its chips
   into "+N", takes All / None over what the search has narrowed to, and drops
-  the last chip on Backspace in an empty box.
+  the last chip on Backspace in an empty box. An option's `group` lists it
+  under a heading — groups in the order their first option appears, a heading
+  gone with its last match, the arrow keys walking the rows as drawn.
 
   ```tsx
   <Combobox options={statuses} value={status} onChange={setStatus} />

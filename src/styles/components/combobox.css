@@ -101,6 +101,16 @@
    take it; the highlighted row is what says where the keyboard is, so a ring
    around the whole list would be a second answer to the same question. */
 .mz-combobox__list:focus-visible { outline: none; }
+/* Groups: the menu's own label over each run of options (#27). */
+.mz-combobox__section { list-style: none; }
+.mz-combobox__section + .mz-combobox__section { margin-top: 4px; }
+.mz-combobox__group { margin: 0; padding: 0; list-style: none; }
+.mz-combobox__group-label {
+  padding: 8px 10px 4px;
+  font-size: var(--mz-text-xs);
+  font-weight: 600;
+  color: var(--mz-text-dim);
+}
 /* Keeps the row the arrow keys just reached clear of the rounded edge. */
 .mz-combobox__option { scroll-margin: 4px; }
 .mz-combobox__text { display: flex; flex-direction: column; min-width: 0; }

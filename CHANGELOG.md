@@ -173,6 +173,13 @@ ran into after it (#26 – #41) — one entry per issue.
   grid's hairline seam while the body is scrolled under it, mirrored in RTL.
   The header's ground is opaque since #41, so nothing scrolls through it;
   hosts layered `--mz-th-bg` over `--mz-surface` by hand.
+- **`Combobox` / `MultiSelect` — option groups** (#27). `group` on an option
+  lists it under a heading: groups in the order their first option appears,
+  each option gathered under its own, a heading hidden once the search has
+  filtered all of its options away. The list is reordered itself, so the
+  arrow keys, Home and End walk the rows in the order they are drawn, and the
+  headings are `role="group"` labels the keyboard passes over. A grouped
+  metric picker had to be rebuilt on `Command` with hand-set `aria-selected`.
 
 ### Changed
 

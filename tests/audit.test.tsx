@@ -268,3 +268,42 @@ describe('NumberInput bounds (#33)', () => {
     expect(screen.getByRole('spinbutton', { name: 'Amount' })).toHaveAttribute('aria-invalid', 'true')
   })
 })
+
+// A grouped metric picker had to be rebuilt on Command (#27).
+describe('Combobox option groups', () => {
+  const metrics = [
+    { value: 'rev', label: 'Revenue', group: 'Sales' },
+    { value: 'cogs', label: 'Cost of goods', group: 'Costs' },
+    { value: 'orders', label: 'Orders', group: 'Sales' },
+    { value: 'rent', label: 'Rent', group: 'Costs' },
+  ]
+
+  it('lists each option under its heading, groups in first-seen order', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { MultiSelect } = await import('../src')
+    render(<MultiSelect options={metrics} aria-label="Metrics" />)
+    await userEvent.click(screen.getByRole('combobox', { name: 'Metrics' }))
+    const groups = screen.getAllByRole('group')
+    expect(groups.map((g) => g.getAttribute('aria-labelledby') && document.getElementById(g.getAttribute('aria-labelledby')!)?.textContent)).toEqual(['Sales', 'Costs'])
+    // Revenue and Orders together under Sales, though Orders came third.
+    expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual(['Revenue', 'Orders', 'Cost of goods', 'Rent'])
+  })
+
+  it('drops a heading the search has emptied, and walks the rows as they are drawn', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { vi } = await import('vitest')
+    const { Combobox } = await import('../src')
+    const onChange = vi.fn()
+    render(<Combobox options={metrics} onChange={onChange} aria-label="Metric" />)
+    await userEvent.click(screen.getByRole('combobox', { name: 'Metric' }))
+    // Only Sales has a match, so Costs and its heading go.
+    await userEvent.type(screen.getByRole('searchbox'), 'ord')
+    expect(screen.getAllByRole('group')).toHaveLength(1)
+    expect(screen.queryByText('Costs')).toBeNull()
+
+    await userEvent.clear(screen.getByRole('searchbox'))
+    // Down from the top: the second row drawn is Orders, not Cost of goods.
+    await userEvent.keyboard('{ArrowDown}{Enter}')
+    expect(onChange).toHaveBeenLastCalledWith('orders', expect.objectContaining({ value: 'orders' }))
+  })
+})
