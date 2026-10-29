@@ -1,0 +1,161 @@
+# A `chore: bump x.y.z` commit on main is a release: this tags it, creates the
+# GitHub release from its CHANGELOG.md section, and publishes the package to
+# npm. `npm run release` writes and pushes that commit; one written by hand
+# works the same.
+#
+# npm trusts this workflow through OIDC (trusted publishing), so there is no
+# npm token in the repository's secrets, 2FA does not get in the way, and the
+# package carries a provenance attestation of the commit it was built from.
+# Set up once on npmjs.com → @morze/ui → Settings → Trusted publishing:
+# GitHub Actions, organisation `morzecrew`, repository `morze-ui`, workflow
+# `release.yml`, and `npm publish` among the allowed actions.
+#
+# Every step checks before it acts — a tag already there must be on the same
+# commit, a release already there is left alone, a version already on npm is
+# not published twice — so re-running a release that failed halfway finishes
+# it. `Run workflow` with a ref (a tag such as v0.6.0) releases a commit whose
+# push came before this workflow did.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: The bump commit to release — a tag (v0.6.0) or a SHA. Empty for the head of main.
+        required: false
+
+permissions:
+  contents: write # the tag and the GitHub release
+  id-token: write # npm trusted publishing
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the workflow's own commit
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Find the bump commit
+        id: find
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          REF: ${{ inputs.ref }}
+        run: |
+          if [ "$EVENT" = workflow_dispatch ]; then
+            sha=$(git rev-parse --verify "${REF:-$AFTER}^{commit}")
+            if ! git log -1 --format=%s "$sha" | grep -qE '^(chore(\([^)]*\))?: )?bump '; then
+              echo "::error::$(git log -1 --format='%h %s' "$sha") is not a bump commit. Give the ref of one — a tag such as v0.6.0."
+              exit 1
+            fi
+          else
+            # The newest bump among the commits this push brought. The release
+            # is cut at that commit, not at the head: whatever was pushed after
+            # it is not part of the version it names.
+            if [ -z "$BEFORE" ] || [ "$BEFORE" = 0000000000000000000000000000000000000000 ]; then
+              range=(-1 "$AFTER")
+            else
+              range=("$BEFORE..$AFTER")
+            fi
+            sha=$(git log --format='%H %s' "${range[@]}" | grep -E '^[0-9a-f]{40} (chore(\([^)]*\))?: )?bump ' | head -1 | cut -d' ' -f1 || true)
+          fi
+          if [ -z "$sha" ]; then
+            echo "No bump commit in this push; nothing to release."
+            exit 0
+          fi
+          version=$(git show "$sha:package.json" | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')
+          subject=$(git log -1 --format=%s "$sha")
+          case "$subject" in
+            *"bump $version"*) ;;
+            *) echo "::error::$subject — but package.json at $sha says $version."; exit 1 ;;
+          esac
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Releasing $version from $sha: $subject"
+
+      - name: Check out the bump commit
+        if: steps.find.outputs.sha
+        run: git worktree add --detach "$RUNNER_TEMP/pkg" "${{ steps.find.outputs.sha }}"
+
+      - uses: actions/setup-node@v6
+        if: steps.find.outputs.sha
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          # No cache in a release build: what is published comes from the
+          # lockfile and the registry, nothing else.
+          package-manager-cache: false
+
+      - name: npm ≥ 11.5.1, which trusted publishing needs
+        if: steps.find.outputs.sha
+        run: npm install --global npm@11 && npm --version
+
+      - name: Tag it
+        if: steps.find.outputs.sha
+        env:
+          SHA: ${{ steps.find.outputs.sha }}
+          TAG: ${{ steps.find.outputs.tag }}
+          VERSION: ${{ steps.find.outputs.version }}
+        run: |
+          if existing=$(git rev-parse -q --verify "refs/tags/$TAG^{commit}"); then
+            if [ "$existing" != "$SHA" ]; then
+              echo "::error::$TAG already exists on $existing, not on $SHA."
+              exit 1
+            fi
+            echo "$TAG is already there."
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a "$TAG" -m "$VERSION" "$SHA"
+            git push origin "$TAG"
+          fi
+
+      - name: Create the GitHub release
+        if: steps.find.outputs.sha
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.find.outputs.tag }}
+          VERSION: ${{ steps.find.outputs.version }}
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "The release $TAG is already there."
+            exit 0
+          fi
+          # Notes from the bump commit's own changelog, through the script of
+          # the workflow's commit — an older tag may predate the script.
+          node scripts/release-notes.mjs "$VERSION" "$RUNNER_TEMP/pkg/CHANGELOG.md" > "$RUNNER_TEMP/notes.md"
+          gh release create "$TAG" --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag --latest
+
+      - name: Install
+        if: steps.find.outputs.sha
+        working-directory: ${{ runner.temp }}/pkg
+        run: npm ci
+
+      - name: Publish to npm
+        if: steps.find.outputs.sha
+        working-directory: ${{ runner.temp }}/pkg
+        env:
+          VERSION: ${{ steps.find.outputs.version }}
+        run: |
+          name=$(node -p 'require("./package.json").name')
+          if [ "$(npm view "$name@$VERSION" version 2>/dev/null)" = "$VERSION" ]; then
+            echo "$name@$VERSION is already on npm."
+            exit 0
+          fi
+          # Built once before publishing: prepublishOnly typechecks before it
+          # builds, and a commit older than the tsconfig fix resolves the
+          # playground's `@morze/ui` through dist. It runs typecheck, test and
+          # build again itself.
+          npm run build
+          npm publish

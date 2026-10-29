@@ -12,6 +12,32 @@ between 0.2.0 and 0.3.7 the package went out eleven times, with real API
 changes among them, and the only record left is six commits that say
 `bump x.y.z`.
 
+## [Unreleased]
+
+### Added
+
+- **Releases from CI.** A `chore: bump x.y.z` commit pushed to `main` is
+  tagged, released on GitHub with its changelog section as the notes, and
+  published to npm by `.github/workflows/release.yml` — through npm's trusted
+  publishing, so there is no token to keep and every version carries a
+  provenance attestation. The workflow releases the bump commit itself, not
+  the head of the push, and every step checks before it acts, so a re-run
+  finishes a release that failed halfway.
+- **`npm run release`** writes that commit: preconditions (main, clean, not
+  behind, entries written), a version picked from patch / minor / major with
+  one recommended by the changelog, typecheck / test / build before any file
+  changes, the changelog and version bumped and tagged locally, and only after
+  a yes the push. `--dry-run`, `--version`, `--yes`, `--browser`, and
+  `--local` for a release without CI.
+
+### Fixed
+
+- **`npm run typecheck` passes on a fresh checkout.** The playground imports
+  `@morze/ui`, which `tsc` resolved through `package.json` into `dist` — so
+  the typecheck, and `prepublishOnly` with it, failed anywhere the package had
+  not been built yet. `tsconfig.json` maps `@morze/ui` to `src`, as the
+  playground's Vite config already did.
+
 ## [0.6.0] — 2026-10-29
 
 What erp-frontend still had to work around on top of 0.5.0 (issues #3 – #12),

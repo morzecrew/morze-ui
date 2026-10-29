@@ -1395,20 +1395,49 @@ with.
 
 ## Publishing
 
-```bash
-npm publish --access public
-```
+**A `chore: bump x.y.z` commit on `main` is a release.** The
+[release workflow](.github/workflows/release.yml) finds it in the push, tags
+that commit `vx.y.z`, creates the GitHub release from its `CHANGELOG.md`
+section, and publishes the package to npm — built from that commit, not from
+whatever was pushed after it. Every step checks first (a tag already on the
+commit, a release already there, a version already on npm), so re-running a
+failed release finishes it. **Run workflow** with a ref (`v0.6.0`) releases a
+bump commit pushed before the workflow existed.
 
-Before that: move the release's entries out of `## [Unreleased]` in
-`CHANGELOG.md` under the new version and date, and bump `package.json`.
-`prepublishOnly` runs `typecheck`, `test` and `build`, so a broken bundle
-cannot go out — but nothing checks that the changelog was written, and eleven
-releases went out without one. See the gap at 0.2.5 – 0.3.7.
+npm trusts the workflow itself (trusted publishing over OIDC): there is no npm
+token in the repository, 2FA does not get in the way, and every version
+carries a provenance attestation of the commit it was built from. It is set
+up once, on npmjs.com → `@morze/ui` → *Settings* → *Trusted publishing*:
+GitHub Actions, organisation `morzecrew`, repository `morze-ui`, workflow
+`release.yml`, with `npm publish` among the allowed actions. A new trusted
+publisher has to publish once within two days, or it expires.
 
-`npm run test:browser` is deliberately *not* in `prepublishOnly`: it needs a
-real Chrome, and a publish that cannot happen on a machine without one is a
-worse failure than the one it guards against. Run it before a release that
-touches the table's layout, sizing or scrolling.
+**`npm run release` writes the bump commit:**
+
+1. **Checks the ground** — on `main`, no uncommitted changes to tracked
+   files, not behind `origin`, the tag free, and entries written under
+   `## [Unreleased]`. An empty section stops it: the release notes are made
+   from it, and eleven releases once went out with nothing written (the gap
+   at 0.2.5 – 0.3.7).
+2. **Asks for the version** — patch, minor, major or your own, with one
+   recommended from the changelog: a `### Breaking` section is a minor bump
+   in 0.x (a major one from 1.0), an `### Added` section a minor one.
+3. **Runs `typecheck`, `test` and `build`** before touching a file, so a red
+   run leaves the tree as it was. `--browser` adds the Chrome specs — do,
+   before a release that touches the table's layout, sizing or scrolling.
+4. **Writes it locally** — `[Unreleased]` becomes `[x.y.z] — date` under a
+   fresh empty `[Unreleased]`, `package.json` and the lockfile move, and
+   `chore: bump x.y.z` is committed and `vx.y.z` tagged.
+5. **Asks before anything leaves the machine**, then pushes the commit and the
+   tag — and the workflow takes it from there.
+
+Declining the push leaves the commit and the tag local, with the command to
+push them later and the one to take them back. `--version
+<x.y.z|patch|minor|major>` and `--yes` run it without questions; `--dry-run`
+shows the version, the steps and the release notes, and changes nothing.
+`--local` releases without CI: the GitHub release from this machine, and
+`npm publish` after its own question (or `--npm`), which needs an npm account
+with 2FA.
 
 The `@morze` scope has to exist in the npm organisation (or point
 `publishConfig` at a private registry).
