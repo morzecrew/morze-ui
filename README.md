@@ -991,6 +991,19 @@ What it does:
   resets the page, reaches the URL through `useTableQuery` as `q`, and arrives
   at the backend in the same request as the filters. A box wired in through
   `toolbar` does none of those.
+- **Tree rows** — `getSubRows` turns rows with rows of their own (a
+  statement's groups and lines) into a tree: the first column steps in by
+  depth, a group folds and unfolds from a toggle with `aria-expanded`, and a
+  leaf keeps a spacer so a level lines up. Folding is
+  `treeExpanded` / `onTreeExpandedChange` (open group keys) or
+  `defaultTreeExpanded` (keys, or `'all'`). The rows on screen are one flat
+  list to everything else — the window, the grid keyboard, the page's
+  selection — so the tree works with all of them. `rowKey` has to be unique
+  across the whole tree.
+
+  ```tsx
+  <DataTable rowKey={(r) => r.id} getSubRows={(r) => r.children} defaultTreeExpanded="all" … />
+  ```
 - **Opening at the end** — `initialScroll="end"` opens a table wider than its
   box scrolled to its last columns (a statement with the latest month on the
   right), once, before it paints. `scrollerRef` hands over the scrolling

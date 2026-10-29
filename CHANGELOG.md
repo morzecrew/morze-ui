@@ -180,6 +180,16 @@ ran into after it (#26 – #41) — one entry per issue.
   arrow keys, Home and End walk the rows in the order they are drawn, and the
   headings are `role="group"` labels the keyboard passes over. A grouped
   metric picker had to be rebuilt on `Command` with hand-set `aria-selected`.
+- **DataTable — tree rows** (#30). `getSubRows` draws a row's children under
+  it, the first column indented by depth, with a toggle (`aria-expanded`)
+  on each group and a spacer on each leaf so a level lines up. Folding is
+  controlled by `treeExpanded` / `onTreeExpandedChange` or seeded by
+  `defaultTreeExpanded` (keys, or `'all'` — groups arriving later open too).
+  The visible rows are laid out flat before the window, the grid keyboard and
+  the page's selection see them, so all three work on a tree unchanged.
+  `aria-rowindex` / `aria-rowcount` are left out on a tree, where `total`
+  counts the top level only. A P&L host flattened rows, tracked folding and
+  drew chevrons itself.
 
 ### Changed
 

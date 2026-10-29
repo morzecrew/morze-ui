@@ -307,3 +307,69 @@ describe('Combobox option groups', () => {
     expect(onChange).toHaveBeenLastCalledWith('orders', expect.objectContaining({ value: 'orders' }))
   })
 })
+
+// A P&L's groups and lines: the host flattened rows, tracked folding and drew
+// its own chevrons (#30).
+describe('DataTable tree rows', () => {
+  type Line = { id: string; name: string; children?: Line[] }
+  const statement: Line[] = [
+    {
+      id: 'rev',
+      name: 'Revenue',
+      children: [
+        { id: 'shop', name: 'Shop' },
+        { id: 'wb', name: 'Wildberries', children: [{ id: 'wb-fbo', name: 'FBO' }] },
+      ],
+    },
+    { id: 'opex', name: 'Operating costs', children: [{ id: 'rent', name: 'Rent' }] },
+    { id: 'tax', name: 'Tax' },
+  ]
+  const names = () => screen.getAllByRole('row').slice(1).map((row) => row.querySelector('.mz-dt__cell')?.textContent)
+  const tree = (props: Partial<React.ComponentProps<typeof DataTable<Line>>> = {}) =>
+    render(
+      <DataTable<Line>
+        columns={[{ id: 'name', header: 'Line', accessor: (r) => r.name }, { id: 'id', header: 'Id', accessor: (r) => r.id }]}
+        data={statement}
+        rowKey={(r) => r.id}
+        getSubRows={(r) => r.children}
+        query={emptyQuery}
+        onQueryChange={() => {}}
+        {...props}
+      />
+    )
+
+  it('starts folded, and unfolds a group under its toggle', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { vi } = await import('vitest')
+    const onTreeExpandedChange = vi.fn()
+    tree({ onTreeExpandedChange })
+    expect(names()).toEqual(['Revenue', 'Operating costs', 'Tax'])
+    const toggles = screen.getAllByRole('button', { name: 'Expand' })
+    // Only groups fold: Tax is a leaf and has none.
+    expect(toggles).toHaveLength(2)
+    expect(toggles[0]).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(toggles[0]!)
+    expect(names()).toEqual(['Revenue', 'Shop', 'Wildberries', 'Operating costs', 'Tax'])
+    expect(onTreeExpandedChange).toHaveBeenLastCalledWith(['rev'])
+    const shop = screen.getAllByRole('row').find((row) => row.textContent?.includes('Shop'))!
+    expect(shop).toHaveAttribute('data-depth', '1')
+    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('opens everything with "all", and keeps a closed parent’s open child out of sight', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    tree({ defaultTreeExpanded: 'all' })
+    expect(names()).toEqual(['Revenue', 'Shop', 'Wildberries', 'FBO', 'Operating costs', 'Rent', 'Tax'])
+    // Folding Revenue hides Wildberries and its own open child with it.
+    await userEvent.click(screen.getAllByRole('button', { name: 'Collapse' })[0]!)
+    expect(names()).toEqual(['Revenue', 'Operating costs', 'Rent', 'Tax'])
+    // And unfolding it brings Wildberries back still open.
+    await userEvent.click(screen.getAllByRole('button', { name: 'Expand' })[0]!)
+    expect(names()).toContain('FBO')
+  })
+
+  it('follows the host when controlled', () => {
+    tree({ treeExpanded: ['opex'] })
+    expect(names()).toEqual(['Revenue', 'Operating costs', 'Rent', 'Tax'])
+  })
+})

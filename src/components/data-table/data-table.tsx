@@ -71,6 +71,18 @@ export type DataTableProps<T> = {
   /** A click anywhere on the row opens it, not only the chevron. */
   expandOnRowClick?: boolean
   /**
+   * Rows that have rows of their own — a statement's groups and its lines.
+   * Given it, a row with children folds and unfolds from a toggle in the
+   * first column, and its children are drawn under it, indented. Keyed by
+   * `rowKey`, so children need keys unique across the whole tree.
+   */
+  getSubRows?: (row: T) => T[] | undefined
+  /** Controlled: the keys of the groups that are open. */
+  treeExpanded?: string[]
+  onTreeExpandedChange?: (keys: string[]) => void
+  /** The groups open at first: a list of keys, or `'all'`. Default: none. */
+  defaultTreeExpanded?: string[] | 'all'
+  /**
    * Fires for a click on the row itself. A click that started on a link,
    * button, field or menu item inside a cell is that control's, not the
    * row's — every host used to have to `stopPropagation` in every action cell
@@ -270,6 +282,10 @@ export function DataTable<T>({
   expanded: controlledExpanded,
   onExpandedChange,
   defaultExpanded,
+  getSubRows,
+  treeExpanded: controlledTree,
+  onTreeExpandedChange,
+  defaultTreeExpanded,
   expandOnRowClick = false,
   onRowClick,
   onRowDoubleClick,
@@ -327,6 +343,66 @@ export function DataTable<T>({
     onExpandedChange?.(next)
   }
 
+  /* -------------------------------- Tree --------------------------------
+     A row's children are drawn under it while it is open. The tree is laid
+     out flat — one list of the rows as they stand on screen, each with its
+     depth — and that list is what the window, the keyboard and the page's
+     selection run over, so none of them has to know there is a tree at all.
+     `defaultTreeExpanded="all"` is kept as the set of groups *closed* since,
+     so a group that arrives with a later page opens like the first ones did. */
+  const [treeState, setTreeState] = React.useState<{ closedSince: 'all' | null; keys: string[] }>(
+    () =>
+      defaultTreeExpanded === 'all'
+        ? { closedSince: 'all', keys: [] }
+        : { closedSince: null, keys: defaultTreeExpanded ?? [] }
+  )
+  const tree = React.useMemo(() => {
+    if (!getSubRows) return null
+    const isOpen = (key: string) =>
+      controlledTree
+        ? controlledTree.includes(key)
+        : treeState.closedSince === 'all'
+          ? !treeState.keys.includes(key)
+          : treeState.keys.includes(key)
+    const nodes: { row: T; key: string; depth: number; branch: boolean; open: boolean }[] = []
+    const groups: string[] = []
+    const walk = (list: T[], depth: number, shown: boolean) => {
+      for (const row of list) {
+        const key = rowKey(row)
+        const children = getSubRows(row)
+        const branch = Boolean(children?.length)
+        const open = branch && isOpen(key)
+        if (branch) groups.push(key)
+        if (shown) nodes.push({ row, key, depth, branch, open })
+        if (branch) walk(children!, depth + 1, shown && open)
+      }
+    }
+    walk(data, 0, true)
+    return { nodes, groups, byKey: new Map(nodes.map((node) => [node.key, node])) }
+  }, [data, getSubRows, rowKey, controlledTree, treeState])
+  const shownRows = React.useMemo(() => (tree ? tree.nodes.map((node) => node.row) : data), [tree, data])
+  const toggleTree = (key: string) => {
+    if (!tree) return
+    const openNow = tree.groups.filter(isGroupOpen)
+    const next = openNow.includes(key) ? openNow.filter((k) => k !== key) : [...openNow, key]
+    if (!controlledTree) {
+      setTreeState((current) =>
+        current.closedSince === 'all'
+          ? {
+              closedSince: 'all',
+              keys: current.keys.includes(key) ? current.keys.filter((k) => k !== key) : [...current.keys, key],
+            }
+          : { closedSince: null, keys: next }
+      )
+    }
+    onTreeExpandedChange?.(next)
+  }
+  /** Open state for a group that is not on screen (under a closed parent). */
+  function isGroupOpen(key: string) {
+    if (controlledTree) return controlledTree.includes(key)
+    return treeState.closedSince === 'all' ? !treeState.keys.includes(key) : treeState.keys.includes(key)
+  }
+
   const {
     layout,
     visible,
@@ -346,7 +422,7 @@ export function DataTable<T>({
   const resize = useColumnResize({ rootRef, widthOf, minWidthOf, onCommit: setWidth })
 
   const selectable = Boolean(selection && onSelectionChange)
-  const pageKeys = React.useMemo(() => data.map(rowKey), [data, rowKey])
+  const pageKeys = React.useMemo(() => shownRows.map(rowKey), [shownRows, rowKey])
   const rows = useRowSelection({
     value: selection ?? { keys: [], allMatching: false },
     onChange: onSelectionChange ?? (() => {}),
@@ -633,7 +709,7 @@ export function DataTable<T>({
      drawn yet — it scrolls by the same row height, measured once. */
   const { theadRef, rowHeight, firstRow, rowsInView, padTop, padBottom } = useVirtualRows({
     virtualize,
-    data,
+    data: shownRows,
     density,
     expandedCount: expanded.size,
     rootRef,
@@ -642,7 +718,7 @@ export function DataTable<T>({
 
   const { gridProps, gridCell, finishEditing, controlCount } = useGridKeyboard({
     keyboard,
-    data,
+    data: shownRows,
     rowKey,
     visible,
     selectable,
@@ -665,7 +741,9 @@ export function DataTable<T>({
    * and a reader on page 3 is told they are at the top of the table.
    */
   const rowIndexOf = (rowIndex: number) =>
-    total === undefined ? undefined : (query.page - 1) * query.pageSize + rowIndex + 2
+    // A tree's rows are not the result set's rows: `total` counts the top
+    // level, and the children in between would make every number a lie.
+    total === undefined || tree ? undefined : (query.page - 1) * query.pageSize + rowIndex + 2
 
   /* Cells are rendered through helpers so the filler column can be spliced in
      between the scrolling columns and the right-pinned group. */
@@ -775,6 +853,7 @@ export function DataTable<T>({
     offset: number
   ) => {
     const key = rowKey(row)
+    const node = tree?.byKey.get(key)
     return list.map((column, index) => {
                           const pinned = layout.pinned[column.id]
                           // `canEdit` is the row-level veto: a closed period, a
@@ -814,6 +893,36 @@ export function DataTable<T>({
                                   labels={labelsProp}
                                   onDone={() => finishEditing(rowIndex, gridCol)}
                                 />
+                              ) : node && column.id === visible[0]?.id ? (
+                                // The tree lives in the first column: the
+                                // indent says how deep, the toggle folds.
+                                <div
+                                  className="mz-dt__tree"
+                                  style={{ '--mz-dt-depth': node.depth } as React.CSSProperties}
+                                >
+                                  {node.branch ? (
+                                    <button
+                                      type="button"
+                                      className="mz-dt__tree-toggle mz-focusable"
+                                      data-open={node.open || undefined}
+                                      aria-expanded={node.open}
+                                      aria-label={node.open ? labels.collapseRow : labels.expandRow}
+                                      onClick={(event) => {
+                                        event.stopPropagation()
+                                        toggleTree(key)
+                                      }}
+                                    >
+                                      <ChevronRightIcon />
+                                    </button>
+                                  ) : (
+                                    <span className="mz-dt__tree-spacer" aria-hidden="true" />
+                                  )}
+                                  <div className="mz-dt__cell">
+                                    {column.cell
+                                      ? column.cell(row, { rowIndex })
+                                      : column.accessor?.(row)}
+                                  </div>
+                                </div>
                               ) : (
                                 <div className="mz-dt__cell">
                                   {column.cell
@@ -980,7 +1089,7 @@ export function DataTable<T>({
           // replaced. `aria-rowcount` counts the header with the rows, and is
           // the only way to say "row 30 of 13 659" when 25 of them are here.
           aria-busy={loading || undefined}
-          aria-rowcount={total === undefined ? undefined : total + 1}
+          aria-rowcount={total === undefined || tree ? undefined : total + 1}
         >
           {caption ? <caption className="mz-sr-only">{caption}</caption> : null}
           {/* A trailing auto-width column absorbs whatever space is left over.
@@ -1093,6 +1202,8 @@ export function DataTable<T>({
                         {...hostProps}
                         className={cn('mz-dt__row', hostClass, hostProps?.className)}
                         aria-rowindex={rowIndexOf(rowIndex)}
+                        data-depth={tree ? tree.byKey.get(key)?.depth : undefined}
+                        data-branch={tree?.byKey.get(key)?.branch || undefined}
                         data-selected={rows.selected.has(key) || rows.allMatching || undefined}
                         data-clickable={rowActivates ? true : undefined}
                         // A row that answers a click answers Enter too, and

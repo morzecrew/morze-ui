@@ -415,6 +415,38 @@
   white-space: normal;
 }
 
+/* ---------------------------------- Tree ---------------------------------
+   Rows with rows of their own (#30): the first column steps in by depth, and
+   a group's toggle — or, on a leaf, a spacer the toggle's width — sits before
+   the text, so the labels of one level line up whether or not they fold. */
+.mz-dt__tree {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-inline-start: calc(var(--mz-dt-depth, 0) * 18px);
+}
+.mz-dt__tree > .mz-dt__cell { flex: 1 1 auto; min-width: 0; }
+.mz-dt__tree-toggle,
+.mz-dt__tree-spacer { flex-shrink: 0; width: 22px; height: 22px; }
+.mz-dt__tree-toggle {
+  display: grid;
+  place-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--mz-radius-sm);
+  background: transparent;
+  color: var(--mz-text-muted);
+  cursor: pointer;
+  transition: background var(--mz-duration-fast) ease, color var(--mz-duration-fast) ease;
+}
+.mz-dt__tree-toggle:hover { background: var(--mz-wash-hover); color: var(--mz-text); }
+.mz-dt__tree-toggle svg { width: 14px; height: 14px; transition: transform var(--mz-duration-fast) var(--mz-ease); }
+.mz-dt__tree-toggle[data-open] svg { transform: rotate(90deg); }
+[dir='rtl'] .mz-dt__tree-toggle:not([data-open]) svg { transform: scaleX(-1); }
+/* A group row reads as a heading over its lines. */
+.mz-dt__row[data-branch] > .mz-dt__td { font-weight: 600; }
+
 /* Pinned columns ride above the scrolling body and carry their own surface. */
 .mz-dt__th[data-pinned],
 .mz-dt__td[data-pinned] {

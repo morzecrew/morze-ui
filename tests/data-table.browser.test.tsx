@@ -201,6 +201,42 @@ describe('auto-fit against a real container', () => {
     host.remove()
   })
 
+  // Group rows fold over indented lines (#30); the indent is layout.
+  it('steps a tree in by depth, and lines up a level whether it folds or not', async () => {
+    type Line = { id: string; name: string; sum: number; note: string; children?: Line[] }
+    const lines: Line[] = [
+      {
+        id: 'rev', name: 'Revenue', sum: 3, note: '',
+        children: [
+          { id: 'shop', name: 'Shop', sum: 1, note: '' },
+          { id: 'wb', name: 'Wildberries', sum: 2, note: '', children: [{ id: 'fbo', name: 'FBO', sum: 2, note: '' }] },
+        ],
+      },
+    ]
+    const { host, unmount } = mountIn(700, (
+      <DataTable<Line>
+        columns={[{ id: 'name', header: 'Line', accessor: (r) => r.name, width: 300 }]}
+        data={lines}
+        rowKey={(r) => r.id}
+        getSubRows={(r) => r.children}
+        defaultTreeExpanded="all"
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    ))
+    await settle()
+    const left = (name: string) =>
+      [...host.querySelectorAll<HTMLElement>('tbody .mz-dt__cell')]
+        .find((cell) => cell.textContent === name)!
+        .getBoundingClientRect().left
+    expect(left('Shop') - left('Revenue')).toBeCloseTo(18, 0)
+    expect(left('FBO') - left('Shop')).toBeCloseTo(18, 0)
+    // Shop is a leaf, Wildberries a group: one level, one edge.
+    expect(left('Wildberries')).toBeCloseTo(left('Shop'), 0)
+    unmount()
+    host.remove()
+  })
+
   it('redistributes into the same width when a column is hidden', async () => {
     // The half of the auto-fit fix happy-dom cannot reach: hiding a column has
     // to hand its width to the others, not leave a gap at the right edge.
