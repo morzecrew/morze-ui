@@ -137,6 +137,31 @@
   --mz-warning-text: var(--mz-warning);
   --mz-info-text: var(--mz-info);
 
+  /* ---- A sequential ramp ----
+     Seven steps from the card to the brand, for a heatmap, a cohort grid, a
+     choropleth: anything where a colour stands for "how much". The kit had
+     categorical tones only, and hosts hard-coded a ramp of their own and
+     picked each cell's text by hand (#37). Each step names the ink that reads
+     on it at 4.5:1 — tests/contrast.test.ts holds them to it. The mid-tones of
+     a violet clear neither ink, which is why the steps bunch on either side
+     of the switch from light text to dark. Cut from --mz-primary and
+     --mz-surface, so a re-branded host gets a ramp in its own hue; a host
+     whose primary is much lighter or darker re-checks the inks. */
+  --mz-seq-1: color-mix(in srgb, var(--mz-primary) 10%, var(--mz-surface));
+  --mz-seq-2: color-mix(in srgb, var(--mz-primary) 22%, var(--mz-surface));
+  --mz-seq-3: color-mix(in srgb, var(--mz-primary) 34%, var(--mz-surface));
+  --mz-seq-4: color-mix(in srgb, var(--mz-primary) 46%, var(--mz-surface));
+  --mz-seq-5: color-mix(in srgb, var(--mz-primary) 60%, var(--mz-surface));
+  --mz-seq-6: color-mix(in srgb, var(--mz-primary) 88%, var(--mz-surface));
+  --mz-seq-7: var(--mz-primary);
+  --mz-seq-ink-1: var(--mz-text);
+  --mz-seq-ink-2: var(--mz-text);
+  --mz-seq-ink-3: var(--mz-text);
+  --mz-seq-ink-4: var(--mz-text);
+  --mz-seq-ink-5: var(--mz-text);
+  --mz-seq-ink-6: var(--mz-on-fill);
+  --mz-seq-ink-7: var(--mz-on-fill);
+
   /* ---- The convex recipe ----
      Every active element (button, toggle, checkbox, radio, switch, slider,
      tab, select trigger) is built from these four layers. */
@@ -370,6 +395,23 @@
   --mz-danger-text: color-mix(in srgb, var(--mz-danger) 74%, #000000);
   --mz-warning-text: color-mix(in srgb, var(--mz-warning) 60%, #000000);
   --mz-info-text: color-mix(in srgb, var(--mz-info) 65%, #000000);
+
+  /* See the dark block. The ramp runs from the white card into the brand, and
+     the ink stays the text colour until the last, deepest step. */
+  --mz-seq-1: color-mix(in srgb, var(--mz-primary) 8%, var(--mz-surface));
+  --mz-seq-2: color-mix(in srgb, var(--mz-primary) 18%, var(--mz-surface));
+  --mz-seq-3: color-mix(in srgb, var(--mz-primary) 30%, var(--mz-surface));
+  --mz-seq-4: color-mix(in srgb, var(--mz-primary) 44%, var(--mz-surface));
+  --mz-seq-5: color-mix(in srgb, var(--mz-primary) 60%, var(--mz-surface));
+  --mz-seq-6: color-mix(in srgb, var(--mz-primary) 78%, var(--mz-surface));
+  --mz-seq-7: var(--mz-primary);
+  --mz-seq-ink-1: var(--mz-text);
+  --mz-seq-ink-2: var(--mz-text);
+  --mz-seq-ink-3: var(--mz-text);
+  --mz-seq-ink-4: var(--mz-text);
+  --mz-seq-ink-5: var(--mz-text);
+  --mz-seq-ink-6: var(--mz-text);
+  --mz-seq-ink-7: #ffffff;
 
   --mz-convex-hairline: rgba(255, 255, 255, 0.4);
   --mz-convex-top: rgba(255, 255, 255, 0.45);

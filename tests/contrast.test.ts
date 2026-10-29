@@ -132,6 +132,19 @@ describe.each(Object.entries(themes))('contrast — %s theme', (_name, tokens) =
     expect(ratio(get(`--mz-${tone}-fg`), get(`--mz-${tone}`))).toBeGreaterThanOrEqual(AA)
   })
 
+  // A heatmap's text sits on the step it labels (#37).
+  it.each([1, 2, 3, 4, 5, 6, 7])('sequential step %i carries its ink', (step) => {
+    expect(ratio(get(`--mz-seq-ink-${step}`), get(`--mz-seq-${step}`))).toBeGreaterThanOrEqual(AA)
+  })
+
+  it('climbs the sequential ramp in one direction', () => {
+    // Away from the card, step by step: a ramp that turned back on itself
+    // would put "more" and "less" on one colour.
+    const card = luminance(get('--mz-surface'))
+    const steps = [1, 2, 3, 4, 5, 6, 7].map((step) => Math.abs(luminance(get(`--mz-seq-${step}`)) - card))
+    for (let i = 1; i < steps.length; i++) expect(steps[i]!).toBeGreaterThan(steps[i - 1]!)
+  })
+
   it.each(TONES)('%s text reads on the page and on its own wash', (tone) => {
     const text = get(`--mz-${tone}-text`)
     for (const ground of ['--mz-bg', '--mz-surface', '--mz-elevated']) {

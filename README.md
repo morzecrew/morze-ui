@@ -193,6 +193,15 @@ from the tokens. A tone of your own sets `--mz-tone-fg` and `--mz-tone-text`
 alongside `--mz-tone`; re-pointing a whole tone re-points its `-fg` and
 `-text` with it, since only you know how light your colour is.
 
+**A sequential ramp** for anything where colour means "how much" — a
+heatmap, a cohort grid: `--mz-seq-1` … `--mz-seq-7` run from the card to the
+brand in each theme, and `--mz-seq-ink-1` … `--mz-seq-ink-7` name the text
+colour that reads on each step at 4.5:1.
+
+```tsx
+<td style={{ background: `var(--mz-seq-${step})`, color: `var(--mz-seq-ink-${step})` }}>{value}</td>
+```
+
 **Re-skinning the kit is one colour per tone**, per theme: `--mz-primary`,
 `--mz-accent`, `--mz-success`, `--mz-danger`, `--mz-warning`, `--mz-info`, and
 `--mz-text` for the text. A hex, an `oklch()`, or a `var()` of the

@@ -162,6 +162,11 @@ ran into after it (#26 – #41) — one entry per issue.
   `onRangeChange('min' | 'max' | false)` tells the host when it leaves the
   range and when it is back, for a `FieldError` of its own. It is still
   clamped when the field is left.
+- **A sequential ramp** (#37): `--mz-seq-1` … `--mz-seq-7` per theme, from the
+  card to the brand, with `--mz-seq-ink-1` … `--mz-seq-ink-7` — the text colour
+  that reads on each step, held to 4.5:1 by the contrast test. Cut from
+  `--mz-primary` and `--mz-surface`, so the ramp follows a re-brand. Hosts
+  hard-coded a seven-step heatmap ramp and picked each cell's ink by hand.
 
 ### Changed
 
