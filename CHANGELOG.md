@@ -12,7 +12,7 @@ between 0.2.0 and 0.3.7 the package went out eleven times, with real API
 changes among them, and the only record left is six commits that say
 `bump x.y.z`.
 
-## [Unreleased]
+## [0.6.0] — 2026-10-29
 
 What erp-frontend still had to work around on top of 0.5.0 (issues #3 – #12),
 what a UX audit of a BI app built on it found (#13 – #25), and what that app
