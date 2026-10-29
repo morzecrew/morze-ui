@@ -595,6 +595,14 @@ What this kit adds on top:
   a decimal point. Not `<input type="number">`, which spins under the scroll
   wheel, refuses that comma, and reports an empty string for anything it
   dislikes — so a host cannot tell "0,5" from "".
+  Thousands are grouped the locale's way («1 200 000» for ru-RU; the tag comes
+  from `locale` or `MorzeLocaleProvider`), while typing and after, and the
+  value stays a number; `grouping={false}` for codes and years. While the
+  field is being edited the groups are spaces even where the locale writes
+  commas, so nothing typed can be mistaken for one — and a comma in «1,5» is a
+  decimal sign under any locale. A typed value outside `min` / `max` sets
+  `aria-invalid` at once and calls `onRangeChange('min' | 'max')`, then
+  `onRangeChange(false)` once it is back; the field clamps it when left.
 - `Empty` — the centred stack every list needs when it has nothing to show:
   `Empty`, `EmptyMedia`, `EmptyTitle`, `EmptyDescription`, `EmptyActions`.
 - `Kbd` / `KbdSequence` — a key drawn as one. `keys={['mod', 'k']}` prints ⌘K

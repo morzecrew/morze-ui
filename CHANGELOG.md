@@ -151,6 +151,17 @@ ran into after it (#26 – #41) — one entry per issue.
   `querySelector('.mz-dt__scroller')`; `initialScroll="end"` opens a table
   wider than its box at its last columns — once, before paint, the right way
   round in RTL.
+- **`NumberInput` groups thousands** (#40): the shown value in the locale's
+  grouping («1 200 000» for ru-RU) while typing and after, the caret kept
+  beside the digits being typed, the value still a number; `grouping={false}`
+  for codes and years, `locale` for the tag (else the provider's). While it
+  is edited the groups are spaces, so a comma typed is never read as one: «1,5»
+  stays one and a half in an English browser.
+- **`NumberInput` — out of bounds as you type** (#33): a value past `min` /
+  `max` sets `aria-invalid` (and the danger rim) at once, and
+  `onRangeChange('min' | 'max' | false)` tells the host when it leaves the
+  range and when it is back, for a `FieldError` of its own. It is still
+  clamped when the field is left.
 
 ### Changed
 

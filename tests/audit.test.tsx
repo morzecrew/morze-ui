@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 
 import {
   Card,
+  NumberInput,
   DataTable,
   Table,
   TableBody,
@@ -187,5 +188,83 @@ describe('DataTable toolbar and glass (#28, #41)', () => {
   it('frosts its header only when asked', () => {
     expect(table({}).container.querySelector('.mz-dt')).not.toHaveAttribute('data-glass')
     expect(table({ glass: true }).container.querySelector('.mz-dt')).toHaveAttribute('data-glass', 'true')
+  })
+})
+
+describe('NumberInput grouping (#40)', () => {
+  const field = () => screen.getByRole('spinbutton', { name: 'Amount' }) as HTMLInputElement
+  const spaces = (text: string) => text.replace(/[  ]/g, ' ')
+
+  it('groups thousands while typing', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { vi } = await import('vitest')
+    const onChange = vi.fn()
+    render(<NumberInput locale="ru-RU" onChange={onChange} aria-label="Amount" />)
+    // Typed one key at a time at the caret: a caret left behind by the
+    // regrouping would put the later digits in the wrong place.
+    await userEvent.type(field(), '1000000,5')
+    expect(spaces(field().value)).toBe('1 000 000,5')
+    expect(onChange).toHaveBeenLastCalledWith(1000000.5)
+    // Where the caret goes in the middle of the text is a real browser's to
+    // say — see tests/number-input.browser.test.tsx.
+  })
+
+  it('shows the locale’s own grouping once the field is left', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    render(
+      <>
+        <NumberInput locale="en-US" defaultValue={1200000} aria-label="Amount" />
+        <button type="button">elsewhere</button>
+      </>
+    )
+    expect(field().value).toBe('1,200,000')
+    // Editing swaps the commas for spaces, so nothing typed can be read as one.
+    await userEvent.click(field())
+    expect(spaces(field().value)).toBe('1 200 000')
+    await userEvent.click(screen.getByRole('button', { name: 'elsewhere' }))
+    expect(field().value).toBe('1,200,000')
+  })
+
+  it('still reads a comma as a decimal sign under an English locale', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { vi } = await import('vitest')
+    const onChange = vi.fn()
+    render(<NumberInput locale="en-US" onChange={onChange} aria-label="Amount" />)
+    // An English browser in a Russian app: «1,5» is one and a half, not 15.
+    await userEvent.type(field(), '1,5')
+    expect(onChange).toHaveBeenLastCalledWith(1.5)
+  })
+
+  it('leaves codes and years alone when asked', async () => {
+    render(<NumberInput locale="ru-RU" defaultValue={2026} grouping={false} aria-label="Amount" />)
+    expect(field().value).toBe('2026')
+  })
+})
+
+describe('NumberInput bounds (#33)', () => {
+  it('says a typed value is out of bounds at once, and when it is back', async () => {
+    const { default: userEvent } = await import('@testing-library/user-event')
+    const { vi } = await import('vitest')
+    const onRangeChange = vi.fn()
+    render(
+      <>
+        <NumberInput max={99} onRangeChange={onRangeChange} aria-label="Amount" />
+        <button type="button">elsewhere</button>
+      </>
+    )
+    const field = screen.getByRole('spinbutton', { name: 'Amount' })
+    await userEvent.type(field, '100')
+    expect(field).toHaveAttribute('aria-invalid', 'true')
+    expect(onRangeChange).toHaveBeenLastCalledWith('max')
+    // Leaving clamps it, and the field is valid again.
+    await userEvent.click(screen.getByRole('button', { name: 'elsewhere' }))
+    expect(field).not.toHaveAttribute('aria-invalid')
+    expect(onRangeChange).toHaveBeenLastCalledWith(false)
+    expect(onRangeChange).toHaveBeenCalledTimes(2)
+  })
+
+  it('keeps a host’s own aria-invalid', () => {
+    render(<NumberInput defaultValue={5} aria-invalid aria-label="Amount" />)
+    expect(screen.getByRole('spinbutton', { name: 'Amount' })).toHaveAttribute('aria-invalid', 'true')
   })
 })
