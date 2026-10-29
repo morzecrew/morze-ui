@@ -41,6 +41,16 @@
      an open dropdown would show through it. */
   z-index: 40;
 }
+/* Solid unless asked (`glass`): this panel follows the pointer, so its
+   backdrop changes on every move, and a frosted one made the compositor
+   re-blur under it each frame — beside a sticky table it stopped pages
+   painting in Chromium (#41). The panel recipe stays; only the frost goes,
+   onto the step it is cut from, as the reduced-transparency fallback does. */
+.mz-chart__tooltip:not([data-glass]) {
+  background-color: var(--mz-elevated);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
 .mz-chart__tooltip-label {
   margin-bottom: 6px;
   color: var(--mz-text);

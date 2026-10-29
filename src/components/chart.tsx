@@ -171,6 +171,12 @@ export type ChartTooltipContentProps = {
   nameKey?: string
   /** Same, for the group heading. */
   labelKey?: string
+  /**
+   * Frosted glass, like the kit's menus. Off by default: the tooltip moves
+   * with the pointer, and a moving backdrop-filter beside a sticky table
+   * stopped Chromium painting parts of the page.
+   */
+  glass?: boolean
   className?: string
 }
 
@@ -185,6 +191,7 @@ function ChartTooltipContent({
   indicator = 'dot',
   nameKey,
   labelKey,
+  glass = false,
   className,
 }: ChartTooltipContentProps) {
   const { config } = useChart()
@@ -199,7 +206,11 @@ function ChartTooltipContent({
   const heading = labelFormatter ? labelFormatter(rawLabel, payload) : rawLabel
 
   return (
-    <div data-slot="chart-tooltip" className={cn('mz-panel mz-chart__tooltip', className)}>
+    <div
+      data-slot="chart-tooltip"
+      data-glass={glass || undefined}
+      className={cn('mz-panel mz-chart__tooltip', className)}
+    >
       {!hideLabel && heading != null ? (
         <div className="mz-chart__tooltip-label">{heading}</div>
       ) : null}

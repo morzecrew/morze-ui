@@ -166,6 +166,14 @@
   border-color: color-mix(in srgb, var(--mz-tone) 35%, transparent);
   box-shadow: var(--mz-glow-panel), inset 0 1px 0 var(--mz-face-top);
 }
+/* Chosen: a card used as a filter or a toggle — a segment, a cell of a class
+   matrix. The tone rim, doubled inside so it reads at rest and not only on
+   hover; hosts drew their own outline for it (#35). */
+.mz-card--interactive[aria-pressed='true'],
+.mz-card--interactive[data-state='on'] {
+  border-color: var(--mz-tone);
+  box-shadow: var(--mz-glow-panel), inset 0 0 0 1px var(--mz-tone), inset 0 1px 0 var(--mz-face-top);
+}
 .mz-card-header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -180,7 +188,10 @@
 }
 .mz-card-description { grid-column: 1; font-size: var(--mz-text-sm); color: var(--mz-text-dim); }
 .mz-card-action { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
-.mz-card-content { flex: 1; }
+/* Grows into the card, but from its own size, not from zero: `flex: 1` is a
+   0% basis, which in a column throws away a `height` set on the content — a
+   chart in a ResponsiveContainer collapsed to its min-height (#34). */
+.mz-card-content { flex: 1 1 auto; }
 .mz-card-footer { display: flex; align-items: center; gap: 10px; }
 
 /* --------------------------------- Badge -------------------------------- */

@@ -15,8 +15,8 @@ changes among them, and the only record left is six commits that say
 ## [Unreleased]
 
 What erp-frontend still had to work around on top of 0.5.0 (issues #3 – #12),
-and what a UX audit of a BI app built on it found (#13 – #25) — one entry per
-issue.
+what a UX audit of a BI app built on it found (#13 – #25), and what that app
+ran into after it (#26 – #41) — one entry per issue.
 
 ### Breaking
 
@@ -137,6 +137,15 @@ issue.
   logic as an inline head script — the same storage key, `system` resolution
   and attribute — so the first frame is right before the bundle loads. Hosts
   hand-wrote this script and kept it in step with the provider by hand.
+- **`Card` — `asChild` and `pressed`** (#32, #35). `asChild` draws the card
+  onto its only child, so a card that opens a page is the router link itself —
+  one box, link semantics, the hover and focus ring on the focused element —
+  instead of a link wrapped round a `div`. `pressed` marks a chosen card with
+  the tone rim (`[aria-pressed=true]` / `[data-state=on]`), and announces
+  `aria-pressed` on a clickable one.
+- **DataTable — `toolbarEnd`** (#28), content at the end of the toolbar row,
+  before the Columns button; and the start group now grows, so a host action
+  in `toolbar` can be pushed to the end with an auto margin.
 
 ### Changed
 
@@ -199,6 +208,15 @@ issue.
   in a 970px box under three short rows. `autoFit="grow-only"` is the old
   behaviour; `useColumnLayout().fitTo(width, { shrink, headerMin })` takes the
   same choice.
+- **Glass is opt-in on the table and the chart tooltip** (#41). Sticky and
+  pinned `DataTable` header cells and the summary row ran a backdrop-filter
+  each — a few dozen layers on a wide statement — and the chart tooltip, which
+  follows the pointer, was frosted too; together they made Chromium on a GPU
+  stop painting whole regions of the page until a reload. `--mz-th-bg` is now
+  the solid `--mz-surface-2` (both tables), and the tooltip draws on
+  `--mz-elevated`. `DataTable glass` and `ChartTooltipContent glass` put the
+  frost back (`--mz-th-glass` is the header's frosted fill). Dialogs, menus,
+  sheets and the sidebar keep their glass.
 
 ### Fixed
 
@@ -244,6 +262,16 @@ issue.
   written to `<html>` is computed from storage and `matchMedia` directly, so
   it is right on the first write. Without `matchMedia`, `system` keeps what
   `<html>` already says.
+- **A height on `CardContent` holds** (#34): `flex: 1` is a 0% basis, which in
+  the card's column threw the height away, so a chart in a
+  `ResponsiveContainer` collapsed; it is `1 1 auto` now.
+- **A long caption in a narrow right-aligned header is cut at its end** (#38).
+  The label now shrinks below its text, ends in an ellipsis and does not take
+  the column's `text-align: end`, and the right-aligned header row is
+  `safe flex-end` where supported, so it can never spill past the cell's
+  start. A plain (unsortable) header carries its full caption in `title`.
+  The report's «зращено» did not reproduce in headless Chrome; these close the
+  routes by which it can happen.
 
 ## [0.5.0] — 2026-09-13
 

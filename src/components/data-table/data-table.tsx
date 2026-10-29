@@ -96,6 +96,11 @@ export type DataTableProps<T> = {
 
   toolbar?: React.ReactNode
   /**
+   * Content at the end of the toolbar row, before the Columns button — an
+   * export, a view switch. `toolbar` stays at the start, after the search.
+   */
+  toolbarEnd?: React.ReactNode
+  /**
    * `false` drops the Columns button — for a table whose layout the host
    * fixes, or drives from its own UI. The layout itself still works: `layout`,
    * `onLayoutChange` and `persistKey` are unaffected.
@@ -111,6 +116,12 @@ export type DataTableProps<T> = {
    */
   autoFit?: boolean | 'grow-only'
   density?: 'compact' | 'normal' | 'relaxed'
+  /**
+   * Frosted header, footer and pinned cells, over the rows that pass behind
+   * them. Off by default: every such cell is a backdrop-filter layer, and a
+   * wide sticky table puts dozens on the page (#41).
+   */
+  glass?: boolean
   /**
    * Sticks the header while the body scrolls. It needs the scroller to have a
    * height to scroll within — `maxHeight`, `height` or `fill` — since without
@@ -257,9 +268,11 @@ export function DataTable<T>({
   onLayoutChange,
   persistKey = null,
   toolbar,
+  toolbarEnd,
   columnManager = true,
   autoFit = true,
   density = 'normal',
+  glass = false,
   stickyHeader = true,
   maxHeight,
   height,
@@ -688,7 +701,10 @@ export function DataTable<T>({
                           </span>
                         </button>
                       ) : (
-                        <span className="mz-dt__th-label" title={column.headerTitle}>
+                        // The caption may be cut with an ellipsis, so the
+                        // full one is a hover away. A sortable header already
+                        // carries it in its sort hint.
+                        <span className="mz-dt__th-label" title={column.headerTitle ?? label}>
                           {column.header}
                         </span>
                       )}
@@ -835,6 +851,7 @@ export function DataTable<T>({
       ref={rootRef}
       data-slot="data-table"
       data-density={density}
+      data-glass={glass || undefined}
       data-filter-trigger={filterTrigger}
       className={cn('mz-dt', fill && 'mz-dt--fill', frame === 'plain' && 'mz-dt--plain', className)}
       style={
@@ -851,7 +868,7 @@ export function DataTable<T>({
     >
       {(() => {
         const showManager = columnManager && columns.some((c) => c.hideable !== false)
-        if (!toolbar && !searchConfig && chips.length === 0 && !showManager) return null
+        if (!toolbar && !toolbarEnd && !searchConfig && chips.length === 0 && !showManager) return null
         return (
           <div className="mz-dt__toolbar">
             <div className="mz-dt__toolbar-main">
@@ -868,21 +885,24 @@ export function DataTable<T>({
               ) : null}
               {toolbar}
             </div>
-            {showManager && (
+            {showManager || toolbarEnd ? (
               <div className="mz-dt__toolbar-side">
-                <ColumnManager
-                  columns={columns}
-                  layout={layout}
-                  labels={labelsProp}
-                  onToggleHidden={toggleHidden}
-                  onSetHidden={setHidden}
-                  onSetPinned={setPinned}
-                  onMoveTo={moveTo}
-                  onUnsize={unsize}
-                  onReset={reset}
-                />
+                {toolbarEnd}
+                {showManager ? (
+                  <ColumnManager
+                    columns={columns}
+                    layout={layout}
+                    labels={labelsProp}
+                    onToggleHidden={toggleHidden}
+                    onSetHidden={setHidden}
+                    onSetPinned={setPinned}
+                    onMoveTo={moveTo}
+                    onUnsize={unsize}
+                    onReset={reset}
+                  />
+                ) : null}
               </div>
-            )}
+            ) : null}
           </div>
         )
       })()}

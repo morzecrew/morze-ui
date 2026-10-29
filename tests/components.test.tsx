@@ -491,6 +491,19 @@ describe('Chart', () => {
     expect(shapes('[data-slot="chart-legend"]')).toEqual([['dot', ''], ['dashed', '0.5']])
   })
 
+  it('is solid unless glass is asked for (#41)', () => {
+    const payload = [{ dataKey: 'shipped', value: 1, color: '#4e75ff' }]
+    const { container } = render(
+      <ChartContainer config={config}>
+        <ChartTooltipContent active payload={payload} />
+        <ChartTooltipContent active payload={payload} glass />
+      </ChartContainer>
+    )
+    const [solid, frosted] = container.querySelectorAll('[data-slot="chart-tooltip"]')
+    expect(solid).not.toHaveAttribute('data-glass')
+    expect(frosted).toHaveAttribute('data-glass', 'true')
+  })
+
   it('names a slice from a field inside the datum', () => {
     // A pie has one series and many slices: the config key lives in the datum,
     // not in dataKey, which is the whole reason nameKey exists.

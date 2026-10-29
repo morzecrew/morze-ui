@@ -24,7 +24,10 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-.mz-dt__toolbar-main { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
+/* It grows, so a host's own action in `toolbar` can be pushed to the end of
+   the row with `margin-inline-start: auto` — it could not travel past the
+   filters while the box was only as wide as its content (#28). */
+.mz-dt__toolbar-main { display: flex; flex: 1 1 auto; align-items: center; gap: 10px; flex-wrap: wrap; min-width: 0; }
 .mz-dt__toolbar-side { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .mz-dt__count {
   display: inline-grid;
@@ -164,10 +167,13 @@
   box-shadow: inset 0 1px 0 var(--mz-glass-edge);
   user-select: none;
 }
-/* Blur only where content actually passes behind the cell: rows under a
-   sticky header, columns under a pinned one. */
-.mz-dt__table[data-sticky] .mz-dt__th,
-.mz-dt__th[data-pinned] {
+/* Frost on request (`glass`), and then only where content actually passes
+   behind the cell: rows under a sticky header, columns under a pinned one.
+   Off by default — see --mz-th-bg for what a few dozen of these cost (#41). */
+.mz-dt[data-glass] { --mz-th-bg: var(--mz-th-glass); }
+.mz-dt[data-glass] .mz-dt__table[data-sticky] .mz-dt__th,
+.mz-dt[data-glass] .mz-dt__th[data-pinned],
+.mz-dt[data-glass] .mz-dt__tf {
   -webkit-backdrop-filter: var(--mz-glass-filter);
   backdrop-filter: var(--mz-glass-filter);
 }
@@ -182,9 +188,26 @@
   gap: 6px;
   min-width: 0;
 }
+/* `safe`: when the caption, the sort arrow and the filter button together are
+   wider than the cell, the row starts at the start and is cut at the end,
+   rather than spilling out past the cell's start edge (#38). */
 .mz-dt__th[data-align='right'] .mz-dt__th-inner { justify-content: flex-end; }
+@supports (justify-content: safe flex-end) {
+  .mz-dt__th[data-align='right'] .mz-dt__th-inner { justify-content: safe flex-end; }
+}
 .mz-dt__th[data-align='center'] .mz-dt__th-inner { justify-content: center; }
-.mz-dt__th-label { overflow: hidden; text-overflow: ellipsis; }
+/* The label is the part that gives way, and it gives way at its end: it may
+   shrink below its text, it ends in an ellipsis, and it does not take the
+   column's `text-align: end` — an overflowing line aligned to the end is cut
+   at its start, «зращено» for «Возвращено», with no ellipsis (#38). */
+.mz-dt__th-label {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: start;
+}
 
 .mz-dt__sort {
   display: inline-flex;
@@ -434,8 +457,6 @@
   height: var(--mz-dt-row-h);
   padding: 0 var(--mz-dt-cell-x);
   background: var(--mz-th-bg);
-  -webkit-backdrop-filter: var(--mz-glass-filter);
-  backdrop-filter: var(--mz-glass-filter);
   border-top: 1px solid var(--mz-border-strong);
   font-weight: var(--mz-th-weight);
   font-variant-numeric: tabular-nums;

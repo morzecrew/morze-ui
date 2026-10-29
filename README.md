@@ -601,7 +601,12 @@ What this kit adds on top:
   on Apple hardware and Ctrl+K everywhere else, and reads the platform only
   after mount, so the server's markup and the client's first render agree.
 - `Card` — `interactive` adds the hover state; combined with `onClick` the card
-  also gets `role="button"`, `tabIndex` and Enter/Space activation.
+  also gets `role="button"`, `tabIndex` and Enter/Space activation. `pressed`
+  marks a chosen card — a filter, a segment — with the tone rim (and
+  `aria-pressed` on a clickable one). `asChild` draws the card onto its child,
+  so a card that opens a page is the link itself:
+  `<Card interactive asChild><Link to="/orders">…</Link></Card>`. A height set
+  on `CardContent` is kept, so a chart in it has room.
 - `Spinner` — `label` (default `Loading`) is announced by screen readers;
   `label={null}` makes it purely decorative.
 - `Badge` — `variant`: `solid` `soft` `outline`.
@@ -963,6 +968,15 @@ What it does:
   resets the page, reaches the URL through `useTableQuery` as `q`, and arrives
   at the backend in the same request as the filters. A box wired in through
   `toolbar` does none of those.
+- **Toolbar** — `toolbar` sits at the start of the row, after the search;
+  `toolbarEnd` at the end, before the Columns button — an export, a view
+  switch.
+- **Glass is opt-in** — the header, the summary row and pinned cells are solid
+  (`--mz-surface-2`). `glass` frosts them over the rows passing behind; each
+  frosted cell is a backdrop-filter layer, and a wide sticky table puts dozens
+  on the page — with a moving chart tooltip beside it, Chromium stopped
+  painting parts of the page. `ChartTooltipContent` is solid for the same
+  reason and takes `glass` too.
 - **A summary row** — `summary`, with each column's `footer(rows)` filling its
   cell. It sticks to the bottom of the scroller, the way the header sticks to
   the top.

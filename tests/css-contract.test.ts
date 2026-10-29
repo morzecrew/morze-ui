@@ -482,13 +482,21 @@ describe('the glass layer', () => {
     expect(css).toMatch(/\.mz-sidebar\{[^}]*backdrop-filter:var\(--mz-glass-filter\)/)
   })
 
-  it('blurs a table header only where rows or columns pass behind it', () => {
-    // --mz-th-bg is the glass well; the indirection is what lets the plain
-    // Table share the header — see the "one header, two tables" block.
+  it('frosts a table header only on request, and only where rows pass behind it', () => {
+    // --mz-th-bg is shared by both tables — see the "one header, two tables"
+    // block. Solid by default: dozens of backdrop-filter cells, with a moving
+    // chart tooltip on the same page, stopped Chromium painting (#41).
     expect(css).toMatch(/\.mz-dt__th\{[^}]*background:var\(--mz-th-bg\)/)
-    expect(css).toMatch(/--mz-th-bg:var\(--mz-glass-well\)/)
-    expect(css).toMatch(/\.mz-dt__table\[data-sticky\] \.mz-dt__th[^{]*\{[^}]*backdrop-filter/)
-    expect(css).toMatch(/\.mz-dt__th\[data-pinned\][^{]*\{[^}]*backdrop-filter/)
+    expect(css).toMatch(/--mz-th-bg:var\(--mz-surface-2\)/)
+    expect(css).toMatch(/--mz-th-glass:var\(--mz-glass-well\)/)
+    expect(css).toMatch(/\.mz-dt\[data-glass\] \.mz-dt__table\[data-sticky\] \.mz-dt__th[^{]*\{[^}]*backdrop-filter/)
+    expect(css).toMatch(/\.mz-dt\[data-glass\] \.mz-dt__th\[data-pinned\][^{]*\{[^}]*backdrop-filter/)
+    // No backdrop-filter on a table cell outside [data-glass].
+    for (const [, selector] of css.matchAll(/([^{}]+)\{[^}]*backdrop-filter:var/g)) {
+      if (/mz-dt__t[hf]/.test(selector!)) expect(selector).toContain('[data-glass]')
+    }
+    // The chart tooltip loses its frost unless asked.
+    expect(css).toMatch(/\.mz-chart__tooltip:not\(\[data-glass\]\)\{[^}]*backdrop-filter:none/)
   })
 
   it('keeps the panel frost off the controls', () => {
@@ -1227,5 +1235,23 @@ describe('the 2026-10 audit', () => {
     expect(css).toMatch(/\.mz-sidebar__menu-button\{[^}]*height:var\(--mz-nav-item-h\)/)
     expect(css).toMatch(/\.mz-dt\{[^}]*--mz-dt-row-h:var\(--mz-row-h\)/)
     expect(css).toMatch(/\.mz-toggle--md\{[^}]*height:var\(--mz-control-h\)/)
+  })
+
+  it('lets the toolbar row reach its end (#28)', () => {
+    expect(css).toMatch(/\.mz-dt__toolbar-main\{[^}]*flex:(1 1 )?auto[;}]/)
+  })
+
+  it('keeps a height set on the card content (#34)', () => {
+    expect(css).toMatch(/\.mz-card-content\{flex:(1 1 )?auto\}/)
+  })
+
+  it('draws a chosen interactive card (#35)', () => {
+    expect(css).toMatch(/\.mz-card--interactive\[aria-pressed=true\],\.mz-card--interactive\[data-state=on\]\{[^}]*border-color:var\(--mz-tone\)/)
+  })
+
+  it('cuts a header caption at its end, never its start (#38)', () => {
+    expect(css).toMatch(/\.mz-dt__th-label\{[^}]*text-overflow:ellipsis[^}]*text-align:start|\.mz-dt__th-label\{[^}]*text-align:start[^}]*/)
+    expect(css).toMatch(/\.mz-dt__th-label\{[^}]*min-width:0/)
+    expect(css).toContain('@supports (justify-content:safe flex-end){.mz-dt__th[data-align=right] .mz-dt__th-inner{justify-content:safe flex-end}')
   })
 })

@@ -74,6 +74,7 @@ export {
   CardDescription,
   CardContent,
 } from './components/card'
+export type { CardProps } from './components/card'
 
 export { Alert, AlertTitle, AlertDescription } from './components/alert'
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './components/accordion'

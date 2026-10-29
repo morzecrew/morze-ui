@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
-import { DataTable, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, emptyQuery } from '../src'
+import {
+  Card,
+  DataTable,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  emptyQuery,
+} from '../src'
 
 /** Component behaviour asked for by the 2026-10 UX audit (#13 – #25). */
 
@@ -117,5 +127,65 @@ describe('the default face', () => {
       expect(firstFamily(element)).toBeNull()
       element.remove()
     })
+  })
+})
+
+describe('Card (#32, #35)', () => {
+  it('is the link itself under asChild, with the focus ring on it', () => {
+    render(
+      <Card interactive asChild>
+        <a href="/orders">Orders</a>
+      </Card>
+    )
+    const link = screen.getByRole('link', { name: 'Orders' })
+    expect(link).toHaveClass('mz-card', 'mz-card--interactive', 'mz-focusable')
+    expect(link).not.toHaveAttribute('role')
+    expect(link).not.toHaveAttribute('tabindex')
+  })
+
+  it('says it is chosen', () => {
+    render(
+      <>
+        <Card interactive pressed onClick={() => {}}>
+          Segment A
+        </Card>
+        <Card interactive pressed={false} onClick={() => {}}>
+          Segment B
+        </Card>
+        <Card interactive pressed>
+          Static
+        </Card>
+      </>
+    )
+    expect(screen.getByRole('button', { name: 'Segment A' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Segment B' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByText('Static')).toHaveAttribute('data-state', 'on')
+  })
+})
+
+describe('DataTable toolbar and glass (#28, #41)', () => {
+  type Row = { id: string }
+  const table = (props: Partial<React.ComponentProps<typeof DataTable<Row>>>) =>
+    render(
+      <DataTable<Row>
+        columns={[{ id: 'id', header: 'Id', accessor: (r) => r.id }]}
+        data={[{ id: '1' }]}
+        rowKey={(r) => r.id}
+        query={emptyQuery}
+        onQueryChange={() => {}}
+        {...props}
+      />
+    )
+
+  it('puts toolbarEnd at the end of the row, before the Columns button', () => {
+    const { container } = table({ toolbar: <span>start</span>, toolbarEnd: <button>Export</button> })
+    const side = container.querySelector('.mz-dt__toolbar-side')!
+    expect(side.firstElementChild).toHaveTextContent('Export')
+    expect(container.querySelector('.mz-dt__toolbar-main')).toHaveTextContent('start')
+  })
+
+  it('frosts its header only when asked', () => {
+    expect(table({}).container.querySelector('.mz-dt')).not.toHaveAttribute('data-glass')
+    expect(table({ glass: true }).container.querySelector('.mz-dt')).toHaveAttribute('data-glass', 'true')
   })
 })

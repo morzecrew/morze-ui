@@ -124,6 +124,49 @@ describe('auto-fit against a real container', () => {
     grow.host.remove()
   })
 
+  // A right-aligned sortable header narrower than its caption clipped the
+  // caption's start with no ellipsis (#38).
+  it('cuts a long caption at its end in a narrow right-aligned column', async () => {
+    const narrow: DataTableColumn<Row>[] = [
+      { id: 'name', header: 'Name', accessor: (r) => r.name, width: 200 },
+      {
+        id: 'sum',
+        header: 'Возвращено покупателями',
+        accessor: (r) => r.sum,
+        width: 90,
+        minWidth: 90,
+        maxWidth: 90,
+        numeric: true,
+        sortable: true,
+      },
+    ]
+    const { host, unmount } = mountIn(400, (
+      <DataTable
+        columns={narrow}
+        data={rows.slice(0, 2)}
+        rowKey={(r) => r.id}
+        total={2}
+        autoFit="grow-only"
+        query={emptyQuery}
+        onQueryChange={vi.fn()}
+      />
+    ))
+    await settle()
+    const th = host.querySelector<HTMLElement>('th[data-col="sum"]')!
+    const label = th.querySelector<HTMLElement>('.mz-dt__th-label')!
+    // Shortened, and from the end: the caption's first letter is drawn inside
+    // the label's box. Inheriting the column's `text-align: end`, an
+    // overflowing caption was pushed out past its start instead.
+    expect(label.scrollWidth).toBeGreaterThan(label.clientWidth)
+    const first = document.createRange()
+    first.setStart(label.firstChild!, 0)
+    first.setEnd(label.firstChild!, 1)
+    expect(first.getBoundingClientRect().left).toBeGreaterThanOrEqual(label.getBoundingClientRect().left - 0.5)
+    expect(th.getAttribute('title') ?? th.querySelector('button')?.title).toContain('Возвращено покупателями')
+    unmount()
+    host.remove()
+  })
+
   it('redistributes into the same width when a column is hidden', async () => {
     // The half of the auto-fit fix happy-dom cannot reach: hiding a column has
     // to hand its width to the others, not leave a gap at the right edge.

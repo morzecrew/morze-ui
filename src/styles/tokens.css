@@ -180,10 +180,16 @@
      be drawn as two: a 12px label-cased header on --mz-well against a 14px
      inherited one on the frosted well, and rows that lit up at 3.5% of the
      text against a 4.5% mix of it. Put both on one page and the kit looked
-     like two kits. Both now read these; the frost is the shared value because
-     a header is exactly the surface rows pass behind, and without backdrop
-     support it falls back to the opaque ramp step anyway. */
-  --mz-th-bg: var(--mz-glass-well);
+     like two kits. Both now read these.
+
+     Solid, the ramp step the frost was cut from. It used to be the frosted
+     well, but a wide sticky table put a backdrop-filter on every header and
+     footer cell, a few dozen layers the compositor re-blurs whenever anything
+     behind them moves — and with a chart tooltip sliding over the same page,
+     Chromium on a GPU stopped painting whole tiles until a reload (#41).
+     `DataTable glass` puts the frost back (--mz-th-glass). */
+  --mz-th-bg: var(--mz-surface-2);
+  --mz-th-glass: var(--mz-glass-well);
   --mz-th-color: var(--mz-text-dim);
   --mz-row-hover: color-mix(in srgb, var(--mz-surface) 95.5%, var(--mz-ink));
 
@@ -391,7 +397,8 @@
   --mz-wash-press: color-mix(in srgb, var(--mz-ink) 12%, transparent);
 
   /* See the dark block. */
-  --mz-th-bg: var(--mz-glass-well);
+  --mz-th-bg: var(--mz-surface-2);
+  --mz-th-glass: var(--mz-glass-well);
   --mz-th-color: var(--mz-text-dim);
   --mz-row-hover: color-mix(in srgb, var(--mz-surface) 95.5%, var(--mz-ink));
 
