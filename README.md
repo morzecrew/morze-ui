@@ -635,7 +635,11 @@ What this kit adds on top:
   `Button`, so a destructive confirmation is `tone="danger"`.
 - `Table` — brings its own horizontal scroll container, because a wide table
   otherwise scrolls the page instead of itself; `containerRef` hands that
-  element back for a synchronised header or a virtualiser.
+  element back for a synchronised header or a virtualiser. `pinned` on a
+  `TableHead` and its column's `TableCell`s keeps a row label at the start
+  edge while the figures scroll under it, on an opaque ground
+  (`--mz-table-bg`, the card's surface by default — set it to `--mz-bg` for a
+  table on the page) with a hairline seam once something is scrolled.
 - `ScrollArea` — the kit's scrollbar in place of the platform's, so a pane
   looks scrollable on macOS too. `viewportRef` reaches the scrolling element.
   It is vertical unless told otherwise, and a vertical area holds its content

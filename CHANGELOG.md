@@ -167,6 +167,12 @@ ran into after it (#26 – #41) — one entry per issue.
   that reads on each step, held to 4.5:1 by the contrast test. Cut from
   `--mz-primary` and `--mz-surface`, so the ramp follows a re-brand. Hosts
   hard-coded a seven-step heatmap ramp and picked each cell's ink by hand.
+- **`Table` — a pinned column** (#36): `pinned` on `TableHead` / `TableCell`
+  sticks the column to the start edge on an opaque ground (`--mz-table-bg`,
+  the surface by default; row hover and selection repeat on it), with the
+  grid's hairline seam while the body is scrolled under it, mirrored in RTL.
+  The header's ground is opaque since #41, so nothing scrolls through it;
+  hosts layered `--mz-th-bg` over `--mz-surface` by hand.
 
 ### Changed
 

@@ -30,11 +30,20 @@ function Table({
    */
   containerRef?: React.Ref<HTMLDivElement>
 }) {
+  // Whether the body is scrolled away from the start, for the seam a pinned
+  // column draws over what passes under it. Distance from the start, so an
+  // RTL container (which counts down from zero) reads the same.
+  const [scrolled, setScrolled] = React.useState(false)
   return (
     <div
       ref={containerRef}
       data-slot="table-container"
+      data-scrolled-start={scrolled || undefined}
       className={cn('mz-table-wrap', containerClassName)}
+      onScroll={(event) => {
+        const next = Math.abs(event.currentTarget.scrollLeft) > 1
+        if (next !== scrolled) setScrolled(next)
+      }}
     >
       <table data-slot="table" className={cn('mz-table', className)} {...props} />
     </div>
@@ -67,6 +76,11 @@ type TableHeadProps = React.ComponentProps<'th'> & {
   sortLabel?: string
   /** A column of figures: end-aligned, tabular digits. Set it on the cells too. */
   numeric?: boolean
+  /**
+   * Sticks the column to the start edge while the table scrolls sideways — a
+   * row label kept in view. Set it on the column's cells too.
+   */
+  pinned?: boolean
 }
 
 /**
@@ -85,6 +99,7 @@ function TableHead({
   onSort,
   sortLabel,
   numeric = false,
+  pinned = false,
   children,
   ...props
 }: TableHeadProps) {
@@ -93,6 +108,7 @@ function TableHead({
       data-slot="table-head"
       data-sortable={sortable || undefined}
       data-numeric={numeric || undefined}
+      data-pinned={pinned || undefined}
       aria-sort={
         sortable ? (sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none') : undefined
       }
@@ -116,13 +132,16 @@ function TableHead({
 type TableCellProps = React.ComponentProps<'td'> & {
   /** A figure: end-aligned, in tabular digits so the places line up. */
   numeric?: boolean
+  /** Sticks the cell to the start edge — see `TableHead`'s `pinned`. */
+  pinned?: boolean
 }
 
-function TableCell({ className, numeric = false, ...props }: TableCellProps) {
+function TableCell({ className, numeric = false, pinned = false, ...props }: TableCellProps) {
   return (
     <td
       data-slot="table-cell"
       data-numeric={numeric || undefined}
+      data-pinned={pinned || undefined}
       className={cn('mz-table__td', className)}
       {...props}
     />
