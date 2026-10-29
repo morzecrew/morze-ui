@@ -18,7 +18,10 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@morze/ui": ["./src/index.ts"]
+    }
   },
   "include": ["src", "playground"],
   "exclude": ["node_modules", "dist"]
