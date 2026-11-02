@@ -14,6 +14,8 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+## [0.7.0] — 2026-11-02
+
 ### Added
 
 - **Figures and record fields** from erp-frontend — the spec is
