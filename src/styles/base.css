@@ -265,9 +265,16 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  /* The lifts and dips only. They live on the `scale` property, apart from
+     `transform`, because `transform` is how some parts are placed: a dialog
+     centred by translate(-50%, -50%), a switch's knob, a toast mid-swipe.
+     `transform: none` here moved a dialog half its width under a resting
+     pointer, and a checked knob back to off (#43). */
   [class^='mz-']:hover,
-  [class*=' mz-']:hover {
-    transform: none !important;
+  [class*=' mz-']:hover,
+  [class^='mz-']:active,
+  [class*=' mz-']:active {
+    scale: none !important;
   }
 }
 

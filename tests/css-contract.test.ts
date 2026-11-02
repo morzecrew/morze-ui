@@ -801,7 +801,7 @@ describe('one wash and two durations (V-05)', () => {
     expect(css).toMatch(/\.mz-checkbox:active\{[^}]*var\(--mz-press-scale\)/)
     expect(css).toMatch(/\.mz-radio:active\{[^}]*var\(--mz-press-scale\)/)
     // The slider thumb is the documented exception: it is held, not clicked.
-    expect(css).toMatch(/\.mz-slider__thumb:active\{[^}]*scale\(1\.06\)/)
+    expect(css).toMatch(/\.mz-slider__thumb:active\{[^}]*scale:1\.06/)
   })
 })
 
@@ -824,11 +824,11 @@ describe('the three verbs (V-03)', () => {
   it('grows a free-standing toggle and never one inside a group', () => {
     // A button grows on hover and a toggle did not; but an item that swells
     // inside a segmented bar climbs over the item beside it.
-    expect(css).toMatch(/\.mz-toggle:hover\{[^}]*scale\(var\(--mz-hover-scale\)\)/)
+    expect(css).toMatch(/\.mz-toggle:hover\{[^}]*scale:var\(--mz-hover-scale\)/)
     const pinned = css.match(
       /\.mz-toggle-group--segmented \.mz-toggle:hover,\.mz-toggle-group--joined \.mz-toggle:hover\{[^}]*\}/
     )?.[0] ?? ''
-    expect(pinned).toContain('transform:none')
+    expect(pinned).toContain('scale:none')
   })
 
   it('gives the switch the hover its family has', () => {
@@ -905,7 +905,6 @@ describe('the token surface is what the kit reads (V-11)', () => {
       '--mz-elevated-rgb',
       '--mz-primary-soft',
       '--mz-primary-glow',
-      '--mz-radius-xl',
     ]) {
       expect(css, dead).not.toContain(dead)
     }
@@ -1253,5 +1252,24 @@ describe('the 2026-10 audit', () => {
     expect(css).toMatch(/\.mz-dt__th-label\{[^}]*text-overflow:ellipsis[^}]*text-align:start|\.mz-dt__th-label\{[^}]*text-align:start[^}]*/)
     expect(css).toMatch(/\.mz-dt__th-label\{[^}]*min-width:0/)
     expect(css).toContain('@supports (justify-content:safe flex-end){.mz-dt__th[data-align=right] .mz-dt__th-inner{justify-content:safe flex-end}')
+  })
+
+  it('stills the lifts under reduced motion, and leaves what transform places alone (#43)', () => {
+    // `transform: none !important` on every hovered mz- element moved a
+    // centred dialog by half its size and put a checked switch knob back to
+    // off. The lifts are on `scale` now; that is all the rule takes away.
+    const reduced = css.match(/@media \(prefers-reduced-motion:reduce\)\{(.*?\})\}/s)?.[1] ?? ''
+    expect(reduced).toMatch(/:hover[^{]*\{scale:none!important\}/)
+    expect(reduced).not.toContain('transform:none')
+    // No hover or press lift is written as a transform any more.
+    expect(css).not.toMatch(/:(hover|active)\{[^}]*transform:scale\(/)
+  })
+
+  it('takes the panel corner from the radius scale (#42)', () => {
+    // A fixed 22px stayed put while a host made every other radius tighter.
+    expect(css).toMatch(/--mz-radius-xl:calc\(var\(--mz-radius-lg\)\s*\*\s*11\s*\/\s*6\)/)
+    const panel = css.match(/\.mz-sidebar-panel\{([^}]*)\}/)?.[1] ?? ''
+    expect(panel).toContain('var(--mz-sidebar-panel-radius,var(--mz-radius-xl))')
+    expect(css).not.toMatch(/--mz-sidebar-panel-radius,\s*22px/)
   })
 })

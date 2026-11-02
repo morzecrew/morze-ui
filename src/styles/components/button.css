@@ -23,7 +23,7 @@
   text-transform: var(--mz-label-transform);
   text-decoration: none;
   transition:
-    transform var(--mz-duration) var(--mz-ease),
+    scale var(--mz-duration) var(--mz-ease),
     background var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
@@ -101,7 +101,7 @@
 }
 
 .mz-btn--primary:hover {
-  transform: scale(var(--mz-hover-scale));
+  scale: var(--mz-hover-scale);
   background-color: var(--mz-fill-hover);
   box-shadow:
     var(--mz-glow-hover),
@@ -109,7 +109,7 @@
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
 .mz-btn--primary:active {
-  transform: scale(var(--mz-press-scale));
+  scale: var(--mz-press-scale);
   background-color: var(--mz-fill-press);
 }
 
@@ -134,10 +134,10 @@
    button, and the lighter face plus the scale already say it is live. The idle
    border and shadow carry over untouched. */
 .mz-btn--secondary:hover {
-  transform: scale(var(--mz-hover-scale));
+  scale: var(--mz-hover-scale);
   background-color: var(--mz-face-hover);
 }
-.mz-btn--secondary:active { transform: scale(var(--mz-press-scale)); }
+.mz-btn--secondary:active { scale: var(--mz-press-scale); }
 
 /* ---- Outline / ghost: from .btn-ghost on the landing ----
    The one control with any frost, inherited from the landing. The blur is a
@@ -164,12 +164,12 @@
    second ring on top of the one already there — the outline just picks up the
    colour. */
 .mz-btn--outline:hover {
-  transform: scale(var(--mz-hover-scale));
+  scale: var(--mz-hover-scale);
   color: var(--mz-tone-text);
   border-color: var(--mz-tone);
 }
 .mz-btn--outline:hover::before { opacity: 1; }
-.mz-btn--outline:active { transform: scale(var(--mz-press-scale)); }
+.mz-btn--outline:active { scale: var(--mz-press-scale); }
 
 .mz-btn--ghost {
   background: transparent;
@@ -205,7 +205,7 @@
   text-shadow: var(--mz-convex-text-shadow);
 }
 .mz-btn--destructive:hover {
-  transform: scale(var(--mz-hover-scale));
+  scale: var(--mz-hover-scale);
   background-color: var(--mz-fill-hover);
   box-shadow:
     var(--mz-glow-hover),
@@ -213,7 +213,7 @@
     inset 0 -1px 0 var(--mz-convex-bottom);
 }
 .mz-btn--destructive:active {
-  transform: scale(var(--mz-press-scale));
+  scale: var(--mz-press-scale);
   background-color: var(--mz-fill-press);
 }
 

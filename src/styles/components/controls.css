@@ -22,10 +22,10 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform var(--mz-duration-fast) var(--mz-ease);
+    scale var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-checkbox:hover { border-color: color-mix(in srgb, var(--mz-tone) 50%, transparent); }
-.mz-checkbox:active { transform: scale(var(--mz-press-scale)); }
+.mz-checkbox:active { scale: var(--mz-press-scale); }
 
 .mz-checkbox[data-state='checked'],
 .mz-checkbox[data-state='indeterminate'] {
@@ -90,10 +90,10 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform var(--mz-duration-fast) var(--mz-ease);
+    scale var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-radio:hover { border-color: color-mix(in srgb, var(--mz-tone) 50%, transparent); }
-.mz-radio:active { transform: scale(var(--mz-press-scale)); }
+.mz-radio:active { scale: var(--mz-press-scale); }
 
 .mz-radio[data-state='checked'] {
   background-color: var(--mz-fill);
@@ -151,7 +151,7 @@
     background var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform var(--mz-duration-fast) var(--mz-ease);
+    scale var(--mz-duration-fast) var(--mz-ease);
 }
 /* Checkbox, radio and switch are one family and answer the cursor the same
    way. The switch was the one that did not: off, it had no hover at all, so
@@ -195,7 +195,7 @@
 }
 /* Press scales the whole control, like the buttons — widening the thumb pushed
    it past the rail in the checked position. */
-.mz-switch:active { transform: scale(var(--mz-press-scale)); }
+.mz-switch:active { scale: var(--mz-press-scale); }
 
 /* -------------------------------- Toggle -------------------------------- */
 .mz-toggle {
@@ -220,7 +220,7 @@
     color var(--mz-duration) ease,
     border-color var(--mz-duration) ease,
     box-shadow var(--mz-duration) ease,
-    transform var(--mz-duration-fast) var(--mz-ease);
+    scale var(--mz-duration-fast) var(--mz-ease);
 }
 .mz-toggle > svg { width: 1.15em; height: 1.15em; flex-shrink: 0; pointer-events: none; }
 
@@ -279,8 +279,8 @@
 /* A free-standing toggle is a button and grows like one. Inside a group it
    must not: an item that swells under the cursor climbs over the item beside
    it, which is why the group rules below never scale. */
-.mz-toggle:hover { transform: scale(var(--mz-hover-scale)); }
-.mz-toggle:active { transform: scale(var(--mz-press-scale)); }
+.mz-toggle:hover { scale: var(--mz-hover-scale); }
+.mz-toggle:active { scale: var(--mz-press-scale); }
 
 /* ----------------------------- ToggleGroup ------------------------------ */
 .mz-toggle-group {
@@ -318,7 +318,7 @@
    `spaced` appearance is left out — those items stand apart, so each of them
    is a button in its own right and grows like one. */
 .mz-toggle-group--segmented .mz-toggle:hover,
-.mz-toggle-group--joined .mz-toggle:hover { transform: none; }
+.mz-toggle-group--joined .mz-toggle:hover { scale: none; }
 .mz-toggle-group--segmented .mz-toggle[data-state='on'] {
   border-color: var(--mz-convex-hairline);
   background-color: var(--mz-fill);
@@ -439,7 +439,7 @@
   cursor: grab;
   transition:
     box-shadow var(--mz-duration) ease,
-    transform var(--mz-duration-fast) var(--mz-ease);
+    scale var(--mz-duration-fast) var(--mz-ease);
 }
 /* Hover darkens the cap, the way every other filled surface darkens — via a
    6% shade wash fading in over the face. The halo keeps its size: a ring that
@@ -461,7 +461,7 @@
    The one control in the kit that grows under pressure instead of dipping,
    and deliberately: the thumb is held, not clicked, and a cap that shrinks
    out from under the finger reads as having slipped. */
-.mz-slider__thumb:active { cursor: grabbing; transform: scale(1.06); outline: none; }
+.mz-slider__thumb:active { cursor: grabbing; scale: 1.06; outline: none; }
 
 /* Hover darkens the toned fill, matching the buttons. */
 .mz-checkbox[data-state='checked']:hover,

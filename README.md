@@ -233,6 +233,7 @@ larger one for surfaces.
 | `--mz-radius-sm` | `6px` | items inside containers: menu items, tabs, checkbox |
 | `--mz-radius` | `8px` | buttons, inputs, select, toggles, badges, alerts |
 | `--mz-radius-lg` | `12px` | cards, dialogs, popovers, menus |
+| `--mz-radius-xl` | `--mz-radius-lg × 11/6` (22px) | large surfaces: the content panel beside the sidebar |
 | `--mz-radius-pill` | `999px` | only what is round by meaning: the radio and its mark |
 
 Fully square corners: `--mz-radius: 0; --mz-radius-sm: 0; --mz-radius-lg: 0`.
@@ -435,9 +436,11 @@ motion and states (`--mz-ease`, `--mz-duration`, `--mz-duration-fast`,
 focus (`--mz-ring-*`).
 
 Every token the kit publishes is a token the kit reads: `--mz-bg-rgb`,
-`--mz-surface-rgb`, `--mz-elevated-rgb`, `--mz-primary-soft`,
-`--mz-primary-glow` and `--mz-radius-xl` were declared and never used, so
-overriding them moved nothing — they are gone as of 0.4. `--mz-face-fill` and
+`--mz-surface-rgb`, `--mz-elevated-rgb`, `--mz-primary-soft` and
+`--mz-primary-glow` were declared and never used, so overriding them moved
+nothing — they are gone as of 0.4. `--mz-radius-xl` went with them and came
+back after 0.6.0 as a step the kit reads (the sidebar's content panel), derived
+from `--mz-radius-lg`. `--mz-face-fill` and
 `--mz-face-fill-hover` stay as deliberate aliases.
 
 The full list lives in `dist/morze-ui-tokens.css`.
@@ -890,8 +893,9 @@ on narrow screens and remembers its state between sessions.
   - `floating` — the navigation lifts off the edge as a separate card.
 
   The side is `side="left" | "right"` (the panel's rounded corner mirrors
-  itself). The panel's radius and padding are `--mz-sidebar-panel-radius` and
-  `--mz-sidebar-panel-pad`. The `mz-sidebar-layout--grid` class on
+  itself). The panel's corner is `--mz-radius-xl`, so it follows the radius
+  scale; `--mz-sidebar-panel-radius` and `--mz-sidebar-panel-pad` override the
+  corner and the padding for the panel alone. The `mz-sidebar-layout--grid` class on
   `SidebarProvider` adds a 48px grid to the background.
 
 `SidebarTrigger` lives in the panel's own header: with `collapsible="icon"`

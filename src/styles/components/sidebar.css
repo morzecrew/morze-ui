@@ -114,14 +114,14 @@
   overflow: auto;
   padding: var(--mz-sidebar-panel-pad, clamp(16px, 2vw, 32px));
   background: var(--mz-surface);
-  border-top-left-radius: var(--mz-sidebar-panel-radius, 22px);
+  border-top-left-radius: var(--mz-sidebar-panel-radius, var(--mz-radius-xl));
   box-shadow:
     -24px -24px 64px -24px color-mix(in srgb, var(--mz-shade) 14%, transparent),
     -8px -8px 24px -12px color-mix(in srgb, var(--mz-shade) 10%, transparent);
 }
 .mz-sidebar-layout:has(.mz-sidebar[data-side='right']) .mz-sidebar-panel {
   border-top-left-radius: 0;
-  border-top-right-radius: var(--mz-sidebar-panel-radius, 22px);
+  border-top-right-radius: var(--mz-sidebar-panel-radius, var(--mz-radius-xl));
   box-shadow:
     24px -24px 64px -24px color-mix(in srgb, var(--mz-shade) 14%, transparent),
     8px -8px 24px -12px color-mix(in srgb, var(--mz-shade) 10%, transparent);

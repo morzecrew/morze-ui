@@ -29,6 +29,11 @@ changes among them, and the only record left is six commits that say
   changes, the changelog and version bumped and tagged locally, and only after
   a yes the push. `--dry-run`, `--version`, `--yes`, `--browser`, and
   `--local` for a release without CI.
+- **`--mz-radius-xl`** (#42) — the large-surface step, `--mz-radius-lg × 11/6`
+  (22px by default). The sidebar's content panel takes its corner from it, so
+  a host that rescales the radii rescales the panel too; it sat at a fixed
+  22px beside a kit made tighter. `--mz-sidebar-panel-radius` still overrides
+  it for the panel alone.
 
 ### Fixed
 
@@ -37,6 +42,20 @@ changes among them, and the only record left is six commits that say
   the typecheck, and `prepublishOnly` with it, failed anywhere the package had
   not been built yet. `tsconfig.json` maps `@morze/ui` to `src`, as the
   playground's Vite config already did.
+- **Reduced motion no longer moves what `transform` places** (#43). The rule
+  that stills hover lifts set `transform: none !important` on every hovered
+  `mz-` element — and a dialog is centred, a switch's knob placed and a toast
+  swiped by `transform`. Under a resting pointer a dialog jumped by half its
+  size (a `position="top"` one opened half off-screen), and a checked knob
+  slid back to off. The lifts and press dips are on the `scale` property now,
+  and the rule resets only `scale`; a Chrome spec with reduced motion
+  emulated hovers a dialog and a knob and checks they stay put.
+- **DataTable — a resize cannot leave a blank strip at the table's end**
+  (#44). Dragging the last column's handle (or its arrow keys, or a
+  double-click on narrow content) gave its width to the filler, and the
+  persisted layout kept the strip. While the row fits the scroller, a column
+  now stops where the row would stop short of it; once the row is wider, it
+  gives way only until the row fits again. Widening is unchanged.
 
 ## [0.6.0] — 2026-10-29
 

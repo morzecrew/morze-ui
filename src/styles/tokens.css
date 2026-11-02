@@ -604,6 +604,11 @@
   --mz-radius: 8px;
   --mz-radius-sm: 6px;
   --mz-radius-lg: 12px;
+  /* The large surfaces: the content panel beside the sidebar. A step past
+     --mz-radius-lg and derived from it, so a host that rescales the radii
+     rescales this too — the panel used to sit at a fixed 22px beside a kit
+     the host had made tighter (#42). 11/6 keeps the default at that 22px. */
+  --mz-radius-xl: calc(var(--mz-radius-lg) * 11 / 6);
   --mz-radius-pill: 999px;
   --mz-radius-control: var(--mz-radius);
 
