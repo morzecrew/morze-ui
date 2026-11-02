@@ -1294,3 +1294,10 @@ describe('figures from erp-frontend (N-01, N-11, N-12)', () => {
     for (let i = 1; i <= 8; i++) expect(css).toContain(`.mz-avatar[data-seed="${i}"]{--mz-tone:var(--mz-avatar-${i},`)
   })
 })
+
+describe('InlineEdit in a narrow tile', () => {
+  it('leaves room for both buttons on the editor’s line in a ~220px tile', () => {
+    // 196px of content: editor basis + 6px gap + two icon-sm buttons + gap.
+    expect(css).toMatch(/\.mz-inline-edit__editor\{flex:6rem[;}]/)
+  })
+})

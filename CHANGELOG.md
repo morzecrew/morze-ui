@@ -14,6 +14,13 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+### Fixed
+
+- **`InlineEdit` keeps Save and Cancel on the editor's line in a ~220px
+  tile.** The editor's basis was 8rem, so a field plus two `icon-sm` buttons
+  needed ~210px of a 196px box and the buttons wrapped under it — where an
+  open select list then covered them. The basis is 6rem.
+
 ## [0.7.0] — 2026-11-02
 
 ### Added

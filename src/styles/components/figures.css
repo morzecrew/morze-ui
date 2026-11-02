@@ -196,7 +196,11 @@
    the buttons wrap under it when the container is narrow. */
 .mz-inline-edit__row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
 .mz-inline-edit__row:has(textarea) { align-items: flex-start; }
-.mz-inline-edit__editor { flex: 1 1 8rem; min-width: 0; }
+/* 6rem, not 8: a record field is a tile of about 220px, and at 8rem the
+   editor plus two `icon-sm` buttons came to ~210px of a 196px box — the
+   buttons wrapped under the editor, where an open select list then sat on
+   top of them. */
+.mz-inline-edit__editor { flex: 1 1 6rem; min-width: 0; }
 .mz-inline-edit__editor > * { width: 100%; }
 .mz-inline-edit__actions { display: flex; flex-shrink: 0; gap: 6px; }
 
