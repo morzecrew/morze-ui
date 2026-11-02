@@ -489,6 +489,8 @@ covers the usual reason for one (a search panel that grows downward).
 | `DateRangePicker` `DataTable` | | | |
 | `Combobox` `MultiSelect` | `Collapsible` | `Empty` `Kbd` | `Command` `ContextMenu` |
 | `NumberInput` | | | |
+| `InlineEdit` | `PageHeader` `SectionHeader` | `Stat` `StatGroup` `Meter` | `InfoTip` |
+| | `Pagination` | `StepIndicator` `ClampText` | |
 
 The API mirrors shadcn/ui: same names, same sub-component composition,
 `asChild`, a `data-slot` on every part — so examples from the shadcn docs work
@@ -677,6 +679,83 @@ button lights up when the *selected* tab is one of the hidden ones, so the row
 never looks as if nothing is chosen. Widths are measured off a mirror row of
 inert spans: a hidden trigger measures zero, and a second row of real triggers
 would duplicate every `value`.
+
+## Figures and record fields
+
+What a list page and a record card need around the table, from
+[docs/gaps-erp-2026-11.md](docs/gaps-erp-2026-11.md):
+
+```tsx
+<PageHeader
+  title="Orders"
+  info="What the tabs hold and how they differ"
+  description="Customer orders, plans and purchases"
+  actions={<Button>Create</Button>}
+/>
+
+<Tabs defaultValue="orders">
+  <TabsList variant="line">
+    <TabsTrigger value="orders" count={18}>Orders</TabsTrigger>
+    <TabsTrigger value="plans" count={counting ? '…' : 5}>Plans</TabsTrigger>
+  </TabsList>
+</Tabs>
+
+<StatGroup aria-label="Order figures" minItemWidth={170}>
+  <Stat label="Open" value={18} />
+  <Stat
+    label="Overdue"
+    value={7}
+    tone="warning"
+    info="Deadline passed, not shipped"
+    selected={figure === 'late'}
+    onSelectedChange={(on) => setFigure(on ? 'late' : null)}
+  />
+</StatGroup>
+
+<Input start={<SearchIcon />} placeholder="Search" />
+<Pagination page={page} pageCount={pages} onPageChange={setPage} size="md" />
+```
+
+- `Stat` is a figure; with `onSelectedChange` it is a toggle (`aria-pressed`)
+  with a check mark in its corner, for a figure that filters the list. The
+  whole tile is the button and the `InfoTip` sits above it, so each takes its
+  own clicks. `hint` is a line under the value, `info` hides behind «?»,
+  `tone` colours the value only, `loading` shows a skeleton.
+- `InfoTip` — the «?» button: `type="button"`, a name (`about="Overdue"` reads
+  "More info: Overdue"), keyboard focus, `size` `sm` for an `xs` line.
+- `Input` `start` / `end` — an icon or a small button inside the field. With
+  either, the field is wrapped in `.mz-input-group` and `className` goes to the
+  wrapper, which is what takes the width.
+- `Pagination` — first, previous, "2 / 6", next, last; `size` `sm` or `md`,
+  `edges={false}` for just the arrows. Not tied to `DataTable`.
+- `Meter` — a hairline share bar (`role="meter"`) for a table cell: `value`,
+  `max`, `tone`. `Progress` stays for work under way.
+- `StepIndicator` — dots for a pipeline status: `total`, 0-based `current`,
+  `label` beside them.
+- `InlineEdit` — a record field that turns into a control: `label`, `view`,
+  `editor`, `onSave` (a promise keeps it busy; a rejection keeps it open).
+  Enter saves, Ctrl/⌘+Enter in a textarea, Escape cancels, focus returns to the
+  pencil. The label is text and the pencil a separate button, and the edit row
+  wraps inside its container instead of widening it.
+- `ClampText` — `lines` of text and "Show more" only when it overflows.
+- `PageHeader` / `SectionHeader` — `title`, `info`, `description`, `meta`
+  (badges by the title), `actions` (stay on the end edge when the row wraps),
+  `as` for the heading level.
+- `Avatar` `seed` — initials coloured by a stable key (a login): one of eight
+  `--mz-avatar-1…8` colours, each clearing 5:1 with white initials.
+
+### Figures on the start edge
+
+`numeric` columns of `DataTable` and `Table` sit on the end edge. A product
+that sets every column like text puts them on the start edge, digits still
+tabular, with one attribute — on `<html>` for the whole app or on a container:
+
+```html
+<html data-numeric-align="start">
+```
+
+or the class `.mz-numeric-start`. An explicit `align: 'right'` is untouched.
+A numeric `DataTable` column without `align` carries `data-align="numeric"`.
 
 ## Calendar
 
@@ -1265,7 +1344,10 @@ import { dataTable as ru, calendar, common } from '@morze/ui/locales/ru'
 `common` carries the strings the rest of the kit takes as individual props
 (`close`, `loading`, `more`, `sidebarNavigation`, `sidebarSections`,
 `toggleSidebar`, `increase`, `decrease`, `commandPalette`,
-`commandPaletteDescription`), `calendar` the five the month grid needs, and `combobox` /
+`commandPaletteDescription`, and for the figures and record fields `moreInfo`,
+`editField`, `save`, `cancel`, `showMore`, `showLess`, `pagination`,
+`firstPage`, `previousPage`, `nextPage`, `lastPage`, `pageOf`, `stepOf`),
+`calendar` the five the month grid needs, and `combobox` /
 `datePicker` the handful their own fields draw — the search box's placeholder,
 the empty and failed lines, the clear button:
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { version } from '../../package.json'
 import SidebarDemo from './SidebarDemo'
 import TableDemo from './TableDemo'
+import FiguresDemo from './FiguresDemo'
 import {
   Accordion,
   AccordionContent,
@@ -198,6 +199,15 @@ function Demo() {
         </CardHeader>
         <CardContent>
           <SidebarDemo />
+        </CardContent>
+      </Card>
+
+      <Card style={{ marginBottom: 20 }}>
+        <CardHeader>
+          <CardTitle>Figures and record fields</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FiguresDemo />
         </CardContent>
       </Card>
 

@@ -1490,9 +1490,14 @@ function headerMinWidths(scroller: HTMLElement): Record<string, number> {
   return out
 }
 
-/** A numeric column sits on the end edge unless it says otherwise. */
+/**
+ * An explicit `align` wins. A numeric column without one gets `numeric`: the
+ * stylesheet puts it on the end edge, or on the start edge under
+ * `[data-numeric-align='start']` (N-12) — a host-wide choice that used to mean
+ * overriding the kit's internal classes.
+ */
 function alignOf(column: { align?: 'left' | 'center' | 'right'; numeric?: boolean }) {
-  return column.align ?? (column.numeric ? 'right' : undefined)
+  return column.align ?? (column.numeric ? 'numeric' : undefined)
 }
 
 /**

@@ -93,7 +93,8 @@
   .mz-textarea, .mz-select-trigger, .mz-item, .mz-tooltip-content,
   .mz-accordion-trigger, .mz-accordion-trigger__icon, .mz-sidebar__menu-button,
   .mz-avatar, .mz-table, .mz-menubar, .mz-navmenu, .mz-scroll-area, .mz-toast,
-  .mz-calendar, .mz-chart, .mz-dt, .mz-card, .mz-sidebar
+  .mz-calendar, .mz-chart, .mz-dt, .mz-card, .mz-sidebar, .mz-stat-group, .mz-stat,
+  .mz-meter, .mz-steps
 ) {
   --mz-tone: var(--mz-primary);
   /* The label colour that goes with the fill — see --mz-primary-fg. A tone

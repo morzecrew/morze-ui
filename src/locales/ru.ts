@@ -130,6 +130,19 @@ export const common: MorzeCommonLabels = {
   decrease: 'Уменьшить',
   commandPalette: 'Палитра команд',
   commandPaletteDescription: 'Найдите команду, чтобы выполнить её',
+  moreInfo: 'Подробнее',
+  editField: (label) => `Изменить «${label}»`,
+  save: 'Сохранить',
+  cancel: 'Отменить',
+  showMore: 'Показать полностью',
+  showLess: 'Свернуть',
+  pagination: 'Страницы',
+  firstPage: 'Первая страница',
+  previousPage: 'Предыдущая страница',
+  nextPage: 'Следующая страница',
+  lastPage: 'Последняя страница',
+  pageOf: (page, total) => `Страница ${page} из ${total}`,
+  stepOf: (step, total) => `Этап ${step} из ${total}`,
 }
 
 export const ru: MorzeLocale = { dataTable, calendar, combobox, datePicker, common }

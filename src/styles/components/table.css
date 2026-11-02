@@ -93,6 +93,13 @@
   text-align: end;
 }
 .mz-table__th[data-numeric] .mz-table__sort { justify-content: flex-end; }
+/* Figures on the start edge for a host that wants every column to read like
+   text (N-12); the digits stay tabular. */
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-table__th[data-numeric],
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-table__td[data-numeric] { text-align: start; }
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-table__th[data-numeric] .mz-table__sort {
+  justify-content: flex-start;
+}
 
 /* A pinned column: sticks to the start edge and carries an opaque surface of
    its own, so the scrolled cells do not show through it (#36). The cell's

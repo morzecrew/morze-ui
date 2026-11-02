@@ -16,6 +16,26 @@ changes among them, and the only record left is six commits that say
 
 ### Added
 
+- **Figures and record fields** from erp-frontend — the spec is
+  [docs/gaps-erp-2026-11.md](docs/gaps-erp-2026-11.md):
+  - `Stat` / `StatGroup` (N-01): figures in one frame, optionally selectable
+    as filters with a check mark, `info`, `hint`, `tone`, `loading`.
+  - `InfoTip` (N-02): the «?» beside a label.
+  - `Input` `start` / `end` (N-03): an icon or a button inside the field.
+  - `Pagination` (N-04): a pager on its own, "2 / 6" between the arrows.
+  - `Meter` (N-05): a share bar for a table cell.
+  - `StepIndicator` (N-06): dots for a pipeline status.
+  - `InlineEdit` (N-07): view, pencil, editor, Save / Cancel, Enter / Escape.
+  - `ClampText` (N-08): N lines and "Show more".
+  - `TabsTrigger` `count` (N-09): a figure after the tab label.
+  - `PageHeader` / `SectionHeader` (N-10).
+  - `Avatar` `seed` (N-11): initials coloured by a stable key, eight
+    `--mz-avatar-*` colours; `avatarSeedIndex` for the same colour elsewhere.
+  - `[data-numeric-align='start']` / `.mz-numeric-start` (N-12): numeric
+    columns of `DataTable` and `Table` on the start edge.
+  - Common labels for all of the above, in `en` and `ru`.
+- `PencilIcon` and `HelpCircleIcon` among the kit's inline icons.
+
 - **Releases from CI.** A `chore: bump x.y.z` commit pushed to `main` is
   tagged, released on GitHub with its changelog section as the notes, and
   published to npm by `.github/workflows/release.yml` — through npm's trusted
@@ -34,6 +54,13 @@ changes among them, and the only record left is six commits that say
   a host that rescales the radii rescales the panel too; it sat at a fixed
   22px beside a kit made tighter. `--mz-sidebar-panel-radius` still overrides
   it for the panel alone.
+
+### Changed
+
+- **A numeric `DataTable` column without `align` carries
+  `data-align="numeric"`**, not `"right"` (N-12). It looks the same by
+  default; a host stylesheet that matched `[data-align='right']` to reach
+  numeric columns matches `[data-align='numeric']` now.
 
 ### Fixed
 

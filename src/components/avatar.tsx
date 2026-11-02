@@ -5,15 +5,48 @@ import { Avatar as AvatarPrimitive } from 'radix-ui'
 
 import { cn } from '../lib/utils'
 
+/** Avatar colours the kit ships (`--mz-avatar-1…8`). */
+const SEED_COLOURS = 8
+
+/**
+ * A string to one of the avatar colours, the same one every time: a
+ * person keeps their colour across lists, sessions and machines. FNV-1a — the
+ * spread over seven buckets is what matters, not cryptographic quality.
+ */
+function avatarSeedIndex(seed: string): number {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < seed.length; i++) {
+    hash ^= seed.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  // FNV's low bits are weak, and `% 8` reads only them: "ivanov", "petrova"
+  // and "admin" all landed on one colour. A final mix spreads the high bits
+  // down.
+  hash ^= hash >>> 16
+  hash = Math.imul(hash, 0x45d9f3b)
+  hash ^= hash >>> 16
+  return ((hash >>> 0) % SEED_COLOURS) + 1
+}
+
 function Avatar({
   className,
   size = 'md',
+  seed,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root> & { size?: 'sm' | 'md' | 'lg' }) {
+}: React.ComponentProps<typeof AvatarPrimitive.Root> & {
+  size?: 'sm' | 'md' | 'lg'
+  /**
+   * Colours the initials by a stable key — a login, an id (N-11): one of the
+   * eight `--mz-avatar-*` colours. Without it the fallback wears the tone, as
+   * before.
+   */
+  seed?: string | null
+}) {
   return (
     <AvatarPrimitive.Root
       data-slot="avatar"
       data-size={size}
+      data-seed={seed ? avatarSeedIndex(seed) : undefined}
       className={cn(
         'mz-avatar',
         size === 'sm' && 'mz-avatar--sm',
@@ -95,4 +128,4 @@ function AvatarFallback({
   )
 }
 
-export { Avatar, AvatarGroup, AvatarImage, AvatarFallback }
+export { Avatar, AvatarGroup, AvatarImage, AvatarFallback, avatarSeedIndex }

@@ -24,6 +24,25 @@ export type MorzeCommonLabels = {
   /** The command palette's accessible name and description. */
   commandPalette: string
   commandPaletteDescription: string
+  /** `InfoTip`'s accessible name when the host gives none. */
+  moreInfo: string
+  /** `InlineEdit`: the pencil, with the field's label. */
+  editField: (label: string) => string
+  save: string
+  cancel: string
+  /** `ClampText`'s toggle. */
+  showMore: string
+  showLess: string
+  /** `Pagination`: the landmark and its controls. */
+  pagination: string
+  firstPage: string
+  previousPage: string
+  nextPage: string
+  lastPage: string
+  /** "Page 2 of 6" — the counter's accessible name. */
+  pageOf: (page: string, total: string) => string
+  /** "Step 3 of 5" — `StepIndicator`'s accessible name. */
+  stepOf: (step: string, total: string) => string
 }
 
 /**

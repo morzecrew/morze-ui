@@ -230,13 +230,32 @@ function TabsListWithMenu({
 /** Width reserved for the "More (N)" button while deciding what fits. */
 const OVERFLOW_BUTTON_WIDTH = 116
 
-function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+function TabsTrigger({
+  className,
+  count,
+  children,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger> & {
+  /**
+   * A figure after the label: how many records the tab holds (N-09). Any node
+   * — a number the host formatted, "…" while it is counted; `null` and
+   * `undefined` draw nothing.
+   */
+  count?: React.ReactNode
+}) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn('mz-tabs-trigger mz-focusable', className)}
       {...props}
-    />
+    >
+      {children}
+      {count === null || count === undefined || count === false ? null : (
+        <span data-slot="tabs-count" className="mz-tabs-trigger__count">
+          {count}
+        </span>
+      )}
+    </TabsPrimitive.Trigger>
   )
 }
 

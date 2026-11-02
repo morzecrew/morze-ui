@@ -52,7 +52,9 @@ describe('numeric columns (#17)', () => {
     )
     const [sum, id] = screen.getAllByRole('cell')
     expect(sum).toHaveAttribute('data-numeric', 'true')
-    expect(sum).toHaveAttribute('data-align', 'right')
+    // `numeric`, not `right`: the stylesheet puts it on the end edge, or on
+    // the start edge under `[data-numeric-align='start']` (N-12).
+    expect(sum).toHaveAttribute('data-align', 'numeric')
     expect(id).toHaveAttribute('data-align', 'center')
   })
 })

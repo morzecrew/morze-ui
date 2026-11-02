@@ -1273,3 +1273,24 @@ describe('the 2026-10 audit', () => {
     expect(css).not.toMatch(/--mz-sidebar-panel-radius,\s*22px/)
   })
 })
+
+describe('figures from erp-frontend (N-01, N-11, N-12)', () => {
+  it('keeps a stat tile opaque over the group’s hairline gap', () => {
+    // A translucent face let the grey 1px gap through: the selected tile went
+    // grey instead of tinted. The face is the surface, the tint goes on ::before.
+    expect(css).toMatch(/\.mz-stat-group\{[^}]*gap:1px/)
+    expect(css).toMatch(/\.mz-stat\{[^}]*background-color:var\(--mz-surface\)/)
+    expect(css).toMatch(/\.mz-stat\[data-selected\]:before\{[^}]*background-color:/)
+  })
+
+  it('reads a numeric column like `right` by default and like text when asked', () => {
+    expect(css).toMatch(/\.mz-dt__th\[data-align=numeric\] \.mz-dt__filter\{[^}]*order:-1/)
+    const start = at(':where([data-numeric-align=start],.mz-numeric-start) .mz-dt__td[data-align=numeric]')
+    expect(start).toBeGreaterThan(at('.mz-dt__td[data-align=numeric]'))
+    expect(css).toMatch(/:where\(\[data-numeric-align=start\],\.mz-numeric-start\) \.mz-table__td\[data-numeric\]\{text-align:start\}/)
+  })
+
+  it('ships eight avatar colours a host can re-point', () => {
+    for (let i = 1; i <= 8; i++) expect(css).toContain(`.mz-avatar[data-seed="${i}"]{--mz-tone:var(--mz-avatar-${i},`)
+  })
+})

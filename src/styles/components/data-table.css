@@ -743,3 +743,38 @@
 .mz-dt__pin svg { transition: transform var(--mz-duration) var(--mz-ease); }
 .mz-dt__pin[data-pinned='left'] svg { transform: rotate(-45deg); }
 .mz-dt__pin[data-pinned='right'] svg { transform: rotate(45deg); }
+
+/* --------------------------------------------------------------------------
+   A numeric column with no `align` of its own (N-12): `data-align='numeric'`.
+   By default it reads exactly like `right` — end edge, funnel first, caption
+   cut at its end.
+   -------------------------------------------------------------------------- */
+.mz-dt__th[data-align='numeric'],
+.mz-dt__td[data-align='numeric'],
+.mz-dt__td[data-align='numeric'] .mz-dt__cell,
+.mz-dt__tf[data-align='numeric'] { text-align: end; }
+.mz-dt__td[data-align='numeric'] { font-variant-numeric: tabular-nums; }
+.mz-dt__th[data-align='numeric'] .mz-dt__th-inner { justify-content: flex-end; }
+@supports (justify-content: safe flex-end) {
+  .mz-dt__th[data-align='numeric'] .mz-dt__th-inner { justify-content: safe flex-end; }
+}
+.mz-dt__th[data-align='numeric'] .mz-dt__filter { order: -1; margin-inline: 0 auto; }
+
+/* --------------------------------------------------------------------------
+   Figures on the start edge (N-12). A numeric column with no `align` of its
+   own carries `data-align='numeric'` and sits on the end edge above; under
+   `[data-numeric-align='start']` or `.mz-numeric-start` — on <html> for the
+   whole app, or on a container — it sits on the start edge like text, digits
+   still tabular. An explicit `align: 'right'` is untouched.
+   -------------------------------------------------------------------------- */
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__th[data-align='numeric'],
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__td[data-align='numeric'],
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__td[data-align='numeric'] .mz-dt__cell,
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__tf[data-align='numeric'] { text-align: start; }
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__th[data-align='numeric'] .mz-dt__th-inner {
+  justify-content: flex-start;
+}
+:where([data-numeric-align='start'], .mz-numeric-start) .mz-dt__th[data-align='numeric'] .mz-dt__filter {
+  order: 0;
+  margin-inline: auto 0;
+}

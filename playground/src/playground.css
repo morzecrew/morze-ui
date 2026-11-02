@@ -43,3 +43,5 @@ body { background: var(--mz-bg); font-family: var(--mz-font-sans); }
 .pg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .pg-col { display: flex; flex-direction: column; gap: 14px; }
 .pg-check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--mz-text); }
+
+.pg-search { max-width: 420px; }
