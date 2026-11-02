@@ -419,7 +419,22 @@ export function DataTable<T>({
     fitEpoch,
   } = useColumnLayout({ columns, persistKey, layout: controlledLayout, onLayoutChange })
 
-  const resize = useColumnResize({ rootRef, widthOf, minWidthOf, onCommit: setWidth })
+  /* How narrow a resize may take a column. Its own `minWidth`, and — while the
+     row fits the scroller — never so narrow that the row stops short of it:
+     the width given up went to the filler as a blank strip at the table's
+     end, and the persisted layout kept it there (#44). Once the row is wider
+     than the scroller, a column can give way until it fits again. Widening is
+     never limited. Read when a resize starts, from the scroller as it is. */
+  const resizeFloorOf = (id: string) => {
+    const min = minWidthOf(id)
+    const scroller = scrollerRef.current
+    if (!scroller || !scroller.clientWidth) return min
+    const controls = (selectable ? SELECT_WIDTH : 0) + (renderExpanded ? EXPAND_WIDTH : 0)
+    const available = scroller.clientWidth - controls - 2
+    const others = visible.reduce((sum, column) => (column.id === id ? sum : sum + widthOf(column.id)), 0)
+    return Math.max(min, Math.floor(available - others))
+  }
+  const resize = useColumnResize({ rootRef, widthOf, minWidthOf: resizeFloorOf, onCommit: setWidth })
 
   const selectable = Boolean(selection && onSelectionChange)
   const pageKeys = React.useMemo(() => shownRows.map(rowKey), [shownRows, rowKey])

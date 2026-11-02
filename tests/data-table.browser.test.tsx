@@ -237,6 +237,79 @@ describe('auto-fit against a real container', () => {
     host.remove()
   })
 
+  // Dragging the last column's handle left gave its width to a blank strip
+  // after the table, and the persisted layout kept the strip (#44).
+  describe('a resize that would leave a blank strip at the end', () => {
+    const fitted = () =>
+      mountIn(900, (
+        <DataTable
+          columns={columns}
+          data={rows.slice(0, 3)}
+          rowKey={(r) => r.id}
+          total={3}
+          query={emptyQuery}
+          onQueryChange={vi.fn()}
+        />
+      ))
+    /** Width of the row against the scroller: 0 when they end together. */
+    const gapOf = (host: HTMLElement) => {
+      const scroller = host.querySelector<HTMLElement>('.mz-dt__scroller')!
+      const filler = host.querySelector<HTMLElement>('thead th.mz-dt__th--filler')!
+      return { filler: filler.getBoundingClientRect().width, scroller }
+    }
+    const drag = async (handle: HTMLElement, dx: number) => {
+      const box = handle.getBoundingClientRect()
+      const x = box.left + box.width / 2
+      const y = box.top + box.height / 2
+      const at = (type: string, clientX: number) =>
+        handle.dispatchEvent(
+          new PointerEvent(type, { bubbles: true, pointerId: 1, button: 0, buttons: 1, clientX, clientY: y })
+        )
+      at('pointerdown', x)
+      for (let step = 1; step <= 10; step++) at('pointermove', x + (dx * step) / 10)
+      at('pointerup', x + dx)
+      await settle(120)
+    }
+    const lastHandle = (host: HTMLElement) =>
+      host.querySelector<HTMLElement>('thead th[data-col="note"] .mz-dt__resizer')!
+
+    it('stops the last column where the row would stop short', async () => {
+      const { host, unmount } = fitted()
+      await settle()
+      expect(gapOf(host).filler).toBeLessThanOrEqual(2)
+      await drag(lastHandle(host), -200)
+      const { filler, scroller } = gapOf(host)
+      expect(filler).toBeLessThanOrEqual(2)
+      expect(scroller.scrollWidth).toBeLessThanOrEqual(scroller.clientWidth)
+      unmount()
+      host.remove()
+    })
+
+    it('does the same for the arrow keys on the separator', async () => {
+      const { host, unmount } = fitted()
+      await settle()
+      lastHandle(host).focus()
+      await userEvent.keyboard('{Shift>}{ArrowLeft}{ArrowLeft}{ArrowLeft}{/Shift}')
+      await settle(120)
+      expect(gapOf(host).filler).toBeLessThanOrEqual(2)
+      unmount()
+      host.remove()
+    })
+
+    it('still widens it, and then lets it come back to the edge', async () => {
+      const { host, unmount } = fitted()
+      await settle()
+      await drag(lastHandle(host), 150)
+      const { scroller } = gapOf(host)
+      expect(scroller.scrollWidth).toBeGreaterThan(scroller.clientWidth)
+      // Back past the edge: it gives way only until the row fits again.
+      await drag(lastHandle(host), -400)
+      expect(gapOf(host).filler).toBeLessThanOrEqual(2)
+      unmount()
+      host.remove()
+    })
+  })
+
   it('redistributes into the same width when a column is hidden', async () => {
     // The half of the auto-fit fix happy-dom cannot reach: hiding a column has
     // to hand its width to the others, not leave a gap at the right edge.
