@@ -14,6 +14,8 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-11-05
+
 ### Added
 
 - **`InlineEdit` — `layout`** (#45): `stack` (default, as before), `row` (a
