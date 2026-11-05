@@ -47,6 +47,21 @@ type InlineEditProps = Omit<React.ComponentProps<'div'>, 'children'> & {
   readOnly?: boolean
   saveDisabled?: boolean
   labels?: Partial<MorzeCommonLabels>
+  /**
+   * Where the label, the value and the pencil go (#45):
+   *
+   * - `stack` (default) — the label on top with the pencil beside it, the
+   *   value under it: a tile in a grid of fields.
+   * - `row` — a property row: the label at the start, the value at the end,
+   *   the pencil last in a column of its own that a read-only row keeps too,
+   *   so the values of a list of rows line up. The editor takes the value's
+   *   and the pencil's place.
+   * - `inline` — a word in a line of text (`ИНД-1 · Индуктивности · шт`):
+   *   the value as it is, the pencil after it, the label read but not shown.
+   * - `lead` — a card's headline figure: the value large, the pencil beside
+   *   it, the label under it as a caption.
+   */
+  layout?: 'stack' | 'row' | 'inline' | 'lead'
 }
 
 const FOCUSABLE = 'input:not([type=hidden]), textarea, select, button, [tabindex]:not([tabindex="-1"])'
@@ -65,6 +80,7 @@ function InlineEdit({
   readOnly = false,
   saveDisabled = false,
   labels: labelsProp,
+  layout = 'stack',
   ...props
 }: InlineEditProps) {
   const labels = useLocaleLabels('common', defaultCommonLabels, labelsProp)
@@ -140,67 +156,111 @@ function InlineEdit({
     void save()
   }
 
+  const labelEl = (
+    <span
+      id={labelId}
+      // Inline, the label is the line's business, not the field's: it is
+      // read, and names the group and the pencil, but it is not drawn.
+      className={cn('mz-inline-edit__label', layout === 'inline' && 'mz-sr-only')}
+    >
+      {label}
+    </span>
+  )
+
+  const pencil =
+    !editing && !readOnly ? (
+      <Button
+        ref={pencilRef}
+        type="button"
+        variant="ghost"
+        size="icon-xs"
+        className="mz-inline-edit__pencil"
+        aria-label={labels.editField(name)}
+        title={labels.editField(name)}
+        onClick={start}
+      >
+        <PencilIcon />
+      </Button>
+    ) : null
+
+  const editRow = (
+    <div role="group" aria-labelledby={labelId} className="mz-inline-edit__row" onKeyDown={onKeyDown}>
+      <div ref={editorRef} className="mz-inline-edit__editor">
+        {editor}
+      </div>
+      <div className="mz-inline-edit__actions">
+        <Button
+          type="button"
+          variant="primary"
+          size="icon-sm"
+          loading={saving}
+          disabled={saveDisabled}
+          aria-label={labels.save}
+          title={labels.save}
+          onClick={() => void save()}
+        >
+          <CheckIcon />
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          disabled={saving}
+          aria-label={labels.cancel}
+          title={labels.cancel}
+          onClick={cancel}
+        >
+          <XIcon />
+        </Button>
+      </div>
+    </div>
+  )
+
+  const viewEl = <div className="mz-inline-edit__view">{view}</div>
+
+  // The parts are placed by the component, one arrangement per layout, so a
+  // host never reaches into this markup to move them — erp did, with
+  // `display: contents` and `order`, and a change here would have broken it.
+  let body: React.ReactNode
+  if (layout === 'row' || layout === 'inline') {
+    body = (
+      <>
+        {labelEl}
+        {editing ? editRow : viewEl}
+        {pencil}
+      </>
+    )
+  } else if (layout === 'lead') {
+    body = (
+      <>
+        <div className="mz-inline-edit__lead">
+          {editing ? editRow : viewEl}
+          {pencil}
+        </div>
+        {labelEl}
+      </>
+    )
+  } else {
+    body = (
+      <>
+        <div className="mz-inline-edit__head">
+          {labelEl}
+          {pencil}
+        </div>
+        {editing ? editRow : viewEl}
+      </>
+    )
+  }
+
   return (
     <div
       data-slot="inline-edit"
+      data-layout={layout}
       data-editing={editing || undefined}
       className={cn('mz-inline-edit', className)}
       {...props}
     >
-      <div className="mz-inline-edit__head">
-        <span id={labelId} className="mz-inline-edit__label">
-          {label}
-        </span>
-        {!editing && !readOnly ? (
-          <Button
-            ref={pencilRef}
-            type="button"
-            variant="ghost"
-            size="icon-xs"
-            className="mz-inline-edit__pencil"
-            aria-label={labels.editField(name)}
-            title={labels.editField(name)}
-            onClick={start}
-          >
-            <PencilIcon />
-          </Button>
-        ) : null}
-      </div>
-
-      {editing ? (
-        <div role="group" aria-labelledby={labelId} className="mz-inline-edit__row" onKeyDown={onKeyDown}>
-          <div ref={editorRef} className="mz-inline-edit__editor">
-            {editor}
-          </div>
-          <div className="mz-inline-edit__actions">
-            <Button
-              type="button"
-              variant="primary"
-              size="icon-sm"
-              loading={saving}
-              disabled={saveDisabled}
-              aria-label={labels.save}
-              title={labels.save}
-              onClick={() => void save()}
-            >
-              <CheckIcon />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              disabled={saving}
-              aria-label={labels.cancel}
-              title={labels.cancel}
-              onClick={cancel}
-            >
-              <XIcon />
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="mz-inline-edit__view">{view}</div>
-      )}
+      {body}
     </div>
   )
 }

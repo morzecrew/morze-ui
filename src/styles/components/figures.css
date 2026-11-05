@@ -204,6 +204,59 @@
 .mz-inline-edit__editor > * { width: 100%; }
 .mz-inline-edit__actions { display: flex; flex-shrink: 0; gap: 6px; }
 
+/* Layouts (#45). The parts are placed by the component for each one, so these
+   rules never reach into another layout's markup. */
+
+/* row — label | value | pencil. The pencil column is a fixed width whether or
+   not the row has a pencil, so a read-only row's value lines up with the
+   editable ones above and below it. Editing, the editor takes the value's and
+   the pencil's columns. */
+.mz-inline-edit[data-layout='row'] {
+  display: grid;
+  grid-template-columns: var(--mz-inline-edit-label-w, minmax(0, auto)) minmax(0, 1fr) var(--mz-control-h-xs);
+  align-items: center;
+  column-gap: 12px;
+  min-height: var(--mz-control-h-sm);
+}
+.mz-inline-edit[data-layout='row'] .mz-inline-edit__label {
+  font-size: var(--mz-text-sm);
+  color: var(--mz-text-dim);
+}
+.mz-inline-edit[data-layout='row'] .mz-inline-edit__view {
+  grid-column: 2;
+  justify-self: end;
+  text-align: end;
+  color: var(--mz-text);
+}
+.mz-inline-edit[data-layout='row'] .mz-inline-edit__pencil { grid-column: 3; justify-self: end; margin-block: 0; }
+.mz-inline-edit[data-layout='row'] .mz-inline-edit__row { grid-column: 2 / -1; justify-content: flex-end; flex-wrap: nowrap; }
+
+/* inline — a word in a line: the value as it is, the pencil after it. */
+.mz-inline-edit[data-layout='inline'] {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+}
+.mz-inline-edit[data-layout='inline'] .mz-inline-edit__view { font-size: inherit; color: inherit; }
+.mz-inline-edit[data-layout='inline'] .mz-inline-edit__row { flex-wrap: nowrap; }
+.mz-inline-edit[data-layout='inline'] .mz-inline-edit__editor { flex-basis: 8rem; }
+
+/* lead — a headline figure with its caption under it. */
+.mz-inline-edit[data-layout='lead'] { gap: 2px; }
+.mz-inline-edit__lead { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.mz-inline-edit[data-layout='lead'] .mz-inline-edit__view {
+  font-size: var(--mz-text-xl);
+  line-height: var(--mz-leading-xl);
+  font-weight: 600;
+  color: var(--mz-text);
+}
+.mz-inline-edit[data-layout='lead'] .mz-inline-edit__label {
+  font-size: var(--mz-text-xs);
+  color: var(--mz-text-muted);
+}
+
 /* ------------------------------- ClampText ------------------------------- */
 
 .mz-clamp-text { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }

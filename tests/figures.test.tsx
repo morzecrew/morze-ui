@@ -297,3 +297,59 @@ describe('Avatar seed (N-11)', () => {
     expect(container.firstElementChild).toHaveAttribute('data-seed', String(avatarSeedIndex('ivanov')))
   })
 })
+
+// erp laid its record properties out as rows, header words and a headline
+// figure by moving InlineEdit's internals around with CSS (#45).
+describe('InlineEdit layouts', () => {
+  const field = (layout: 'stack' | 'row' | 'inline' | 'lead', props: Partial<React.ComponentProps<typeof InlineEdit>> = {}) =>
+    render(
+      <InlineEdit
+        layout={layout}
+        label="Unit"
+        view="pcs"
+        editor={<input aria-label="Unit value" defaultValue="pcs" />}
+        onSave={() => {}}
+        {...props}
+      />
+    ).container.querySelector<HTMLElement>('[data-slot="inline-edit"]')!
+
+  it('keeps today’s stack by default', () => {
+    const root = render(<InlineEdit label="Unit" view="pcs" editor={null} onSave={() => {}} />).container.firstElementChild!
+    expect(root).toHaveAttribute('data-layout', 'stack')
+    expect(root.querySelector('.mz-inline-edit__head')).not.toBeNull()
+  })
+
+  it('lays a row out as label, value, pencil — in that order, no head wrapper', () => {
+    const root = field('row')
+    expect(root.querySelector('.mz-inline-edit__head')).toBeNull()
+    expect([...root.children].map((child) => child.className.split(' ')[0])).toEqual([
+      'mz-inline-edit__label',
+      'mz-inline-edit__view',
+      'mz-btn',
+    ])
+  })
+
+  it('hides an inline label from sight but not from the reader', async () => {
+    const root = field('inline')
+    expect(root.querySelector('.mz-inline-edit__label')).toHaveClass('mz-sr-only')
+    // It still names the pencil and, editing, the group.
+    await userEvent.click(screen.getByRole('button', { name: /Unit/ }))
+    expect(screen.getByRole('group', { name: 'Unit' })).toBeInTheDocument()
+  })
+
+  it('puts the caption under a lead figure', () => {
+    const root = field('lead')
+    expect(root.lastElementChild).toHaveClass('mz-inline-edit__label')
+    expect(root.querySelector('.mz-inline-edit__lead .mz-inline-edit__view')).toHaveTextContent('pcs')
+  })
+
+  it.each(['row', 'inline', 'lead'] as const)('edits, saves on Enter and gives focus back in %s', async (layout) => {
+    const onSave = vi.fn()
+    field(layout, { onSave })
+    await userEvent.click(screen.getByRole('button', { name: /Unit/ }))
+    expect(screen.getByRole('textbox', { name: 'Unit value' })).toHaveFocus()
+    await userEvent.keyboard('{Enter}')
+    expect(onSave).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: /Unit/ })).toHaveFocus()
+  })
+})
