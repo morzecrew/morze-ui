@@ -166,11 +166,24 @@
   border-color: color-mix(in srgb, var(--mz-tone) 35%, transparent);
   box-shadow: var(--mz-glow-panel), inset 0 1px 0 var(--mz-face-top);
 }
+/* Flat: a block on a surface that is already raised — the page panel beside
+   the sidebar. A shadow and a sheen on each card there added a third depth
+   that meant nothing, and set them apart from the plain bordered blocks
+   beside them (#46). A border and the surface only. Flat is what a card is
+   inside SidebarPanel unless it asks to float (`elevation="raised"`), and
+   anywhere with `elevation="flat"`. After the hover, so a flat card does not
+   lift when pointed at either; before the chosen state, which draws its ring
+   with a box-shadow too. */
+.mz-card[data-elevation='flat'],
+.mz-sidebar-panel .mz-card:not([data-elevation]) {
+  background-image: none;
+  box-shadow: none;
+}
 /* Chosen: a card used as a filter or a toggle — a segment, a cell of a class
    matrix. The tone rim, doubled inside so it reads at rest and not only on
    hover; hosts drew their own outline for it (#35). */
-.mz-card--interactive[aria-pressed='true'],
-.mz-card--interactive[data-state='on'] {
+.mz-card.mz-card--interactive[aria-pressed='true'],
+.mz-card.mz-card--interactive[data-state='on'] {
   border-color: var(--mz-tone);
   box-shadow: var(--mz-glow-panel), inset 0 0 0 1px var(--mz-tone), inset 0 1px 0 var(--mz-face-top);
 }

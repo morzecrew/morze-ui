@@ -1245,7 +1245,9 @@ describe('the 2026-10 audit', () => {
   })
 
   it('draws a chosen interactive card (#35)', () => {
-    expect(css).toMatch(/\.mz-card--interactive\[aria-pressed=true\],\.mz-card--interactive\[data-state=on\]\{[^}]*border-color:var\(--mz-tone\)/)
+    // Doubled class: it has to outrank the flat card on SidebarPanel (#46),
+    // which takes the box-shadow the ring is drawn with.
+    expect(css).toMatch(/\.mz-card\.mz-card--interactive\[aria-pressed=true\],\.mz-card\.mz-card--interactive\[data-state=on\]\{[^}]*border-color:var\(--mz-tone\)/)
   })
 
   it('cuts a header caption at its end, never its start (#38)', () => {

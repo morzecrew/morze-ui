@@ -14,6 +14,30 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+### Added
+
+- **`InlineEdit` — `layout`** (#45): `stack` (default, as before), `row` (a
+  property row — label at the start, value at the end, the pencil in a column
+  of its own that a read-only row keeps, so values line up), `inline` (a word
+  in a line of text, the label read but not shown) and `lead` (a headline
+  figure with its label as a caption). The component places the parts for
+  each, so a host no longer moves them with `display: contents` and `order` —
+  which a change to the markup would have broken without a word.
+- **`Card` — `elevation`** (`flat` | `raised`) and **`DataTable`
+  `frame="flat"`** (#46): a border and the surface, no shadow and no sheen,
+  for blocks on a surface that is raised already.
+- **`--mz-sidebar-panel-shadow`** (#46) sets the content panel's shadow.
+
+### Changed
+
+- **Cards and tables are flat inside `SidebarPanel` by default** (#46). The
+  panel is raised above the page already, and a shadow on every card and
+  table in it was a third depth that meant nothing beside the plain bordered
+  blocks next to them. `elevation="raised"` / `frame="card"` keep a block
+  floating. Menus, popovers, dialogs, sheets and the bulk bar are unchanged.
+- **The content panel casts its near shadow only** (#46). The wide 64px layer
+  under it showed as a grey haze along the edge.
+
 ### Fixed
 
 - **`InlineEdit` keeps Save and Cancel on the editor's line in a ~220px

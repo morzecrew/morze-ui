@@ -18,6 +18,13 @@ type CardProps = React.ComponentProps<'div'> & {
    * with the tone rim; announced as `aria-pressed` on a clickable card.
    */
   pressed?: boolean
+  /**
+   * `raised` — a shadow and the top sheen, a card standing off the page.
+   * `flat` — a border and the surface only, for a block on a surface that is
+   * raised already. Left out, a card is flat inside `SidebarPanel` and
+   * raised everywhere else.
+   */
+  elevation?: 'flat' | 'raised'
 }
 
 function Card({
@@ -25,6 +32,7 @@ function Card({
   interactive = false,
   asChild = false,
   pressed,
+  elevation,
   onClick,
   onKeyDown,
   ...props
@@ -50,6 +58,7 @@ function Card({
   return (
     <Comp
       data-slot="card"
+      data-elevation={elevation}
       role={clickable ? 'button' : undefined}
       tabIndex={clickable ? 0 : undefined}
       aria-pressed={clickable && pressed !== undefined ? pressed : undefined}

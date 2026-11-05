@@ -162,11 +162,13 @@ export type DataTableProps<T> = {
    */
   fill?: boolean
   /**
-   * `card` (default) frames the scroller with a border, a radius and a
-   * shadow; `plain` drops all three, for a table already inside a Card or a
-   * panel, where the two frames doubled up.
+   * `card` frames the scroller with a border, a radius and a shadow; `flat`
+   * keeps the border and drops the shadow, for a table on a surface that is
+   * raised already; `plain` drops all three, for a table already inside a
+   * Card, where the two frames doubled up. Left out, it is `flat` inside
+   * `SidebarPanel` and `card` everywhere else.
    */
-  frame?: 'card' | 'plain'
+  frame?: 'card' | 'flat' | 'plain'
   /**
    * Built-in search box in the toolbar. Its value lives in `query.search`, so
    * it resets the page, reaches the URL through `useTableQuery`, and arrives
@@ -307,7 +309,7 @@ export function DataTable<T>({
   maxHeight,
   height,
   fill = false,
-  frame = 'card',
+  frame,
   search = false,
   filterTrigger = 'hover',
   summary = false,
@@ -1006,6 +1008,7 @@ export function DataTable<T>({
       data-density={density}
       data-glass={glass || undefined}
       data-filter-trigger={filterTrigger}
+      data-frame={frame}
       className={cn('mz-dt', fill && 'mz-dt--fill', frame === 'plain' && 'mz-dt--plain', className)}
       style={
         {

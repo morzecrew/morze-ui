@@ -116,6 +116,13 @@
   background: transparent;
   box-shadow: none;
 }
+/* `frame="flat"`: the frame without the lift — border, radius and surface, no
+   shadow — for a table on a surface that is raised already. It is the frame a
+   table gets inside SidebarPanel unless it asks for `card` (#46). */
+.mz-dt[data-frame='flat'] .mz-dt__scroller,
+.mz-sidebar-panel .mz-dt:not([data-frame]) .mz-dt__scroller {
+  box-shadow: none;
+}
 
 /* The seam between the pinned column and the scrolling body is marked with a
    plain hairline instead of a drop shadow, and only while something is

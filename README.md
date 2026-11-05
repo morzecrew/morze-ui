@@ -630,7 +630,11 @@ What this kit adds on top:
   `aria-pressed` on a clickable one). `asChild` draws the card onto its child,
   so a card that opens a page is the link itself:
   `<Card interactive asChild><Link to="/orders">…</Link></Card>`. A height set
-  on `CardContent` is kept, so a chart in it has room.
+  on `CardContent` is kept, so a chart in it has room. `elevation`: `raised`
+  (a shadow and the top sheen) or `flat` (border and surface only). Left out,
+  a card is flat inside `SidebarPanel` — the panel is raised already, and a
+  shadow on every block in it is a third depth that means nothing — and
+  raised everywhere else. Menus, popovers, dialogs and sheets keep theirs.
 - `Spinner` — `label` (default `Loading`) is announced by screen readers;
   `label={null}` makes it purely decorative.
 - `Badge` — `variant`: `solid` `soft` `outline`.
@@ -736,7 +740,13 @@ What a list page and a record card need around the table, from
   `editor`, `onSave` (a promise keeps it busy; a rejection keeps it open).
   Enter saves, Ctrl/⌘+Enter in a textarea, Escape cancels, focus returns to the
   pencil. The label is text and the pencil a separate button, and the edit row
-  wraps inside its container instead of widening it.
+  wraps inside its container instead of widening it. `layout` places the parts:
+  `stack` (default — a tile: label and pencil on top, value under), `row` (a
+  property row: label at the start, value at the end, the pencil in a column
+  of its own that a read-only row keeps, so values line up; width of the label
+  column in `--mz-inline-edit-label-w`), `inline` (a word in a line of text,
+  the label read but not shown) and `lead` (a headline figure with its label as
+  a caption under it). Don't move the parts with your own CSS — pick the layout.
 - `ClampText` — `lines` of text and "Show more" only when it overflows.
 - `PageHeader` / `SectionHeader` — `title`, `info`, `description`, `meta`
   (badges by the title), `actions` (stay on the end edge when the row wraps),
@@ -974,7 +984,8 @@ on narrow screens and remembers its state between sessions.
   The side is `side="left" | "right"` (the panel's rounded corner mirrors
   itself). The panel's corner is `--mz-radius-xl`, so it follows the radius
   scale; `--mz-sidebar-panel-radius` and `--mz-sidebar-panel-pad` override the
-  corner and the padding for the panel alone. The `mz-sidebar-layout--grid` class on
+  corner and the padding for the panel alone, and `--mz-sidebar-panel-shadow`
+  its shadow (one near layer by default). The `mz-sidebar-layout--grid` class on
   `SidebarProvider` adds a 48px grid to the background.
 
 `SidebarTrigger` lives in the panel's own header: with `collapsible="icon"`
@@ -1067,8 +1078,10 @@ What it does:
   kit's default face, has proportional digits, so without this a column only
   lined up where the OS fallback happened to be tabular. The plain `Table` takes
   `numeric` on `TableHead` and `TableCell`.
-- **`frame="plain"`** drops the scroller's border, radius and shadow, for a
-  table already inside a `Card` or a panel where the two frames doubled up.
+- **`frame`** — `card` (border, radius, shadow), `flat` (the same without the
+  shadow) or `plain` (none of the three, for a table already inside a `Card`,
+  where two frames doubled up). Left out, it is `flat` inside `SidebarPanel`
+  and `card` elsewhere.
 - **Global search** — `search` (or `{ placeholder, debounce }`) puts a box in
   the toolbar whose value is `query.search`. Because it is part of the query it
   resets the page, reaches the URL through `useTableQuery` as `q`, and arrives
