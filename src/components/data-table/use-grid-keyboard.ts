@@ -183,10 +183,13 @@ export function useGridKeyboard<T>({
   visible,
   selectable,
   expandable,
+  drawn,
   ...rest
 }: Omit<Grid<T>, 'columns' | 'setFocus' | 'pending'> & {
   keyboard: boolean
   visible: DataTableColumn<T>[]
+  /** The rows the virtual window has drawn: `[first, first + count)`. */
+  drawn?: { first: number; count: number }
 }): GridKeyboard {
   const columns = React.useMemo<GridColumn<T>[]>(
     () => [
@@ -205,6 +208,16 @@ export function useGridKeyboard<T>({
   // table, and a tab stop no cell carries is a grid Tab cannot enter at all.
   const focusRow = Math.max(0, Math.min(focus.row, rest.data.length - 1))
   const focusCol = Math.max(0, Math.min(focus.col, columns.length - 1))
+  // The row that carries the tab stop. A mouse scroll can carry the focused
+  // row out of the virtual window, and a stop on a row that is not drawn is
+  // no stop at all: Tab skipped the grid. The first drawn row stands in until
+  // the reader is back — unless the grid itself is walking to a row it has
+  // asked the window to draw.
+  const stopRow =
+    drawn && drawn.count > 0 && !pending.current &&
+    (focusRow < drawn.first || focusRow >= drawn.first + drawn.count)
+      ? drawn.first
+      : focusRow
 
   React.useEffect(() => {
     if (!pending.current) return
@@ -239,7 +252,7 @@ export function useGridKeyboard<T>({
       keyboard
         ? {
             role: 'gridcell',
-            tabIndex: row === focusRow && col === focusCol ? 0 : -1,
+            tabIndex: row === stopRow && col === focusCol ? 0 : -1,
             'data-grid-row': row,
             'data-grid-col': col,
           }

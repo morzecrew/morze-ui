@@ -1207,6 +1207,13 @@ What it does:
   `columnManager={false}` drops the button for a layout the host fixes or
   drives itself; the layout props keep working without it.
 
+  Only what the user changed outlives a release: a width they never dragged
+  follows the column's declared `width`, so a new width in code reaches every
+  saved layout, and a column they unpinned is stored as `pinned: { id: false }`
+  — JSON keeps `false` where it drops `undefined` — so a column declared
+  pinned stays unpinned after a reload. A host that keeps `onLayoutChange` in
+  its own store gets the same shape.
+
   Past eight columns the list grows a search box, and show-all / hide-all act
   on whatever the search has narrowed to. Dragging is off while the list is
   filtered — a drop lands beside the row above it *in the table*, which in a
@@ -1307,7 +1314,11 @@ used to leave in English. `tag` is the BCP 47 tag `Calendar`, the date fields
 and `DataTable` format with. A component's own `labels` / `locale` props still
 win, key by key; a provider inside another overrides only what it names;
 without one, everything stays English. `useMorzeLocale()` hands the bundle and
-tag in force to a widget of your own.
+tag in force to a widget of your own, and the two the kit's own widgets use
+are exported too: `useLocaleLabels('common', defaults, labels)` merges one
+section the same way — defaults, then the provider, then the widget's own
+`labels` — and `useLocaleTag(locale)` is the widget's `locale` prop, else the
+provider's tag.
 
 Every string can also be replaced per instance.
 `Dialog`/`Sheet`/`Toaster` take `closeLabel`, `Spinner` takes `label`, `Sidebar`
@@ -1464,6 +1475,14 @@ kept out of `npm test` so the fast suite stays fast. The provider uses the
 Chrome already on the machine (`channel: 'chrome'`), so `npm i` needs no
 browser download; a CI without one runs `npx playwright install chromium`
 once.
+
+```bash
+npm run lint:package   # publint + arethetypeswrong over the packed tarball (after a build)
+```
+
+The [CI workflow](.github/workflows/ci.yml) runs all of it — typecheck, both
+suites, the build and the package lint — on every pull request and every push
+to `main`.
 
 Layout: `src/components/*.tsx` for components (markup and API),
 `src/styles/**` for the visual layer (`tokens.css` → `base.css` →

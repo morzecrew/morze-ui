@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { DataTableFilters, DataTableQuery, SavedView } from './types'
+import type { DataTableFilters, DataTableQuery, FilterValue, SavedView } from './types'
 import { emptyQuery } from './types'
 import { parseSort, serializeSort } from './utils'
 
@@ -70,10 +70,48 @@ function countFrom(raw: string | null, whenMissing: number, whenInvalid: number)
 function filtersFrom(raw: string | null, fallback: DataTableFilters, codec: FilterCodec) {
   if (raw === null) return fallback
   try {
-    return codec.parse(raw)
+    return wellFormed(codec.parse(raw))
   } catch {
     return {}
   }
+}
+
+const isOptional = (value: unknown, type: 'number' | 'string') =>
+  value === undefined || typeof value === type
+
+/** Whether one parsed entry has the shape its `type` promises. */
+function isFilterShape(value: unknown): value is FilterValue {
+  if (!value || typeof value !== 'object') return false
+  const entry = value as Record<string, unknown>
+  switch (entry.type) {
+    case 'text':
+      return typeof entry.value === 'string'
+    case 'select':
+      return Array.isArray(entry.value) && entry.value.every((item) => typeof item === 'string')
+    case 'number-range':
+      return isOptional(entry.min, 'number') && isOptional(entry.max, 'number')
+    case 'date-range':
+      return isOptional(entry.from, 'string') && isOptional(entry.to, 'string')
+    case 'boolean':
+      return typeof entry.value === 'boolean'
+    case 'custom':
+      return 'value' in entry
+    default:
+      return false
+  }
+}
+
+/**
+ * What `JSON.parse` returns is whatever the address bar held. `?t.f=null`
+ * threw in the middle of a render, and a select filter without `values` threw
+ * on `.length` — a shared link that crashed the page it pointed to. An entry
+ * of the wrong shape is dropped; the rest of the filters still apply.
+ */
+function wellFormed(parsed: unknown): DataTableFilters {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+  return Object.fromEntries(
+    Object.entries(parsed as Record<string, unknown>).filter(([, value]) => isFilterShape(value))
+  ) as DataTableFilters
 }
 
 function decode(prefix: string, fallback: DataTableQuery, codec: FilterCodec): DataTableQuery {

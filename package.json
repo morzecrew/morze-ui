@@ -31,39 +31,74 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./form": {
-      "types": "./dist/form/index.d.ts",
-      "import": "./dist/form/index.js",
-      "require": "./dist/form/index.cjs"
+      "import": {
+        "types": "./dist/form/index.d.ts",
+        "default": "./dist/form/index.js"
+      },
+      "require": {
+        "types": "./dist/form/index.d.cts",
+        "default": "./dist/form/index.cjs"
+      }
     },
     "./locales/en": {
-      "types": "./dist/locales/en.d.ts",
-      "import": "./dist/locales/en.js",
-      "require": "./dist/locales/en.cjs"
+      "import": {
+        "types": "./dist/locales/en.d.ts",
+        "default": "./dist/locales/en.js"
+      },
+      "require": {
+        "types": "./dist/locales/en.d.cts",
+        "default": "./dist/locales/en.cjs"
+      }
     },
     "./locales/ru": {
-      "types": "./dist/locales/ru.d.ts",
-      "import": "./dist/locales/ru.js",
-      "require": "./dist/locales/ru.cjs"
+      "import": {
+        "types": "./dist/locales/ru.d.ts",
+        "default": "./dist/locales/ru.js"
+      },
+      "require": {
+        "types": "./dist/locales/ru.d.cts",
+        "default": "./dist/locales/ru.cjs"
+      }
     },
     "./theme-script": {
-      "types": "./dist/theme-script.d.ts",
-      "import": "./dist/theme-script.js",
-      "require": "./dist/theme-script.cjs"
+      "import": {
+        "types": "./dist/theme-script.d.ts",
+        "default": "./dist/theme-script.js"
+      },
+      "require": {
+        "types": "./dist/theme-script.d.cts",
+        "default": "./dist/theme-script.cjs"
+      }
     },
     "./testing": {
-      "types": "./dist/testing/index.d.ts",
-      "import": "./dist/testing/index.js",
-      "require": "./dist/testing/index.cjs"
+      "import": {
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
+      },
+      "require": {
+        "types": "./dist/testing/index.d.cts",
+        "default": "./dist/testing/index.cjs"
+      }
     },
     "./testing/setup": {
-      "types": "./dist/testing/setup.d.ts",
-      "import": "./dist/testing/setup.js",
-      "require": "./dist/testing/setup.cjs"
+      "import": {
+        "types": "./dist/testing/setup.d.ts",
+        "default": "./dist/testing/setup.js"
+      },
+      "require": {
+        "types": "./dist/testing/setup.d.cts",
+        "default": "./dist/testing/setup.cjs"
+      }
     },
     "./styles.css": "./dist/morze-ui.css",
     "./tokens.css": "./dist/morze-ui-tokens.css",
@@ -82,6 +117,7 @@
     "build:css": "node scripts/build-css.mjs",
     "build": "npm run clean && npm run build:js && npm run build:css",
     "typecheck": "tsc --noEmit",
+    "lint:package": "publint && attw --pack . --profile node16 --exclude-entrypoints ./styles.css ./tokens.css ./fonts.css",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:browser": "vitest run --config vitest.browser.config.ts",
@@ -95,7 +131,7 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.0.0"
+    "react-hook-form": "^7.25.0"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -103,6 +139,7 @@
     "radix-ui": "^1.6.7"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@fontsource-variable/golos-text": "^5.3.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
@@ -115,6 +152,7 @@
     "happy-dom": "^20.11.6",
     "lightningcss": "^1.33.0",
     "playwright": "^1.63.0",
+    "publint": "^0.3.25",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.87.0",
@@ -127,7 +165,7 @@
     "access": "public"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "peerDependenciesMeta": {
     "react-hook-form": {

@@ -95,7 +95,7 @@ export function ColumnManager<T>({
       column: DataTableColumn<T>
       declaredIndex: number
     }[]
-    const side = (id: string): Side => layout.pinned[id]
+    const side = (id: string): Side => layout.pinned[id] || undefined
     const groups: Side[] = ['left', undefined, 'right']
     return groups.flatMap((group) => {
       const inGroup = ordered.filter((e) => side(e.column.id) === group)
@@ -111,7 +111,7 @@ export function ColumnManager<T>({
     })
   }, [columns, layout])
 
-  const sideOf = (id: string): Side => layout.pinned[id]
+  const sideOf = (id: string): Side => layout.pinned[id] || undefined
   /** A drop only lands inside one group — see the note above the component. */
   const canDropOn = (sourceId: string, targetId: string) =>
     sourceId !== targetId && sideOf(sourceId) === sideOf(targetId)

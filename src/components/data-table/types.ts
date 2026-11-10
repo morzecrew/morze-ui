@@ -167,8 +167,17 @@ export type RowAttributes = React.ComponentPropsWithoutRef<'tr'> & {
 export type ColumnLayout = {
   order: string[]
   hidden: string[]
+  /**
+   * Hand-set widths are the ones that count: for a column not in `sized`, the
+   * declared `width` wins, so a new width in code reaches existing layouts.
+   */
   widths: Record<string, number>
-  pinned: Record<string, 'left' | 'right' | undefined>
+  /**
+   * `false` is a column the user unpinned. It is spelled out rather than left
+   * `undefined` because JSON drops an `undefined` key, and a column declared
+   * `pinned` then came back pinned after a reload.
+   */
+  pinned: Record<string, 'left' | 'right' | false | undefined>
   /** Columns the user resized by hand; auto-fit leaves these alone. */
   sized: string[]
 }
