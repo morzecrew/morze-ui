@@ -495,11 +495,13 @@ function Field({
   trigger: React.ReactNode
   children: React.ReactNode
 }) {
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div data-slot="combobox" data-tone={tone} className={cn('mz-combobox', className)}>
         <PopoverTrigger asChild>
           <button
+            ref={triggerRef}
             type="button"
             id={id}
             disabled={disabled}
@@ -534,7 +536,13 @@ function Field({
             className="mz-combobox__clear mz-focusable"
             aria-label={labels.clear}
             title={labels.clear}
-            onClick={onClear}
+            onClick={() => {
+              onClear()
+              // The × goes with the value it cleared, and the focus would go
+              // with it to <body>, a whole form away from where the reader
+              // was. The trigger is the field, so the focus stays in it.
+              triggerRef.current?.focus()
+            }}
           >
             <XIcon />
           </button>
@@ -734,7 +742,10 @@ function MultiSelect({
 
   /* All and None act on what is on screen, which is what a reader who has
      just typed a word expects them to mean; None, with nothing typed, empties
-     the field. Below two options there is no work to save. */
+     the field. Neither touches a disabled option: the reader cannot tick or
+     untick one by hand, so a bulk button must not do it for them — a locked
+     value the host put there stays. Below two options there is no work to
+     save. */
   const toolbar =
     selectAll && list.shown.length > 1 ? (
       <div className="mz-combobox__toolbar">
@@ -753,7 +764,7 @@ function MultiSelect({
           size="xs"
           variant="link"
           onClick={() => {
-            const drop = new Set(list.shown.map((option) => option.value))
+            const drop = new Set(list.shown.filter((o) => !o.disabled).map((o) => o.value))
             commit(values.filter((value) => !drop.has(value)))
           }}
         >

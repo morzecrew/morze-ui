@@ -9,6 +9,7 @@ export const defaultCommonLabels: MorzeCommonLabels = {
   close: 'Close',
   loading: 'Loading',
   more: 'More',
+  breadcrumb: 'Breadcrumb',
   sidebarNavigation: 'Navigation',
   sidebarSections: 'Application sections',
   toggleSidebar: 'Toggle sidebar',

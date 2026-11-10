@@ -113,6 +113,9 @@
    [data-disabled] rule in base.css takes care of blocking the pointer. */
 .mz-calendar__day[aria-disabled='true'] { opacity: 0.3; cursor: not-allowed; }
 .mz-calendar__day[data-outside] { color: var(--mz-text-muted); opacity: 0.6; }
+/* A neighbouring month's day beside a second grid is a picture of the week's
+   shape, not a control (calendar.tsx): no hover, no hand. */
+.mz-calendar__day--echo { cursor: default; pointer-events: none; }
 
 /* Today is a ring, never a fill — a fill would be indistinguishable from the
    selection on the day they coincide. */

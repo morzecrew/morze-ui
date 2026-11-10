@@ -52,6 +52,8 @@ function Pagination({
     if (target !== current) onPageChange(target)
   }
   const fmt = (n: number) => n.toLocaleString(locale)
+  const atStart = current <= 1
+  const atEnd = current >= total
 
   return (
     <nav
@@ -61,22 +63,33 @@ function Pagination({
       className={cn('mz-pagination', className)}
       {...props}
     >
+      {/* Soft-disabled, not `disabled`: Next is the button under the
+          reader's finger when the last page arrives, and a natively disabled
+          button drops the focus it holds to <body>. `aria-disabled` keeps it
+          in place and says the way is shut; `Button` refuses the press. */}
       {edges ? (
-        <Button type="button" variant="outline" size={buttonSize} disabled={current <= 1} onClick={() => go(1)} aria-label={labels.firstPage}>
+        <Button type="button" variant="outline" size={buttonSize} aria-disabled={atStart || undefined} onClick={() => go(1)} aria-label={labels.firstPage}>
           <ChevronsLeftIcon />
         </Button>
       ) : null}
-      <Button type="button" variant="outline" size={buttonSize} disabled={current <= 1} onClick={() => go(current - 1)} aria-label={labels.previousPage}>
+      <Button type="button" variant="outline" size={buttonSize} aria-disabled={atStart || undefined} onClick={() => go(current - 1)} aria-label={labels.previousPage}>
         <ChevronLeftIcon />
       </Button>
-      <span className="mz-pagination__page" aria-label={labels.pageOf(fmt(current), fmt(total))}>
-        {fmt(current)} / {fmt(total)}
+      {/* "2 / 6" is for the eye; the reader hears "Page 2 of 6". An
+          aria-label on a span with no role is not read at all, so the words
+          are text of their own, in a status region that speaks the new page
+          when Next is pressed and the focus stays put. */}
+      <span className="mz-pagination__page" role="status">
+        <span aria-hidden="true">
+          {fmt(current)} / {fmt(total)}
+        </span>
+        <span className="mz-sr-only">{labels.pageOf(fmt(current), fmt(total))}</span>
       </span>
-      <Button type="button" variant="outline" size={buttonSize} disabled={current >= total} onClick={() => go(current + 1)} aria-label={labels.nextPage}>
+      <Button type="button" variant="outline" size={buttonSize} aria-disabled={atEnd || undefined} onClick={() => go(current + 1)} aria-label={labels.nextPage}>
         <ChevronRightIcon />
       </Button>
       {edges ? (
-        <Button type="button" variant="outline" size={buttonSize} disabled={current >= total} onClick={() => go(total)} aria-label={labels.lastPage}>
+        <Button type="button" variant="outline" size={buttonSize} aria-disabled={atEnd || undefined} onClick={() => go(total)} aria-label={labels.lastPage}>
           <ChevronsRightIcon />
         </Button>
       ) : null}

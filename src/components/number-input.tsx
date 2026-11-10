@@ -137,6 +137,7 @@ function NumberInput({
   locale: localeProp,
   onRangeChange,
   disabled,
+  readOnly,
   onKeyDown,
   onBlur,
   ...props
@@ -203,9 +204,15 @@ function NumberInput({
     onChange?.(next)
   }
 
-  const nudge = (direction: 1 | -1) => {
+  /* Shift+arrow is one move of ten steps, not ten moves of one: every call
+     reads the same `current` from this render, so ten calls in a row each
+     landed one step above the old value and the field moved by one. A read-only field shows
+     its value and takes no part in changing it, so it refuses here — the one
+     place the keys and the steppers both pass through. */
+  const nudge = (direction: 1 | -1, times = 1) => {
+    if (readOnly || disabled) return
     const from = current ?? 0
-    const next = round(clamp(from + direction * step, min, max), precision ?? decimalsOf(step))
+    const next = round(clamp(from + direction * step * times, min, max), precision ?? decimalsOf(step))
     setDraft(null)
     commit(next)
   }
@@ -238,6 +245,7 @@ function NumberInput({
         aria-valuemin={min}
         aria-valuemax={max}
         disabled={disabled}
+        readOnly={readOnly}
         className={cn(
           'mz-input mz-number__input',
           inputSize === 'sm' && 'mz-input--sm',
@@ -264,10 +272,10 @@ function NumberInput({
           const big = event.shiftKey ? 10 : 1
           if (event.key === 'ArrowUp') {
             event.preventDefault()
-            for (let i = 0; i < big; i += 1) nudge(1)
+            nudge(1, big)
           } else if (event.key === 'ArrowDown') {
             event.preventDefault()
-            for (let i = 0; i < big; i += 1) nudge(-1)
+            nudge(-1, big)
           }
         }}
         onFocus={(event) => {
@@ -284,7 +292,9 @@ function NumberInput({
           // are applied here rather than under the caret, where clamping "1"
           // on the way to "12" would fight the typing.
           setDraft(null)
-          if (current === undefined) return
+          // Nothing was typed into a read-only field, so there is nothing to
+          // settle: clamping here would rewrite a value the host only shows.
+          if (current === undefined || readOnly) return
           const settled = round(clamp(current, min, max), precision)
           if (settled !== current) commit(settled)
         }}
@@ -300,7 +310,7 @@ function NumberInput({
             tabIndex={-1}
             className="mz-number__stepper"
             aria-label={labels?.increase ?? common.increase}
-            disabled={disabled || (max !== undefined && (current ?? 0) >= max)}
+            disabled={disabled || readOnly || (max !== undefined && (current ?? 0) >= max)}
             onClick={() => nudge(1)}
           >
             <ChevronUpIcon />
@@ -310,7 +320,7 @@ function NumberInput({
             tabIndex={-1}
             className="mz-number__stepper"
             aria-label={labels?.decrease ?? common.decrease}
-            disabled={disabled || (min !== undefined && (current ?? 0) <= min)}
+            disabled={disabled || readOnly || (min !== undefined && (current ?? 0) <= min)}
             onClick={() => nudge(-1)}
           >
             <ChevronDownIcon />

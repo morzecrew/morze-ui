@@ -32,6 +32,12 @@ items A-01 – A-35.
   the index did not.
 - **`useLocaleLabels` and `useLocaleTag`** are exported: the hooks the kit's own
   widgets read their strings and locale tag with, for a widget of your own.
+- **`DatePicker` / `DateRangePicker` — `aria-label` and `aria-labelledby`**
+  (A-14), as on `Combobox`, for a field with no `<label for>`.
+- **`Slider` — `thumbLabels`** (A-19): a name for each thumb of a range
+  ("From", "To").
+- **`Breadcrumb` — `label`**, and **`common.breadcrumb`** in `en`
+  ("Breadcrumb") and `ru` ("Навигационная цепочка") (A-29).
 
 ### Changed
 
@@ -48,6 +54,19 @@ items A-01 – A-35.
 - **The release workflow verifies before it tags.** A red typecheck or test
   failed in `prepublishOnly`, after the tag and the GitHub release were out
   for a version npm never got.
+- **`DatePicker` / `DateRangePicker` take `null` for a controlled empty field**
+  (A-18). `value` is `Date | null` / `DateRange | null`, and the field is
+  controlled whenever `value` is not `undefined`, as `Combobox` is. Before,
+  `value={undefined}` read as uncontrolled and the field kept whatever was
+  picked, whatever the host held.
+- **`Pagination` arrows are soft-disabled** (A-29): on the last page Next is
+  `aria-disabled` and refuses the press instead of turning `disabled`, which
+  dropped the focus it held to `<body>`. The "2 / 6" counter is a status
+  region that reads "Page 2 of 6"; it was an `aria-label` on a span with no
+  role, which nothing read.
+- **`Breadcrumb`'s landmark is named from the locale** (A-29) — it was the
+  hard-coded lowercase English "breadcrumb".
+- **A selectable `Stat` is named "Late 7", not "Late: 7"** (A-20) — see Fixed.
 
 ### Fixed
 
@@ -85,6 +104,50 @@ items A-01 – A-35.
 - **Selected rows of a `keyboard` grid carry `aria-selected`** (A-12).
 - **An editor whose row left the data does not reopen when the row comes back**
   (A-13).
+- **A date field is named by its label and its date** (A-14). A fixed
+  `aria-label` named every `DatePicker` "Open the calendar", over both the
+  chosen date and the `<label for>`.
+- **`Button asChild disabled` / `loading` no longer lets the link fire** (A-15).
+  It only set `aria-disabled`; the click, the link's own `onClick` and Enter
+  all went through. The press is refused in the capture phase, and the control
+  stays focusable.
+- **A collapsed `offcanvas` sidebar is out of the tab order** (A-16). Its
+  zero-width panel left every link tabbable, with the focus ring nowhere to be
+  seen. The panel is `inert` while put away.
+- **`NumberInput`: Shift+arrow moves ten steps, and `readOnly` holds** (A-17).
+  Ten nudges in a row each read the same stale value, so Shift+arrow moved by
+  one; a read-only field still changed from the arrow keys and the steppers.
+- **`Slider` thumbs have a name** (A-19). `aria-label` went to the root span,
+  so each `role="slider"` was announced as a bare number.
+- **A selectable `Stat` with a node `label` has a name** (A-20): the toggle is
+  named by `aria-labelledby` on the label and the figure, instead of a string
+  only a string label could build.
+- **The × in `Combobox`, `MultiSelect`, `DatePicker` and `DateRangePicker`
+  keeps the focus in the field** (A-21). It went to `<body>` with the button
+  that was removed.
+- **`Calendar` with several months: one tab stop, one copy of each day** (A-22).
+  The days spilling in from the neighbouring month were live buttons — two
+  tab stops, a second selected copy, and arrowing into the next month could
+  land on the copy. They are drawn but inert now, and `aria-selected` moved
+  from the `<button>` to the gridcell.
+- **`FormControl` no longer sets `aria-invalid="false"`** (A-23). It overrode
+  the control's own answer, so a `NumberInput` typed past `max` looked valid
+  inside a form.
+- **`InfoTip` opens on a tap** (A-24). Radix Tooltip ignores touch, and a mouse
+  click on a hovered tip closed it. A press toggles the tip now; hover and
+  focus still open it.
+- **`TabsList overflow="menu"` measures the `count` and keeps the host's ref**
+  (A-25). The measuring mirror drew the label without its count, so counted
+  tabs ran under the menu button, and `cloneElement` replaced a ref the host
+  put on a trigger.
+- **`Command`: Home/End leave the caret alone, and the highlight skips disabled
+  items** (A-26).
+- **`MultiSelect` "None" keeps disabled selected options** (A-27) — it unticked
+  values the reader could not untick by hand.
+- **`SidebarMenuSkeleton` hydrates cleanly** (A-28): the width came from
+  `Math.random()`, so server and client disagreed. It comes from `useId()`.
+- **The active `SidebarMenuButton` has `aria-current="page"`** (A-29), unless
+  the host passes its own.
 
 ## [0.8.0] — 2026-11-05
 

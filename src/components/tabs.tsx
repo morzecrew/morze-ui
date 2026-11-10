@@ -155,7 +155,12 @@ function TabsListWithMenu({
               mirrorRefs.current[i] = el
             }}
           >
-            {(item.props as { children?: React.ReactNode }).children}
+            {/* The face a trigger draws, count and all: a mirror of the label
+                alone measured every counted tab short by its badge, and the
+                last one to "fit" ran under the menu button. */}
+            <TriggerFace count={(item.props as { count?: React.ReactNode }).count}>
+              {(item.props as { children?: React.ReactNode }).children}
+            </TriggerFace>
           </span>
         ))}
       </div>
@@ -175,9 +180,12 @@ function TabsListWithMenu({
         {items.map((item, i) =>
           React.cloneElement(item as React.ReactElement<Record<string, unknown>>, {
             key: i,
-            ref: (el: HTMLElement | null) => {
+            // Composed, not replaced: a ref given to cloneElement overwrites
+            // the one the host put on the trigger, which then stayed null
+            // for good the moment the list was told to collapse.
+            ref: composeRefs((item.props as { ref?: React.Ref<HTMLElement> }).ref, (el) => {
               triggerRefs.current[i] = el
-            },
+            }),
             style: {
               ...((item.props as { style?: React.CSSProperties }).style ?? {}),
               ...(i >= visibleCount ? { display: 'none' } : null),
@@ -227,6 +235,43 @@ function TabsListWithMenu({
   )
 }
 
+/**
+ * One ref callback that feeds a host's ref of any kind and one of ours. It
+ * returns a cleanup, so React 19 detaches through it rather than by a call
+ * with null — and a host callback that returned a cleanup of its own gets
+ * that cleanup run, as it would have without the list in between.
+ */
+function composeRefs(
+  theirs: React.Ref<HTMLElement> | undefined,
+  ours: (el: HTMLElement | null) => void
+) {
+  return (el: HTMLElement | null) => {
+    ours(el)
+    const cleanup = typeof theirs === 'function' ? theirs(el) : undefined
+    if (theirs && typeof theirs !== 'function') theirs.current = el
+    return () => {
+      ours(null)
+      if (typeof cleanup === 'function') cleanup()
+      else if (typeof theirs === 'function') theirs(null)
+      else if (theirs) theirs.current = null
+    }
+  }
+}
+
+/** The label and the count after it — what a trigger draws, and what is measured. */
+function TriggerFace({ count, children }: { count?: React.ReactNode; children?: React.ReactNode }) {
+  return (
+    <>
+      {children}
+      {count === null || count === undefined || count === false ? null : (
+        <span data-slot="tabs-count" className="mz-tabs-trigger__count">
+          {count}
+        </span>
+      )}
+    </>
+  )
+}
+
 /** Width reserved for the "More (N)" button while deciding what fits. */
 const OVERFLOW_BUTTON_WIDTH = 116
 
@@ -249,12 +294,7 @@ function TabsTrigger({
       className={cn('mz-tabs-trigger mz-focusable', className)}
       {...props}
     >
-      {children}
-      {count === null || count === undefined || count === false ? null : (
-        <span data-slot="tabs-count" className="mz-tabs-trigger__count">
-          {count}
-        </span>
-      )}
+      <TriggerFace count={count}>{children}</TriggerFace>
     </TabsPrimitive.Trigger>
   )
 }

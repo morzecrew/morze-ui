@@ -114,7 +114,8 @@ describe('Calendar / range', () => {
     expect(day(13)).toHaveAttribute('data-range-end')
     expect(day(11)).toHaveAttribute('data-range-middle')
     // The middle is a span, not a selection: aria must not claim otherwise.
-    expect(day(11)).not.toHaveAttribute('aria-selected')
+    expect(day(11).closest('td')).not.toHaveAttribute('aria-selected')
+    expect(day(10).closest('td')).toHaveAttribute('aria-selected', 'true')
   })
 })
 
@@ -242,5 +243,73 @@ describe('Calendar / layout', () => {
 
     rerender(<Calendar defaultMonth={JUNE} locale="en-US" weekStartsOn={1} />)
     expect(headings()[0]).toMatch(/mon/i)
+  })
+})
+
+describe('Calendar / several months (A-22)', () => {
+  const JAN = new Date(2026, 0, 1)
+  const FEB_2 = new Date(2026, 1, 2)
+
+  it('keeps one tab stop and one copy of each day across the run', () => {
+    const { container } = render(
+      <Calendar
+        mode="single"
+        selected={FEB_2}
+        defaultMonth={JAN}
+        numberOfMonths={2}
+        locale="en-GB"
+        today={new Date(2026, 0, 15)}
+      />
+    )
+    // January's grid ends on February days and February's starts on January
+    // ones; those copies used to be buttons, so the roving day had two.
+    expect(days().filter((d) => d.tabIndex === 0)).toHaveLength(1)
+    expect(container.querySelectorAll('[data-day="2026-2-2"]')).toHaveLength(1)
+    expect(container.querySelectorAll('[data-selected]')).toHaveLength(1)
+    expect(days().some((d) => d.dataset.outside)).toBe(false)
+  })
+
+  it('draws the spilled-in days as pictures, not controls', async () => {
+    const onSelect = vi.fn()
+    const { container } = render(
+      <Calendar mode="single" defaultMonth={JAN} numberOfMonths={2} locale="en-GB" onSelect={onSelect} />
+    )
+    const echoes = container.querySelectorAll('.mz-calendar__day--echo')
+    expect(echoes.length).toBeGreaterThan(0)
+    echoes.forEach((echo) => {
+      expect(echo.tagName).toBe('SPAN')
+      expect(echo).toHaveAttribute('aria-hidden', 'true')
+      expect(echo.closest('td')).not.toHaveAttribute('role')
+    })
+    await userEvent.click(echoes[0] as HTMLElement)
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('puts aria-selected on the gridcell, not the button', () => {
+    render(<Calendar mode="single" selected={new Date(2024, 5, 12)} defaultMonth={JUNE} locale="en-GB" />)
+    expect(day(12)).not.toHaveAttribute('aria-selected')
+    expect(day(12).closest('td')).toHaveAttribute('role', 'gridcell')
+    expect(day(12).closest('td')).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getAllByRole('gridcell', { selected: true })).toHaveLength(1)
+  })
+
+  it('arrows from one month into the next onto the live copy of the day', async () => {
+    render(<Calendar mode="single" defaultMonth={JAN} numberOfMonths={2} locale="en-GB" />)
+    const jan31 = document.querySelector('[data-day="2026-1-31"]') as HTMLButtonElement
+    jan31.focus()
+    await userEvent.keyboard('{ArrowRight}')
+    const focused = document.activeElement as HTMLElement
+    expect(focused.dataset.day).toBe('2026-2-1')
+    // February's own first, not the copy at the foot of January's grid that
+    // came first in the DOM.
+    expect(focused.dataset.outside).toBeUndefined()
+    expect(focused.closest('.mz-calendar__month')).toHaveTextContent(/February 2026/)
+  })
+
+  it('keeps a single month’s spilled-in days live', () => {
+    render(<Calendar defaultMonth={JUNE} locale="en-GB" />)
+    const outside = days().filter((d) => d.dataset.outside)
+    expect(outside.length).toBeGreaterThan(0)
+    outside.forEach((d) => expect(d.tabIndex).toBe(-1))
   })
 })
