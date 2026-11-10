@@ -14,6 +14,8 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+## [0.9.0] — 2026-11-10
+
 Fixes from the audit of 2026-11-10 — [`docs/audit-2026-11-10.md`](docs/audit-2026-11-10.md),
 items A-01 – A-35.
 
