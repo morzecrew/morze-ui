@@ -14,6 +14,78 @@ changes among them, and the only record left is six commits that say
 
 ## [Unreleased]
 
+Fixes from the audit of 2026-11-10 — [`docs/audit-2026-11-10.md`](docs/audit-2026-11-10.md),
+items A-01 – A-35.
+
+### Added
+
+- **CI on every pull request** (`.github/workflows/ci.yml`): typecheck, the unit
+  suite, the Chrome suite, the build and `npm run lint:package` (publint and
+  arethetypeswrong over the packed tarball). Until now the checks ran only in
+  `prepublishOnly`, and the browser specs ran nowhere.
+- **Props types for every component** that did not name its own: `BadgeProps`,
+  `AlertProps`, `AvatarProps`, `AvatarGroupProps`, `DialogContentProps`,
+  `SheetContentProps`, `SelectTriggerProps`, `ScrollAreaProps`, `ProgressProps`,
+  `ToggleProps`, `ToggleGroupProps`, `KbdProps`, `KbdSequenceProps`,
+  `FieldProps`, `LabelProps`, `RadioGroupProps`, `SeparatorProps`,
+  `SkeletonProps` — and `SpinnerProps`, which the component file exported and
+  the index did not.
+- **`useLocaleLabels` and `useLocaleTag`** are exported: the hooks the kit's own
+  widgets read their strings and locale tag with, for a widget of your own.
+
+### Changed
+
+- **`require` gets CommonJS types.** `exports` names `.d.cts` files under the
+  `require` condition; every entry used to hand a CommonJS consumer the ESM
+  `.d.ts` ("masquerading as ESM" in arethetypeswrong).
+- **`react-hook-form` peer is `^7.25.0`** — `FormControl` reads
+  `getFieldState`, which earlier 7.x releases do not have.
+- **`engines.node` is `>=20`.** Node 18 is past its end of life, and the
+  toolchain needs 20 already.
+- **`ColumnLayout.pinned` takes `false`** for a column the user unpinned (A-04),
+  and a width outlives the declaration only for a column in `sized` (A-05) —
+  see Fixed.
+- **The release workflow verifies before it tags.** A red typecheck or test
+  failed in `prepublishOnly`, after the tag and the GitHub release were out
+  for a version npm never got.
+
+### Fixed
+
+- **`DataTable` text editor: one Enter, one save** (A-01). Saving disabled the
+  input, Chrome blurred it, and the blur saved the same value again — two
+  concurrent writes for one keystroke. The input is read-only while saving and
+  keeps focus; a second save never starts while one is in flight.
+- **`DataTable` select editor: a refused save is shown** (A-02). Radix closes
+  the list right after a pick, and that close unmounted the editor before the
+  save answered, so a refusal rolled the value back in silence. The editor
+  stays until the save settles; a refusal reopens the list with its message.
+- **Unticking a row under "all matching" unticks that row** (A-03). On any page
+  but the one where "all matching" was chosen, it left the unticked row as the
+  only one selected. The page's header box also reads ticked in that mode now.
+- **An unpinned column stays unpinned after a reload** (A-04). `undefined` was
+  dropped by `JSON.stringify`, and the declared `pinned` came back.
+- **A new declared column width reaches saved layouts** (A-05). Any saved layout
+  action froze every column's width, so an actions column widened in code
+  kept its old width for everyone who had ever hidden a column.
+- **Pinned header cells stay put in RTL** (A-06). They used physical
+  `left`/`right` while the body used logical insets, so the header scrolled
+  away from its column.
+- **A stale expanded key no longer turns `virtualize` off for good** (A-07). Only
+  panels of rows on the page count.
+- **`keyboard` + `virtualize` keeps a tab stop after a mouse scroll** (A-08):
+  the first drawn row stands in for a focused row that scrolled out.
+- **A malformed `f` parameter in the URL is no filter, not a crash** (A-09).
+  `?t.f=null` or a select filter without values threw during render; entries
+  of the wrong shape are dropped, the rest still apply.
+- **`DataTablePagination` past the last page** (A-10) shows the last page and
+  moves the query there, instead of "101–80 of 80" and "5 / 4".
+- **Typing in the table's search box no longer re-renders every cell** (A-11):
+  the draft lives in a component of its own, and the table only hears the
+  debounced commit.
+- **Selected rows of a `keyboard` grid carry `aria-selected`** (A-12).
+- **An editor whose row left the data does not reopen when the row comes back**
+  (A-13).
+
 ## [0.8.0] — 2026-11-05
 
 ### Added

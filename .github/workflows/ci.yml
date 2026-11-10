@@ -1,0 +1,52 @@
+# Every pull request and every push to main: typecheck, both test suites, the
+# build, and a lint of the package as npm will see it.
+#
+# Until this existed the checks ran in one place only — `prepublishOnly`, at
+# the moment of publishing — and the Chrome specs (`*.browser.test.tsx`) ran
+# nowhere at all. A red test was found by the release, after the merge.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      # The runner image has Google Chrome, which is what the browser config
+      # asks Playwright for (`channel: 'chrome'`).
+      - name: Browser tests
+        run: npm run test:browser
+
+      - name: Build
+        run: npm run build
+
+      # publint and arethetypeswrong over the packed tarball: every `exports`
+      # target exists, and `require` gets CommonJS types, not ESM ones.
+      - name: Lint the package
+        run: npm run lint:package

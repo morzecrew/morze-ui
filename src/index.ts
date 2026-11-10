@@ -13,7 +13,12 @@ export { MorzeThemeProvider, useMorzeTheme } from './components/theme-provider'
 export type { MorzeTheme, MorzeDensity, MorzeThemeProviderProps } from './components/theme-provider'
 export { themeScript } from './theme-script'
 export type { ThemeScriptOptions } from './theme-script'
-export { MorzeLocaleProvider, useMorzeLocale } from './components/locale-provider'
+export {
+  MorzeLocaleProvider,
+  useMorzeLocale,
+  useLocaleLabels,
+  useLocaleTag,
+} from './components/locale-provider'
 export type { MorzeLocaleProviderProps } from './components/locale-provider'
 
 export { Button, buttonVariants } from './components/button'
@@ -27,6 +32,7 @@ export { RadioGroup, RadioGroupItem } from './components/radio-group'
 export { Switch } from './components/switch'
 export type { SwitchProps } from './components/switch'
 export { Slider } from './components/slider'
+export type { SliderProps } from './components/slider'
 
 export { Input, inputVariants } from './components/input'
 export type { InputProps } from './components/input'
@@ -100,6 +106,7 @@ export { Avatar, AvatarGroup, AvatarImage, AvatarFallback, avatarSeedIndex } fro
 export { Separator } from './components/separator'
 export { Skeleton } from './components/skeleton'
 export { Spinner } from './components/spinner'
+export type { SpinnerProps } from './components/spinner'
 
 export {
   Dialog,
@@ -388,3 +395,6 @@ export type {
 
 /** Locale bundles live behind their own entry points: `@morze/ui/locales/ru`. */
 export type { MorzeCommonLabels, MorzeLocale, MorzeLocaleBundle } from './locales/types'
+
+/** Props of the components that do not name their own — see `props.ts`. */
+export type * from './props'

@@ -254,6 +254,62 @@ const spacerRow = (height: number, colSpan: number) =>
     </tr>
   ) : null
 
+/**
+ * The search box, with its draft, as a component of its own. The draft is
+ * state, and as the table's state every letter re-rendered every cell — 500
+ * cell renders for five letters over a hundred rows. Only the debounced
+ * commit reaches the table now.
+ *
+ * Typed locally and pushed into the query on a timer: the value is part of
+ * `query`, and committing per keystroke would be one request per letter. The
+ * draft follows the query whenever the query moves on its own — a Reset, the
+ * back button, a saved view — but not while the reader is mid-word, which is
+ * what the pending timer stands for.
+ */
+const SearchBox = React.memo(function SearchBox({
+  search,
+  debounce,
+  label,
+  placeholder,
+  onCommit,
+}: {
+  search: string | undefined
+  debounce: number
+  label: string
+  placeholder: string
+  onCommit: (value: string) => void
+}) {
+  const [draft, setDraft] = React.useState(search ?? '')
+  const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
+  React.useEffect(() => {
+    // Not while the reader is mid-word: a pending timer is what says so.
+    if (timer.current) return
+    setDraft(search ?? '')
+  }, [search])
+  React.useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current)
+  }, [])
+  return (
+    <Input
+      type="search"
+      inputSize="sm"
+      className="mz-dt__search"
+      aria-label={label}
+      placeholder={placeholder}
+      value={draft}
+      onChange={(event) => {
+        const value = event.target.value
+        setDraft(value)
+        if (timer.current) clearTimeout(timer.current)
+        timer.current = setTimeout(() => {
+          timer.current = null
+          onCommit(value)
+        }, debounce)
+      }}
+    />
+  )
+})
+
 const pinStyle = (pinned: 'left' | 'right' | undefined, offset: string | undefined) =>
   pinned
     ? ({ [pinned === 'left' ? 'insetInlineStart' : 'insetInlineEnd']: offset } as React.CSSProperties)
@@ -440,6 +496,12 @@ export function DataTable<T>({
 
   const selectable = Boolean(selection && onSelectionChange)
   const pageKeys = React.useMemo(() => shownRows.map(rowKey), [shownRows, rowKey])
+  // A cell being edited whose row has left `data` — a refetch, a filter from
+  // elsewhere — is not being edited any more. Held on, it reopened its editor
+  // the moment the row came back, with the old draft gone.
+  React.useEffect(() => {
+    if (editing && !pageKeys.includes(editing.key)) setEditing(null)
+  }, [editing, pageKeys])
   const rows = useRowSelection({
     value: selection ?? { keys: [], allMatching: false },
     onChange: onSelectionChange ?? (() => {}),
@@ -655,42 +717,23 @@ export function DataTable<T>({
     )
 
   /* ------------------------------- Search -------------------------------
-     Typed locally and pushed into the query on a timer: the value is part of
-     `query`, and committing per keystroke would be one request per letter.
-     The draft follows the query whenever the query moves on its own — a
-     Reset, the back button, a saved view — but not while the reader is
-     mid-word, which is what the pending timer stands for. */
+     The draft and its timer live in `SearchBox`; the table only hears the
+     debounced commit. */
   const searchConfig = search === true ? {} : search === false ? null : search
   const searchDebounce = searchConfig?.debounce ?? 300
-  const [searchDraft, setSearchDraft] = React.useState(query.search ?? '')
-  const searchTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Both are read at fire time rather than closed over, so a filter applied
-  // while the timer runs is not rolled back by it and a fresh callback does
-  // not have to restart the timer. Kept current after the commit, like the
-  // load-more ref above: a render React later discards must not leave a ref
-  // pointing into it.
+  // Read at fire time rather than closed over, so a filter applied while the
+  // timer runs is not rolled back by it. Kept current after the commit: a
+  // render React later discards must not leave a ref pointing into it.
   const queryChangeRef = React.useRef(onQueryChange)
   const queryRef = React.useRef(query)
   React.useEffect(() => {
     queryChangeRef.current = onQueryChange
     queryRef.current = query
   })
-  React.useEffect(() => {
-    // Not while the reader is mid-word: a pending timer is what says so.
-    if (searchTimer.current) return
-    setSearchDraft(query.search ?? '')
-  }, [query.search])
-  React.useEffect(() => () => {
-    if (searchTimer.current) clearTimeout(searchTimer.current)
-  }, [])
-  const onSearchInput = (value: string) => {
-    setSearchDraft(value)
-    if (searchTimer.current) clearTimeout(searchTimer.current)
-    searchTimer.current = setTimeout(() => {
-      searchTimer.current = null
-      queryChangeRef.current(setSearch(queryRef.current, value))
-    }, searchDebounce)
-  }
+  const commitSearch = React.useCallback(
+    (value: string) => queryChangeRef.current(setSearch(queryRef.current, value)),
+    []
+  )
 
   /* A click that started on a control inside a cell belongs to that control.
      Without this the row handler fired too: opening a record behind the
@@ -713,6 +756,14 @@ export function DataTable<T>({
     return Boolean(control && event.currentTarget.contains(control))
   }
 
+  // Panels actually drawn: an open key whose row is no longer in `data` draws
+  // nothing, and counting it switched the window off for good — Collapse all
+  // only clears the keys on this page, so nothing could switch it back on.
+  const openPanels = React.useMemo(
+    () => (renderExpanded ? pageKeys.filter((key) => expanded.has(key)).length : 0),
+    [renderExpanded, pageKeys, expanded]
+  )
+
   const fillerIndex = visible.length - rightPinned.length
   // +1 for the filler column, so full-width rows really span the table.
   const colSpan = visible.length + 1 + (selectable ? 1 : 0) + (renderExpanded ? 1 : 0)
@@ -728,7 +779,7 @@ export function DataTable<T>({
     virtualize,
     data: shownRows,
     density,
-    expandedCount: expanded.size,
+    expandedCount: openPanels,
     rootRef,
     scrollerRef,
   })
@@ -750,6 +801,7 @@ export function DataTable<T>({
     toggleExpanded,
     toggleSelection: rows.toggle,
     setEditing,
+    drawn: { first: firstRow, count: rowsInView.length },
   })
 
   /**
@@ -767,7 +819,7 @@ export function DataTable<T>({
   const renderHeaderCells = (list: DataTableColumn<T>[]) =>
     list.map((column) => {
                 const { dir, index } = sortStateOf(query, column.id)
-                const pinned = layout.pinned[column.id]
+                const pinned = layout.pinned[column.id] || undefined
                 const label = labelOf(column.id)
                 return (
                   <th
@@ -789,11 +841,9 @@ export function DataTable<T>({
                         : undefined
                     }
                     className={cn('mz-dt__th', column.headerClassName)}
-                    style={
-                      pinned
-                        ? ({ [pinned]: offsets.get(column.id) } as React.CSSProperties)
-                        : undefined
-                    }
+                    // The same logical inset as the body: a physical `left`
+                    // here let the header scroll away from its column in RTL.
+                    style={pinStyle(pinned, offsets.get(column.id))}
                   >
                     <div className="mz-dt__th-inner">
                       {column.sortable ? (
@@ -872,7 +922,7 @@ export function DataTable<T>({
     const key = rowKey(row)
     const node = tree?.byKey.get(key)
     return list.map((column, index) => {
-                          const pinned = layout.pinned[column.id]
+                          const pinned = layout.pinned[column.id] || undefined
                           // `canEdit` is the row-level veto: a closed period, a
                           // locked record. A cell it refuses is an ordinary cell,
                           // down to the caret it does not show.
@@ -960,7 +1010,7 @@ export function DataTable<T>({
      lengths rather than a barcode. */
   const renderSkeletonCells = (list: DataTableColumn<T>[], rowIndex: number) =>
     list.map((column, columnIndex) => {
-      const pinned = layout.pinned[column.id]
+      const pinned = layout.pinned[column.id] || undefined
       return (
         <td
           key={column.id}
@@ -982,7 +1032,7 @@ export function DataTable<T>({
      the pinned groups aligned across all three. */
   const renderSummaryCells = (list: DataTableColumn<T>[]) =>
     list.map((column) => {
-      const pinned = layout.pinned[column.id]
+      const pinned = layout.pinned[column.id] || undefined
       return (
         <td
           key={column.id}
@@ -1029,14 +1079,12 @@ export function DataTable<T>({
           <div className="mz-dt__toolbar">
             <div className="mz-dt__toolbar-main">
               {searchConfig ? (
-                <Input
-                  type="search"
-                  inputSize="sm"
-                  className="mz-dt__search"
-                  aria-label={labels.search}
+                <SearchBox
+                  search={query.search}
+                  debounce={searchDebounce}
+                  label={labels.search}
                   placeholder={searchConfig.placeholder ?? labels.search}
-                  value={searchDraft}
-                  onChange={(event) => onSearchInput(event.target.value)}
+                  onCommit={commitSearch}
                 />
               ) : null}
               {toolbar}
@@ -1223,6 +1271,14 @@ export function DataTable<T>({
                         data-depth={tree ? tree.byKey.get(key)?.depth : undefined}
                         data-branch={tree?.byKey.get(key)?.branch || undefined}
                         data-selected={rows.selected.has(key) || rows.allMatching || undefined}
+                        // In a grid, selection is a state of the row itself:
+                        // the ticked checkbox alone left a screen reader
+                        // walking the cells with no word of it.
+                        aria-selected={
+                          keyboard && selectable
+                            ? rows.selected.has(key) || rows.allMatching
+                            : undefined
+                        }
                         data-clickable={rowActivates ? true : undefined}
                         // A row that answers a click answers Enter too, and
                         // has to be reachable to be given one. In the grid the

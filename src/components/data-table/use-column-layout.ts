@@ -35,6 +35,10 @@ function readStored(key: string | null): Partial<ColumnLayout> | null {
     if (!raw) return null
     const stored = JSON.parse(raw) as StoredLayout
     if (stored.v !== undefined && stored.v !== LAYOUT_VERSION) return null
+    // Written before `sized` existed: every width in it was the user's.
+    if (stored.widths && !Array.isArray(stored.sized)) {
+      return { ...stored, sized: Object.keys(stored.widths) }
+    }
     return stored
   } catch {
     return null
@@ -133,7 +137,7 @@ export function useColumnLayout<T>({
   // fit that has to follow.
   const [fitEpoch, setFitEpoch] = React.useState(0)
 
-  const layout = React.useMemo(() => overlayFit(base, fitted), [base, fitted])
+  const layout = React.useMemo(() => unpinnedAsUndefined(overlayFit(base, fitted)), [base, fitted])
 
   // Kept current after every commit, so `update` — and the `fitTo` the table
   // hands to a ResizeObserver as an effect dependency — keep a stable identity
@@ -369,8 +373,9 @@ export function useColumnLayout<T>({
      * lost.
      */
     setHidden: (ids: string[]) => update((c) => ({ ...c, hidden: [...new Set(ids)] })),
-    setPinned: (id: string, side: 'left' | 'right' | undefined) =>
-      update((c) => ({ ...c, pinned: { ...c.pinned, [id]: side } })),
+    // Unpinned is stored as `false`: see `ColumnLayout['pinned']`.
+    setPinned: (id: string, side: 'left' | 'right' | false | undefined) =>
+      update((c) => ({ ...c, pinned: { ...c.pinned, [id]: side || false } })),
     move: (id: string, delta: number) =>
       update((c) => {
         const order = [...c.order]
@@ -433,12 +438,41 @@ function merge(base: ColumnLayout, patch: Partial<ColumnLayout>, fallback: Colum
     const before = fallback.order.slice(0, index).reverse().find((prev) => order.includes(prev))
     order.splice(before === undefined ? 0 : order.indexOf(before) + 1, 0, id)
   })
+  // Only a width the user set by hand outlives the declaration. Every width
+  // used to be carried, so once any layout action had been saved, a column
+  // whose declared width changed in a release — an actions column going from
+  // 80 to 140 — kept the old one for good.
+  const sized = (patch.sized ?? base.sized ?? []).filter((id) => known.has(id))
   return {
     order,
     hidden: (patch.hidden ?? base.hidden).filter((id) => known.has(id)),
-    widths: { ...fallback.widths, ...base.widths, ...patch.widths },
+    widths: { ...fallback.widths, ...handSet(base), ...handSet(patch) },
     pinned: { ...fallback.pinned, ...base.pinned, ...patch.pinned },
-    sized: (patch.sized ?? base.sized ?? []).filter((id) => known.has(id)),
+    sized,
+  }
+}
+
+/**
+ * The widths of a layout that still count against the declared ones. A layout
+ * that says which columns were sized by hand — anything this hook wrote —
+ * holds every other width only as a copy of an older declaration. One without
+ * `sized` is a host's own partial layout, and all of its widths are meant.
+ */
+function handSet(layout: Partial<ColumnLayout>): Record<string, number> {
+  const widths = layout.widths ?? {}
+  if (!layout.sized) return widths
+  const sized = new Set(layout.sized)
+  return Object.fromEntries(Object.entries(widths).filter(([id]) => sized.has(id)))
+}
+
+/** The layout as the table reads it: an unpinned column is just not pinned. */
+function unpinnedAsUndefined(layout: ColumnLayout): ColumnLayout {
+  if (!Object.values(layout.pinned).includes(false)) return layout
+  return {
+    ...layout,
+    pinned: Object.fromEntries(
+      Object.entries(layout.pinned).map(([id, side]) => [id, side || undefined])
+    ),
   }
 }
 

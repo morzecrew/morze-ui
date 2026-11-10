@@ -47,15 +47,32 @@ export function CellEditor<T>({
   // warns on that switch — and so the reader keeps the choice they were
   // making in front of them.
   const [open, setOpen] = React.useState(true)
+  // One save at a time. Enter used to save, and the blur that followed —
+  // Chrome blurs an input the moment it turns disabled — saved the same
+  // value a second time: two writes racing to the backend for one keystroke.
+  const inFlight = React.useRef(false)
+  // A save that settles after the editor is gone has nobody to report to.
+  const mounted = React.useRef(true)
+  React.useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   const save = async (next: string) => {
+    if (inFlight.current) return
     if (next === initial) return onDone()
+    inFlight.current = true
     setSaving(true)
     setError(null)
     try {
       await def.onSave(row, next)
-      onDone()
+      inFlight.current = false
+      if (mounted.current) onDone()
     } catch (cause) {
+      inFlight.current = false
+      if (!mounted.current) return
       // The typed value stays; only the committed one rolls back, so a
       // reader who hit a validation error can correct it rather than retype.
       setValue(next)
@@ -95,9 +112,14 @@ export function CellEditor<T>({
           // Dismissing the list is how this editor says "done" — after a
           // refusal too, where it means the reader has read the message and
           // given up on the change.
+          //
+          // Radix closes the list right after a pick, so a close while the
+          // save is in flight is that pick, not a dismissal: the editor stays
+          // until the save settles — a refusal reopens the list with the
+          // message instead of unmounting with nobody left to show it.
           onOpenChange={(next) => {
             setOpen(next)
-            if (!next) onDone()
+            if (!next && !inFlight.current) onDone()
           }}
         >
           <SelectTrigger size="sm" className="mz-dt__editor" aria-invalid={error ? true : undefined}>
@@ -124,7 +146,10 @@ export function CellEditor<T>({
         type={def.type === 'number' ? 'number' : 'text'}
         className="mz-dt__editor"
         value={value}
-        disabled={saving}
+        // Read-only, not disabled, while saving: a disabled input drops
+        // focus, and that blur was a second save.
+        readOnly={saving}
+        aria-busy={saving || undefined}
         aria-invalid={error ? true : undefined}
         onChange={(event) => setValue(event.target.value)}
         onKeyDown={onKeyDown}
@@ -132,7 +157,7 @@ export function CellEditor<T>({
         // second attempt: re-saving here would loop on a value the backend
         // has already refused.
         onBlur={() => {
-          if (!error) void save(value)
+          if (!error && !inFlight.current) void save(value)
         }}
       />
       {message}

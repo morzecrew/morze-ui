@@ -1427,7 +1427,9 @@ describe('global search (G-04)', () => {
           columns={columns}
           data={rows}
           rowKey={(r) => r.id}
-          total={2}
+          // Enough rows for a page 4 to exist: past the end, the pager
+          // would move the query back on its own (A-10).
+          total={200}
           query={{ ...emptyQuery, page: 4 }}
           onQueryChange={onQueryChange}
           search

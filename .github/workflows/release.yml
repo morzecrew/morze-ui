@@ -101,6 +101,20 @@ jobs:
         if: steps.find.outputs.sha
         run: npm install --global npm@11 && npm --version
 
+      - name: Install
+        if: steps.find.outputs.sha
+        working-directory: ${{ runner.temp }}/pkg
+        run: npm ci
+
+      # Before anything is tagged or announced: a red typecheck or test used to
+      # fail in `prepublishOnly`, after the tag and the GitHub release were
+      # already out for a version npm never got. Built first, for the same
+      # reason as below: an older commit typechecks the playground via dist.
+      - name: Verify
+        if: steps.find.outputs.sha
+        working-directory: ${{ runner.temp }}/pkg
+        run: npm run build && npm run typecheck && npm test
+
       - name: Tag it
         if: steps.find.outputs.sha
         env:
@@ -136,11 +150,6 @@ jobs:
           # the workflow's commit — an older tag may predate the script.
           node scripts/release-notes.mjs "$VERSION" "$RUNNER_TEMP/pkg/CHANGELOG.md" > "$RUNNER_TEMP/notes.md"
           gh release create "$TAG" --title "$VERSION" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag --latest
-
-      - name: Install
-        if: steps.find.outputs.sha
-        working-directory: ${{ runner.temp }}/pkg
-        run: npm ci
 
       - name: Publish to npm
         if: steps.find.outputs.sha

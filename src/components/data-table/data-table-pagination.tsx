@@ -63,11 +63,25 @@ export function DataTablePagination({
    */
   const unknownTotal = total === undefined
   const pages = pageCount(total, query.pageSize)
-  const canPrevious = query.page > 1
-  const canNext = unknownTotal ? rowsOnPage >= query.pageSize : query.page < pages
+  /* A page past the end — the last rows of the last page were deleted, or a
+     shared link outlived its data. It read "101–80 of 80" and "5 / 4" over
+     an empty table, with nothing offering a way back. The pager shows the
+     last page that exists and moves the query there. */
+  const pastEnd = !unknownTotal && total > 0 && query.page > pages
+  const page = pastEnd ? pages : query.page
+  const onQueryChangeRef = React.useRef(onQueryChange)
+  React.useEffect(() => {
+    onQueryChangeRef.current = onQueryChange
+  })
+  React.useEffect(() => {
+    if (pastEnd) onQueryChangeRef.current({ ...query, page: pages })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pastEnd, pages])
+  const canPrevious = page > 1
+  const canNext = unknownTotal ? rowsOnPage >= query.pageSize : page < pages
   const empty = total === 0 || (unknownTotal && rowsOnPage === 0)
-  const from = total === 0 ? 0 : (query.page - 1) * query.pageSize + 1
-  const to = unknownTotal ? from + rowsOnPage - 1 : Math.min(query.page * query.pageSize, total)
+  const from = total === 0 ? 0 : (page - 1) * query.pageSize + 1
+  const to = unknownTotal ? from + rowsOnPage - 1 : Math.min(page * query.pageSize, total)
   // Four disabled buttons and "1 / 1" under three rows say nothing the count
   // has not said already (#23).
   const showNav = nav === 'always' || canPrevious || canNext
@@ -124,7 +138,7 @@ export function DataTablePagination({
       {showNav ? (
         <div className="mz-dt__pagination-nav">
           <span className="mz-dt__pagination-page">
-            {query.page.toLocaleString(locale)}
+            {page.toLocaleString(locale)}
             {unknownTotal ? null : ` / ${pages.toLocaleString(locale)}`}
           </span>
           <Button type="button"
@@ -140,7 +154,7 @@ export function DataTablePagination({
             variant="secondary"
             size="icon-sm"
             disabled={!canPrevious}
-            onClick={() => go(query.page - 1)}
+            onClick={() => go(page - 1)}
             aria-label={labels.previousPage}
           >
             <ChevronLeftIcon />
@@ -149,7 +163,7 @@ export function DataTablePagination({
             variant="secondary"
             size="icon-sm"
             disabled={!canNext}
-            onClick={() => go(query.page + 1)}
+            onClick={() => go(page + 1)}
             aria-label={labels.nextPage}
           >
             <ChevronRightIcon />
@@ -159,7 +173,7 @@ export function DataTablePagination({
             <Button type="button"
               variant="secondary"
               size="icon-sm"
-              disabled={query.page >= pages}
+              disabled={page >= pages}
               onClick={() => go(pages)}
               aria-label={labels.lastPage}
             >

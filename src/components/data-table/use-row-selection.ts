@@ -19,6 +19,13 @@ export function useRowSelection(options: {
 
   const setKeys = (keys: string[], allMatching = false) => onChange({ keys, allMatching })
 
+  // "Everything the filter matches" draws every row ticked, but `keys` only
+  // holds the rows that were on screen when it was chosen. A change from that
+  // state starts from what the reader sees — this page, all ticked — or
+  // unticking one row on page 2 left that row as the only one ticked.
+  const base = () => (value.allMatching ? new Set(pageKeys) : new Set(selected))
+  const isOn = (key: string) => value.allMatching || selected.has(key)
+
   const toggle = (key: string, event?: { shiftKey?: boolean }) => {
     // Shift extends from the last clicked row, matching file-manager behaviour.
     if (event?.shiftKey && anchor.current) {
@@ -26,25 +33,25 @@ export function useRowSelection(options: {
       const to = pageKeys.indexOf(key)
       if (from >= 0 && to >= 0) {
         const range = pageKeys.slice(Math.min(from, to), Math.max(from, to) + 1)
-        const next = new Set(selected)
-        const turningOn = !selected.has(key)
+        const next = base()
+        const turningOn = !isOn(key)
         range.forEach((id) => (turningOn ? next.add(id) : next.delete(id)))
         setKeys([...next])
         return
       }
     }
     anchor.current = key
-    const next = new Set(selected)
+    const next = base()
     if (next.has(key)) next.delete(key)
     else next.add(key)
     setKeys([...next])
   }
 
-  const pageSelected = pageKeys.length > 0 && pageKeys.every((key) => selected.has(key))
-  const pagePartial = !pageSelected && pageKeys.some((key) => selected.has(key))
+  const pageSelected = pageKeys.length > 0 && pageKeys.every(isOn)
+  const pagePartial = !pageSelected && pageKeys.some(isOn)
 
   const togglePage = () => {
-    const next = new Set(selected)
+    const next = base()
     if (pageSelected) pageKeys.forEach((key) => next.delete(key))
     else pageKeys.forEach((key) => next.add(key))
     setKeys([...next])
