@@ -76,7 +76,9 @@ function Stat({
 }: StatProps) {
   const selectable = !!onSelectedChange
   const labelText = typeof label === 'string' ? label : undefined
-  const valueText = typeof value === 'string' || typeof value === 'number' ? String(value) : undefined
+  const id = React.useId()
+  const labelId = `${id}-label`
+  const valueId = `${id}-value`
 
   return (
     <div
@@ -91,7 +93,13 @@ function Stat({
           type="button"
           className="mz-stat__toggle mz-focusable"
           aria-pressed={selected}
-          aria-label={labelText ? (loading || !valueText ? labelText : `${labelText}: ${valueText}`) : undefined}
+          // Named by the label and the figure drawn under it rather than by a
+          // string put together here, which could only be built from a
+          // string label and left a tile labelled with a node — an icon and
+          // a word, a translated <Trans> — a button with no name at all.
+          // While the figure is counted it is a skeleton with no text, so the
+          // name is the label alone.
+          aria-labelledby={`${labelId} ${valueId}`}
           onClick={() => onSelectedChange(!selected)}
         />
       ) : null}
@@ -105,7 +113,9 @@ function Stat({
         </span>
       ) : null}
       <span className="mz-stat__label">
-        <span className="mz-stat__label-text">{label}</span>
+        <span id={labelId} className="mz-stat__label-text">
+          {label}
+        </span>
         {info ? (
           <span className="mz-stat__info">
             <InfoTip size="sm" label={infoLabel} about={labelText}>
@@ -114,7 +124,7 @@ function Stat({
           </span>
         ) : null}
       </span>
-      <span className="mz-stat__value" data-tone={tone}>
+      <span id={valueId} className="mz-stat__value" data-tone={tone}>
         {loading ? <Skeleton className="mz-stat__skeleton" /> : value}
       </span>
       {hint ? <span className="mz-stat__hint">{hint}</span> : null}

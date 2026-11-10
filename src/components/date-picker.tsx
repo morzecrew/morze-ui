@@ -58,6 +58,12 @@ type FieldProps = Pick<
   className?: string
   /** Width of the popover's calendar in months. */
   numberOfMonths?: number
+  /**
+   * A name for a field with no `<label for>` of its own. Without either, the
+   * trigger is named by what it shows — the date, or the placeholder.
+   */
+  'aria-label'?: string
+  'aria-labelledby'?: string
   /** The error state, drawn the way an `Input` draws it; set on the trigger. */
   'aria-invalid'?: React.AriaAttributes['aria-invalid']
   'aria-describedby'?: string
@@ -76,6 +82,8 @@ function Field({
   placeholder,
   id,
   className,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
   'aria-invalid': ariaInvalid,
   'aria-describedby': ariaDescribedby,
   onClear,
@@ -93,22 +101,33 @@ function Field({
   placeholder: string
   id?: string
   className?: string
+  'aria-label'?: string
+  'aria-labelledby'?: string
   'aria-invalid'?: React.AriaAttributes['aria-invalid']
   'aria-describedby'?: string
   onClear: () => void
   children: React.ReactNode
 }) {
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div data-slot="date-field" data-tone={tone} className={cn('mz-datefield', className)}>
         <PopoverTrigger asChild>
           <button
+            ref={triggerRef}
             type="button"
             id={id}
             disabled={disabled}
             data-size={size}
             data-placeholder={filled ? undefined : true}
-            aria-label={labels.open}
+            // Named by its own text and by the `<label for>` beside it, the
+            // way a select trigger is. A fixed aria-label here replaced both,
+            // so every date field in a form read as "Open the calendar" and
+            // none of them said which date it held. What a press does is
+            // left to the title, which a reader hears after the name.
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledby}
+            title={labels.open}
             aria-invalid={ariaInvalid}
             aria-describedby={ariaDescribedby}
             className={cn(
@@ -129,7 +148,13 @@ function Field({
             className="mz-datefield__clear mz-focusable"
             aria-label={labels.clear}
             title={labels.clear}
-            onClick={onClear}
+            onClick={() => {
+              onClear()
+              // The × goes with the value it cleared, and the focus would go
+              // with it to <body>, a whole form away from where the reader
+              // was. The trigger is the field, so the focus stays in it.
+              triggerRef.current?.focus()
+            }}
           >
             <XIcon />
           </button>
@@ -143,7 +168,11 @@ function Field({
 }
 
 export type DatePickerProps = FieldProps & {
-  value?: Date
+  /**
+   * The chosen day; `null` is a controlled field that is empty. `undefined`
+   * leaves the field to keep its own value, as `defaultValue` started it.
+   */
+  value?: Date | null
   defaultValue?: Date
   onChange?: (date: Date | undefined) => void
   /** How the chosen day is written in the field. Defaults to the locale's. */
@@ -167,7 +196,10 @@ function DatePicker({
   const locale = useLocaleTag(localeProp)
   const [open, setOpen] = React.useState(false)
   const [internal, setInternal] = React.useState<Date | undefined>(defaultValue)
-  const value = controlled ?? internal
+  // Controlled is a question of whether the prop is there, not of whether it
+  // holds a day: a host that owns an empty field passes `null`, and that
+  // field must stay empty until the host says otherwise.
+  const value = controlled === undefined ? internal : (controlled ?? undefined)
 
   const commit = (next: Date | undefined) => {
     if (controlled === undefined) setInternal(next)
@@ -222,7 +254,8 @@ function DatePicker({
 export type DateRangePreset = { label: string; range: DateRange }
 
 export type DateRangePickerProps = FieldProps & {
-  value?: DateRange
+  /** The chosen span; `null` is a controlled field that is empty. */
+  value?: DateRange | null
   defaultValue?: DateRange
   onChange?: (range: DateRange | undefined) => void
   format?: (date: Date) => string
@@ -250,7 +283,7 @@ function DateRangePicker({
   const locale = useLocaleTag(localeProp)
   const [open, setOpen] = React.useState(false)
   const [internal, setInternal] = React.useState<DateRange | undefined>(defaultValue)
-  const value = controlled ?? internal
+  const value = controlled === undefined ? internal : (controlled ?? undefined)
 
   const commit = (next: DateRange | undefined) => {
     if (controlled === undefined) setInternal(next)

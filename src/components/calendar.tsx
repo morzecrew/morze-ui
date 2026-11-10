@@ -478,8 +478,38 @@ function Calendar({
                         return <td key={date.getTime()} className="mz-calendar__cell" />
                       }
 
+                      /* Beside another month the days that spill in are copies
+                         of days the next grid draws for real. As buttons they
+                         were a second tab stop on the roving day, a second
+                         `data-day` for the focus to land on (the copy came
+                         first in the DOM), and a second selected day. They
+                         are drawn for the shape of the week and nothing more.
+                         A single month keeps them live: there they are the
+                         only copy, and a click on one pages to it. */
+                      if (outside && monthCount > 1) {
+                        return (
+                          <td key={date.getTime()} className="mz-calendar__cell">
+                            <span
+                              aria-hidden="true"
+                              data-outside
+                              className="mz-calendar__day mz-calendar__day--echo"
+                            >
+                              {date.getDate()}
+                            </span>
+                          </td>
+                        )
+                      }
+
                       return (
-                        <td key={date.getTime()} className="mz-calendar__cell" role="gridcell">
+                        <td
+                          key={date.getTime()}
+                          className="mz-calendar__cell"
+                          role="gridcell"
+                          // On the cell, not the button: aria-selected belongs to
+                          // a gridcell and means nothing on a button, so a reader
+                          // never heard which day was chosen.
+                          aria-selected={state.selected || undefined}
+                        >
                           <button
                             type="button"
                             data-slot="calendar-day"
@@ -493,8 +523,7 @@ function Calendar({
                             data-preview={state.preview || undefined}
                             data-disabled={dayDisabled || undefined}
                             className="mz-calendar__day mz-focusable"
-                            tabIndex={isSameDay(date, tabbableDay) ? 0 : -1}
-                            aria-selected={state.selected || undefined}
+                            tabIndex={!outside && isSameDay(date, tabbableDay) ? 0 : -1}
                             aria-label={fmt.day.format(date)}
                             // aria-disabled, not the attribute: a natively
                             // disabled button cannot take focus, so arrowing

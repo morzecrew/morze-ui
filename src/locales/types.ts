@@ -8,13 +8,16 @@ import type { DatePickerLabels } from '../components/date-picker'
  * `closeLabel`, `Spinner` `label`, `Sidebar` `mobileTitle` /
  * `mobileDescription`, `SidebarTrigger` / `SidebarRail` `label`, `Toaster`
  * `closeLabel`, `BreadcrumbEllipsis` `label`, `TabsList` `overflowLabel`,
- * `NumberInput` `labels`, `CommandDialog` `title` / `description`.
+ * `NumberInput` `labels`, `CommandDialog` `title` / `description`,
+ * `Breadcrumb` `label`.
  */
 export type MorzeCommonLabels = {
   close: string
   loading: string
   /** What is behind a collapse: the breadcrumb ellipsis, the tab overflow. */
   more: string
+  /** `Breadcrumb`'s landmark name. */
+  breadcrumb: string
   sidebarNavigation: string
   sidebarSections: string
   toggleSidebar: string

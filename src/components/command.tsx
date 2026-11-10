@@ -77,23 +77,33 @@ function Command({
   )
 
   /** The items the reader can actually see, in the order they are drawn. */
-  const visibleItems = React.useCallback(
+  const drawnItems = React.useCallback(
     () =>
       Array.from(
         rootRef.current?.querySelectorAll<HTMLElement>('[data-command-item]:not([hidden])') ?? []
       ),
     []
   )
+  /* The ones the highlight may rest on. A disabled item is drawn — the reader
+     should see that the command exists — but the arrows, Home and End and the
+     first-match default all landed on it before, and Enter then did nothing
+     with no word as to why. */
+  const visibleItems = React.useCallback(
+    () => drawnItems().filter((item) => !item.hasAttribute('data-disabled')),
+    [drawnItems]
+  )
 
   // The highlight belongs to a list, and the list changes with every keystroke:
   // an item that has just been filtered away must not keep it, and a list that
   // has just gained one must not be left with nothing highlighted.
   React.useEffect(() => {
+    // Empty is about what is drawn: a list of disabled matches is not
+    // "Nothing found".
+    setEmpty(drawnItems().length === 0)
     const items = visibleItems()
-    setEmpty(items.length === 0)
     const stillThere = items.some((item) => item.dataset.value === active)
     if (!stillThere) setActive(items[0]?.dataset.value ?? null)
-  }, [query, version, active, visibleItems])
+  }, [query, version, active, visibleItems, drawnItems])
 
   const move = (delta: number) => {
     const items = visibleItems()
@@ -132,7 +142,10 @@ function Command({
           } else if (event.key === 'Enter' && active) {
             event.preventDefault()
             run()
-          } else if (event.key === 'Home' || event.key === 'End') {
+          } else if ((event.key === 'Home' || event.key === 'End') && query === '') {
+            // With text in the box Home and End are the caret's — the reader
+            // going back to fix the first letter — and only with nothing typed
+            // is there no caret to move, so they jump the list instead.
             const items = visibleItems()
             if (items.length === 0) return
             event.preventDefault()

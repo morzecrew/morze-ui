@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 
-import { Input } from '../src'
+import { Input, NumberInput } from '../src'
 import {
   Form,
   FormControl,
@@ -51,7 +51,8 @@ describe('Form', () => {
     // The whole point of the scaffolding: none of this is written by hand.
     expect(input.id).toBeTruthy()
     expect(input).toHaveAttribute('aria-describedby', description.id)
-    expect(input).toHaveAttribute('aria-invalid', 'false')
+    // No error, no attribute (A-23): `false` would override the control's own.
+    expect(input).not.toHaveAttribute('aria-invalid')
   })
 
   it('reserves no room for a message until there is one', () => {
@@ -71,5 +72,34 @@ describe('Form', () => {
     // Both the description and the error, so the reason survives the failure.
     expect(input.getAttribute('aria-describedby')).toContain(message.id)
     expect(screen.getByText('Email')).toHaveAttribute('data-error', 'true')
+  })
+})
+
+describe('FormControl and the control’s own validity (A-23)', () => {
+  function Quantity() {
+    const form = useForm<{ qty: number | undefined }>({ defaultValues: { qty: 50 } })
+    return (
+      <Form {...form}>
+        <FormField
+          control={form.control}
+          name="qty"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Quantity</FormLabel>
+              <FormControl>
+                <NumberInput value={field.value} onChange={field.onChange} max={10} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </Form>
+    )
+  }
+
+  it('lets an out-of-range NumberInput say it is invalid before the form has a rule to', () => {
+    render(<Quantity />)
+    const input = screen.getByRole('spinbutton', { name: 'Quantity' })
+    expect(input).toHaveAttribute('data-out-of-range', 'max')
+    expect(input).toHaveAttribute('aria-invalid', 'true')
   })
 })

@@ -269,6 +269,13 @@ function Sidebar({
       data-side={side}
       data-variant={variant}
       data-collapsible={collapsible === 'none' ? undefined : collapsible}
+      // An offcanvas panel put away is a column of zero width, and nothing in
+      // it can be seen — but its links were still in the tab order, so the
+      // keyboard walked through a dozen stops that drew no focus ring
+      // anywhere. `inert` takes the whole panel out of the tab order and the
+      // accessibility tree until it is opened again; the icon rail stays
+      // live, since its icons are on screen.
+      inert={state === 'collapsed' && collapsible === 'offcanvas' ? true : undefined}
       className={cn('mz-sidebar', className)}
       {...props}
     >
@@ -435,6 +442,7 @@ function SidebarMenuButton({
   size = 'md',
   tooltip,
   className,
+  'aria-current': ariaCurrent,
   ...props
 }: SidebarMenuButtonProps) {
   const Comp = asChild ? Slot.Root : 'button'
@@ -445,6 +453,10 @@ function SidebarMenuButton({
       data-slot="sidebar-menu-button"
       data-size={size}
       data-active={isActive || undefined}
+      // The highlight says "you are here" to the eye only; aria-current says
+      // it to a reader. "page" is the usual answer for a navigation item, and
+      // a host whose item is a step or a location passes its own.
+      aria-current={ariaCurrent ?? (isActive ? 'page' : undefined)}
       className={cn('mz-sidebar__menu-button mz-focusable', className)}
       {...props}
     />
@@ -486,13 +498,28 @@ function SidebarMenuBadge({ className, ...props }: React.ComponentProps<'div'>) 
   )
 }
 
+/** A small string hash (FNV-1a), for a number that only has to be stable. */
+function hash(text: string) {
+  let h = 0x811c9dc5
+  for (let i = 0; i < text.length; i += 1) {
+    h ^= text.charCodeAt(i)
+    h = Math.imul(h, 0x01000193)
+  }
+  return h >>> 0
+}
+
 function SidebarMenuSkeleton({
   className,
   showIcon = false,
   ...props
 }: React.ComponentProps<'div'> & { showIcon?: boolean }) {
-  // A stable pseudo-random width keeps the placeholder from re-flowing.
-  const width = React.useMemo(() => `${Math.floor(Math.random() * 40) + 50}%`, [])
+  // A width between 50% and 90%, so a column of placeholders looks like a
+  // list of labels rather than a stack of bars. Derived from useId(), which
+  // the server and the client agree on, so the width the server drew is the
+  // width hydration finds; Math.random() gave each side its own and React
+  // reported a mismatch for every skeleton on the page.
+  const id = React.useId()
+  const width = `${(hash(id) % 40) + 50}%`
   return (
     <div
       data-slot="sidebar-menu-skeleton"

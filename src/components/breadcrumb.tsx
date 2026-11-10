@@ -8,11 +8,18 @@ import { ChevronRightIcon, EllipsisIcon } from '../lib/icons'
 import { defaultCommonLabels } from '../locales/defaults'
 import { useLocaleLabels } from './locale-provider'
 
-function Breadcrumb({ className, ...props }: React.ComponentProps<'nav'>) {
+/**
+ * The trail is a navigation landmark, and a landmark is found by its name.
+ * The name was the English word "breadcrumb", written in lowercase into every
+ * locale; it comes from `common.breadcrumb` now, and `label` names a second
+ * trail on the same page apart from the first.
+ */
+function Breadcrumb({ className, label, ...props }: React.ComponentProps<'nav'> & { label?: string }) {
+  const common = useLocaleLabels('common', defaultCommonLabels)
   return (
     <nav
       data-slot="breadcrumb"
-      aria-label="breadcrumb"
+      aria-label={label ?? common.breadcrumb}
       className={cn('mz-breadcrumb', className)}
       {...props}
     />

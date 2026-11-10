@@ -1,5 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
+import { renderToString } from 'react-dom/server'
+import { hydrateRoot } from 'react-dom/client'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -12,6 +14,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
   SidebarPanel,
   SidebarProvider,
   SidebarTrigger,
@@ -253,5 +256,94 @@ describe('SidebarTrigger icon', () => {
       </SidebarProvider>
     )
     expect(screen.getByTestId('own')).toBeInTheDocument()
+  })
+})
+
+describe('a collapsed offcanvas panel is out of reach (A-16)', () => {
+  function Nav({ collapsible, open }: { collapsible: 'offcanvas' | 'icon'; open: boolean }) {
+    return (
+      <SidebarProvider storageKey={null} open={open}>
+        <Sidebar collapsible={collapsible}>
+          <SidebarContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton>Orders</SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
+      </SidebarProvider>
+    )
+  }
+  const panel = (container: HTMLElement) => container.querySelector('[data-slot="sidebar"]')!
+
+  it('is inert while put away, so Tab cannot walk through it', () => {
+    const { container, rerender } = render(<Nav collapsible="offcanvas" open={false} />)
+    // happy-dom keeps an inert subtree focusable; the tab order itself is checked
+    // in a real browser, in sidebar.browser.test.tsx.
+    expect(panel(container)).toHaveAttribute('inert')
+
+    rerender(<Nav collapsible="offcanvas" open />)
+    expect(panel(container)).not.toHaveAttribute('inert')
+  })
+
+  it('leaves the icon rail live, since its icons are on screen', () => {
+    const { container } = render(<Nav collapsible="icon" open={false} />)
+    expect(panel(container)).not.toHaveAttribute('inert')
+  })
+})
+
+describe('SidebarMenuButton says which page is current (A-29)', () => {
+  it('sets aria-current="page" on the active item only', () => {
+    render(
+      <SidebarProvider storageKey={null}>
+        <SidebarMenuButton isActive>Orders</SidebarMenuButton>
+        <SidebarMenuButton>Plans</SidebarMenuButton>
+        <SidebarMenuButton isActive aria-current="step">
+          Review
+        </SidebarMenuButton>
+      </SidebarProvider>
+    )
+    expect(screen.getByRole('button', { name: 'Orders' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('button', { name: 'Plans' })).not.toHaveAttribute('aria-current')
+    // A host that says what kind of "current" it is keeps its word.
+    expect(screen.getByRole('button', { name: 'Review' })).toHaveAttribute('aria-current', 'step')
+  })
+})
+
+describe('SidebarMenuSkeleton hydrates without a mismatch (A-28)', () => {
+  it('draws the same width on the server and the client', async () => {
+    const tree = (
+      <SidebarProvider storageKey={null}>
+        <SidebarMenuSkeleton />
+        <SidebarMenuSkeleton showIcon />
+      </SidebarProvider>
+    )
+    // Deterministic: the same tree is the same markup, render after render.
+    expect(renderToString(tree)).toBe(renderToString(tree))
+
+    // React does not patch a mismatched attribute on hydration; it keeps the
+    // server's and says so on the console, which is what is watched here.
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const host = document.createElement('div')
+    host.innerHTML = renderToString(tree)
+    document.body.appendChild(host)
+    const widths = () =>
+      Array.from(host.querySelectorAll<HTMLElement>('.mz-sidebar__menu-skeleton-text')).map((el) => el.style.width)
+    const server = widths()
+    server.forEach((width) => {
+      const percent = Number.parseInt(width, 10)
+      expect(percent).toBeGreaterThanOrEqual(50)
+      expect(percent).toBeLessThan(90)
+    })
+
+    const errors: unknown[] = []
+    const root = await act(async () => hydrateRoot(host, tree, { onRecoverableError: (e) => errors.push(e) }))
+    expect(errors).toEqual([])
+    expect(consoleError).not.toHaveBeenCalled()
+    expect(widths()).toEqual(server)
+    consoleError.mockRestore()
+    act(() => root.unmount())
+    host.remove()
   })
 })

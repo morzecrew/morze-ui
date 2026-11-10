@@ -78,12 +78,14 @@ function refusal({
   off: boolean
   ariaDisabled: ButtonProps['aria-disabled']
 }) {
-  const soft = !off && (ariaDisabled === true || ariaDisabled === 'true')
+  // A slotted element may not support `disabled` (a link, for one), so an
+  // `asChild` that is off is soft-disabled instead: aria says so, which the
+  // CSS honours, and the component refuses the activation the platform will
+  // not — a link with `aria-disabled` still follows its href when clicked.
+  const soft = (asChild && off) || (!off && (ariaDisabled === true || ariaDisabled === 'true'))
   return {
-    // A slotted element may not support `disabled` (a link, for one), so the
-    // state is also expressed through aria, which the CSS honours.
     disabled: asChild ? undefined : off,
-    'aria-disabled': soft || (asChild && off) ? true : undefined,
+    'aria-disabled': soft ? true : undefined,
     soft,
   }
 }
@@ -93,6 +95,17 @@ function refusal({
     handler; `stopPropagation`, because a row or a card around it must not take
     the click the button has just declined. */
 const refuse = (event: React.MouseEvent) => {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+/** The keyboard half of the same refusal. A button or a link turns Enter into
+    a click, which `refuse` already declines, but a slotted element that acts
+    on its own key handler — a `div role="button"`, a menu item — never makes
+    a click to decline. Tab and the rest pass, so the control stays on the
+    keyboard's path. */
+const refuseKey = (event: React.KeyboardEvent) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return
   event.preventDefault()
   event.stopPropagation()
 }
@@ -108,6 +121,9 @@ function Button({
   disabled,
   'aria-disabled': ariaDisabled,
   onClick,
+  onClickCapture,
+  onKeyDown,
+  onKeyDownCapture,
   children,
   ...props
 }: ButtonProps) {
@@ -148,7 +164,13 @@ function Button({
       className={cn(buttonVariants({ variant, size, wrap }), className)}
       {...state}
       aria-busy={loading || undefined}
-      onClick={soft ? refuse : onClick}
+      // In the capture phase, because Slot runs the child's own handler
+      // before the one it was given: a link's `onClick` would have fired
+      // before a bubble-phase refusal got its turn.
+      onClickCapture={soft ? refuse : onClickCapture}
+      onKeyDownCapture={soft ? refuseKey : onKeyDownCapture}
+      onClick={soft ? undefined : onClick}
+      onKeyDown={soft ? undefined : onKeyDown}
       {...props}
     >
       {content}

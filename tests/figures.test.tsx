@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import * as React from 'react'
 
@@ -45,6 +45,32 @@ describe('InfoTip (N-02)', () => {
     render(<InfoTip label="What is late">Explained</InfoTip>)
     expect(screen.getByRole('button', { name: 'What is late' })).toBeInTheDocument()
   })
+
+  it('opens on a press and puts itself away on the next one (A-24)', async () => {
+    const user = userEvent.setup()
+    render(<InfoTip>Past the deadline</InfoTip>)
+    const tip = screen.getByRole('button', { name: 'More info' })
+    await user.click(tip)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Past the deadline')
+    await user.click(tip)
+    await waitFor(() => expect(screen.queryByRole('tooltip')).toBeNull())
+  })
+
+  it('opens on a tap, which a plain tooltip ignores (A-24)', async () => {
+    const user = userEvent.setup()
+    render(<InfoTip>Past the deadline</InfoTip>)
+    await user.pointer({ keys: '[TouchA]', target: screen.getByRole('button', { name: 'More info' }) })
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Past the deadline')
+  })
+
+  it('still opens on focus, and closes on Escape (A-24)', async () => {
+    const user = userEvent.setup()
+    render(<InfoTip>Past the deadline</InfoTip>)
+    await user.tab()
+    expect(await screen.findByRole('tooltip')).toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(screen.queryByRole('tooltip')).toBeNull())
+  })
 })
 
 describe('Stat (N-01)', () => {
@@ -63,7 +89,7 @@ describe('Stat (N-01)', () => {
   it('toggles when selectable, and the InfoTip takes its own click', async () => {
     const onSelectedChange = vi.fn()
     render(<Stat label="Late" value={7} info="Past the deadline" tone="danger" onSelectedChange={onSelectedChange} />)
-    const toggle = screen.getByRole('button', { name: 'Late: 7' })
+    const toggle = screen.getByRole('button', { name: 'Late 7' })
     expect(toggle).toHaveAttribute('aria-pressed', 'false')
 
     await userEvent.click(screen.getByRole('button', { name: 'More info: Late' }))
@@ -72,6 +98,27 @@ describe('Stat (N-01)', () => {
     await userEvent.click(toggle)
     expect(onSelectedChange).toHaveBeenCalledWith(true)
     expect(screen.getByText('7')).toHaveAttribute('data-tone', 'danger')
+  })
+
+  it('names a selectable tile by a label that is a node, and by its figure (A-20)', () => {
+    const { rerender } = render(
+      <Stat
+        label={
+          <>
+            <svg aria-hidden="true" /> Overdue
+          </>
+        }
+        value={7}
+        info="Past the deadline"
+        onSelectedChange={() => {}}
+      />
+    )
+    expect(screen.getByRole('button', { name: 'Overdue 7', pressed: false })).toBeInTheDocument()
+    // The InfoTip keeps its own name and is not read into the tile's.
+    expect(screen.getByRole('button', { name: 'More info' })).toBeInTheDocument()
+
+    rerender(<Stat label="Overdue" value={7} loading onSelectedChange={() => {}} />)
+    expect(screen.getByRole('button', { name: 'Overdue', pressed: false })).toBeInTheDocument()
   })
 
   it('draws the check mark only as a picture', () => {
@@ -94,7 +141,8 @@ describe('Pagination (N-04)', () => {
     const onPageChange = vi.fn()
     render(<Pagination page={2} pageCount={6} onPageChange={onPageChange} />)
     expect(screen.getByRole('navigation', { name: 'Pagination' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Page 2 of 6')).toHaveTextContent('2 / 6')
+    expect(screen.getByRole('status')).toHaveTextContent('Page 2 of 6')
+    expect(screen.getByText('2 / 6')).toHaveAttribute('aria-hidden', 'true')
     await userEvent.click(screen.getByRole('button', { name: 'Next page' }))
     expect(onPageChange).toHaveBeenLastCalledWith(3)
     await userEvent.click(screen.getByRole('button', { name: 'Last page' }))
@@ -103,8 +151,9 @@ describe('Pagination (N-04)', () => {
 
   it('disables what leads nowhere and clamps the page', () => {
     render(<Pagination page={9} pageCount={3} onPageChange={() => {}} edges={false} />)
-    expect(screen.getByLabelText('Page 3 of 3')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent('Page 3 of 3')
+    // Soft-disabled (A-29): reachable, announced as unavailable, inert.
+    expect(screen.getByRole('button', { name: 'Next page' })).toHaveAttribute('aria-disabled', 'true')
     expect(screen.queryByRole('button', { name: 'Last page' })).toBeNull()
   })
 
@@ -115,7 +164,7 @@ describe('Pagination (N-04)', () => {
       </MorzeLocaleProvider>
     )
     expect(screen.getByRole('navigation', { name: 'Страницы' })).toBeInTheDocument()
-    expect(screen.getByLabelText('Страница 1 из 2')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Страница 1 из 2')
   })
 })
 

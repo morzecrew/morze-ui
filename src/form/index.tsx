@@ -116,7 +116,11 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot.Root>) {
       data-slot="form-control"
       id={formItemId}
       aria-describedby={error ? `${formDescriptionId} ${formMessageId}` : formDescriptionId}
-      aria-invalid={!!error}
+      // Only ever `true`. A `false` here reached the child as the host's own
+      // answer and overrode the one the control gives itself — a
+      // `NumberInput` typed past its `max` is invalid before the form's
+      // rules have run, and said so everywhere but inside a form.
+      aria-invalid={error ? true : undefined}
       {...props}
     />
   )

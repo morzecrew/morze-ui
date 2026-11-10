@@ -547,6 +547,9 @@ What this kit adds on top:
   item in a neutral bar is expressible.
 - `Progress` — `indeterminate`: a travelling slice, and no `aria-valuenow` to
   claim a percentage nobody knows.
+- `Slider` — `aria-label` / `aria-labelledby` name the thumb, the element that
+  is the `role="slider"`; `thumbLabels` names each thumb of a range
+  (`['From', 'To']`).
 - `AvatarGroup` — `max`, which closes the stack with a "+N" chip.
 - `TableHead` — `sortable`, `sorted`, `onSort`, `sortLabel`: the sort control
   the hand-laid table was missing, drawn the way the grid draws it, with
@@ -554,6 +557,9 @@ What this kit adds on top:
 - `DatePicker` / `DateRangePicker` — the `Calendar` behind a field, with the
   select trigger's own recipe for the trigger, a clear button, `presets` on the
   range, and `toISODate` / `fromISODate` for the `YYYY-MM-DD` a backend speaks.
+  `value={null}` is a controlled empty field (`undefined` leaves it
+  uncontrolled), as on `Combobox`. The trigger is named by its date and its
+  `<label for>`; `aria-label` / `aria-labelledby` name a field with neither.
 
   ```tsx
   <DateRangePicker
@@ -1323,7 +1329,7 @@ provider's tag.
 Every string can also be replaced per instance.
 `Dialog`/`Sheet`/`Toaster` take `closeLabel`, `Spinner` takes `label`, `Sidebar`
 takes `mobileTitle` / `mobileDescription`, `SidebarTrigger` takes `label`,
-`BreadcrumbEllipsis` takes `label`, `TabsList` takes `overflowLabel`,
+`Breadcrumb` and `BreadcrumbEllipsis` take `label`, `TabsList` takes `overflowLabel`,
 `NumberInput` takes `labels` and `CommandDialog` takes `title` / `description`.
 
 `Calendar` reads its month, weekday and day names from `Intl` — a `locale` tag

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import * as React from 'react'
 
@@ -44,6 +44,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
   DatePicker,
+  DateRangePicker,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -52,8 +53,10 @@ import {
   EmptyDescription,
   EmptyTitle,
   KbdSequence,
+  MorzeLocaleProvider,
   MultiSelect,
   NumberInput,
+  Pagination,
   Progress,
   RadioGroup,
   RadioGroupItem,
@@ -69,6 +72,7 @@ import {
   SheetContent,
   SheetTitle,
   SidebarProvider,
+  Slider,
   Table,
   TableBody,
   TableCell,
@@ -90,6 +94,7 @@ import {
   toISODate,
   type ChartConfig,
 } from '../src'
+import ru from '../src/locales/ru'
 
 describe('Table', () => {
   it('scrolls itself rather than the page', () => {
@@ -154,7 +159,7 @@ describe('Breadcrumb', () => {
       </Breadcrumb>
     )
 
-    expect(screen.getByRole('navigation')).toHaveAttribute('aria-label', 'breadcrumb')
+    expect(screen.getByRole('navigation')).toHaveAttribute('aria-label', 'Breadcrumb')
     expect(screen.getByText('Orders')).toHaveAttribute('aria-current', 'page')
     expect(screen.getByText('Show more')).toHaveClass('mz-sr-only')
     // Separators are decoration; a screen reader must not read them as crumbs.
@@ -791,11 +796,13 @@ describe('DatePicker (K-11)', () => {
         today={new Date(2026, 2, 15)}
         defaultValue={new Date(2026, 2, 15)}
         onChange={onChange}
-        labels={{ open: 'Pick a day' }}
       />
     )
-    const trigger = screen.getByRole('button', { name: 'Pick a day' })
-    expect(trigger).toHaveTextContent(new Date(2026, 2, 15).toLocaleDateString('en-GB'))
+    const shown = new Date(2026, 2, 15).toLocaleDateString('en-GB')
+    // Named by the day it holds (A-14): a fixed "Open the calendar" named
+    // every date field in a form the same.
+    const trigger = screen.getByRole('button', { name: shown })
+    expect(trigger).toHaveTextContent(shown)
     await user.click(trigger)
     const days = (await screen.findAllByRole('button')).filter(
       (button) => button.dataset.slot === 'calendar-day'
@@ -1289,3 +1296,362 @@ describe('the small composites (K-11)', () => {
   })
 })
 
+
+/* ---------------------------------------------------------------------------
+   The 2026-11-10 audit, section 3 (docs/audit-2026-11-10.md). Each block is
+   the regression test for one item; the ones that live elsewhere are in
+   calendar, figures, form and sidebar tests.
+   ------------------------------------------------------------------------ */
+
+describe('DatePicker takes its name from its label and its value (A-14)', () => {
+  it('is named by the <label for> beside it, not by "Open the calendar"', () => {
+    render(
+      <>
+        <label htmlFor="due">Due date</label>
+        <DatePicker id="due" locale="en-US" defaultValue={new Date(2026, 10, 3)} />
+      </>
+    )
+    expect(screen.getByRole('button', { name: 'Due date' })).toHaveTextContent('11/3/2026')
+    expect(screen.queryByRole('button', { name: 'Open the calendar' })).toBeNull()
+  })
+
+  it('is named by what it shows with no label, and takes aria-label / aria-labelledby', () => {
+    render(
+      <>
+        <DatePicker locale="en-US" defaultValue={new Date(2026, 10, 3)} />
+        <DateRangePicker aria-label="Period" />
+        <span id="ship">Shipped on</span>
+        <DatePicker aria-labelledby="ship" />
+      </>
+    )
+    expect(screen.getByRole('button', { name: '11/3/2026' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Period' })).toHaveTextContent('Pick a date')
+    expect(screen.getByRole('button', { name: 'Shipped on' })).toBeInTheDocument()
+  })
+})
+
+describe('Button asChild refuses a press while it is off (A-15)', () => {
+  it('declines the click on a disabled link, its own onClick included', () => {
+    const onClick = vi.fn()
+    render(
+      <Button asChild disabled>
+        <a href="#next" onClick={onClick}>
+          Next
+        </a>
+      </Button>
+    )
+    const link = screen.getByRole('link', { name: 'Next' })
+    expect(link).toHaveAttribute('aria-disabled', 'true')
+    // fireEvent returns false when the default action was prevented: the
+    // href is not followed.
+    expect(fireEvent.click(link)).toBe(false)
+    expect(onClick).not.toHaveBeenCalled()
+  })
+
+  it('declines Enter and Space while loading, and lets Tab through', () => {
+    const onKeyDown = vi.fn()
+    render(
+      <Button asChild loading>
+        <div role="button" tabIndex={0} onKeyDown={onKeyDown}>
+          Send
+        </div>
+      </Button>
+    )
+    const control = screen.getByRole('button', { name: 'Send' })
+    expect(control).not.toHaveAttribute('tabindex', '-1')
+    expect(fireEvent.keyDown(control, { key: 'Enter' })).toBe(false)
+    expect(fireEvent.keyDown(control, { key: ' ' })).toBe(false)
+    expect(onKeyDown).not.toHaveBeenCalled()
+    expect(fireEvent.keyDown(control, { key: 'Tab' })).toBe(true)
+    expect(onKeyDown).toHaveBeenCalledTimes(1)
+  })
+
+  it('leaves a link that is on alone', () => {
+    const onClick = vi.fn()
+    render(
+      <Button asChild>
+        <a href="#next" onClick={onClick}>
+          Next
+        </a>
+      </Button>
+    )
+    fireEvent.click(screen.getByRole('link', { name: 'Next' }))
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('NumberInput Shift+arrow and readOnly (A-17)', () => {
+  it('moves ten steps on Shift+arrow, in one change', () => {
+    const onChange = vi.fn()
+    render(<NumberInput aria-label="Qty" defaultValue={5} step={2} onChange={onChange} />)
+    const input = screen.getByRole('spinbutton', { name: 'Qty' })
+    fireEvent.keyDown(input, { key: 'ArrowUp', shiftKey: true })
+    expect(onChange.mock.calls).toEqual([[25]])
+    expect(input).toHaveAttribute('aria-valuenow', '25')
+    fireEvent.keyDown(input, { key: 'ArrowDown', shiftKey: true })
+    expect(onChange).toHaveBeenLastCalledWith(5)
+  })
+
+  it('still clamps a Shift+arrow move to the bounds', () => {
+    const onChange = vi.fn()
+    render(<NumberInput aria-label="Qty" defaultValue={5} max={8} onChange={onChange} />)
+    fireEvent.keyDown(screen.getByRole('spinbutton'), { key: 'ArrowUp', shiftKey: true })
+    expect(onChange.mock.calls).toEqual([[8]])
+  })
+
+  it('takes no change from the keys or the steppers when read-only', () => {
+    const onChange = vi.fn()
+    render(<NumberInput aria-label="Qty" value={5} max={3} readOnly onChange={onChange} />)
+    const input = screen.getByRole('spinbutton', { name: 'Qty' })
+    expect(input).toHaveAttribute('readonly')
+    fireEvent.keyDown(input, { key: 'ArrowUp' })
+    fireEvent.keyDown(input, { key: 'ArrowDown', shiftKey: true })
+    expect(screen.getByRole('button', { name: 'Increase' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Decrease' })).toBeDisabled()
+    // Not clamped on blur either: the host only shows this value.
+    fireEvent.focus(input)
+    fireEvent.blur(input)
+    expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+describe('DatePicker can be controlled empty (A-18)', () => {
+  it('stays empty under value={null} until the host takes the day', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(<DatePicker value={null} onChange={onChange} locale="en-US" today={new Date(2026, 10, 10)} />)
+    const trigger = screen.getByRole('button', { name: 'Pick a date' })
+    await user.click(trigger)
+    await user.click(document.querySelector('[data-day="2026-11-12"]') as HTMLElement)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange.mock.calls[0]![0].getDate()).toBe(12)
+    // The host did not store it, so the field is still empty.
+    expect(trigger).toHaveTextContent('Pick a date')
+  })
+
+  it('follows the host from a day to null and back', () => {
+    const { rerender } = render(
+      <DateRangePicker
+        locale="en-US"
+        value={{ from: new Date(2026, 10, 3), to: new Date(2026, 10, 5) }}
+      />
+    )
+    expect(screen.getAllByRole('button')[0]).toHaveTextContent('11/3/2026 – 11/5/2026')
+    rerender(<DateRangePicker locale="en-US" value={null} />)
+    expect(screen.getAllByRole('button')[0]).toHaveTextContent('Pick a date')
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull()
+  })
+})
+
+describe('Slider names its thumbs (A-19)', () => {
+  it('puts aria-label on the slider a reader lands on', () => {
+    const { container } = render(<Slider aria-label="Volume" defaultValue={[30]} />)
+    expect(screen.getByRole('slider', { name: 'Volume' })).toBeInTheDocument()
+    expect(container.querySelector('[data-slot="slider"]')).not.toHaveAttribute('aria-label')
+  })
+
+  it('names each end of a range from thumbLabels', () => {
+    render(<Slider aria-label="Price" thumbLabels={['From', 'To']} defaultValue={[10, 90]} />)
+    expect(screen.getByRole('slider', { name: 'From' })).toHaveAttribute('aria-valuenow', '10')
+    expect(screen.getByRole('slider', { name: 'To' })).toHaveAttribute('aria-valuenow', '90')
+  })
+
+  it('forwards aria-labelledby too', () => {
+    render(
+      <>
+        <span id="vol">Volume</span>
+        <Slider aria-labelledby="vol" defaultValue={[30]} />
+      </>
+    )
+    expect(screen.getByRole('slider', { name: 'Volume' })).toBeInTheDocument()
+  })
+})
+
+describe('the clear button hands the focus back to the field (A-21)', () => {
+  it('Combobox', async () => {
+    const user = userEvent.setup()
+    render(<Combobox aria-label="City" options={[{ value: 'a', label: 'Alpha' }]} defaultValue="a" />)
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    expect(screen.getByRole('combobox', { name: 'City' })).toHaveFocus()
+    expect(screen.queryByRole('button', { name: 'Clear' })).toBeNull()
+  })
+
+  it('MultiSelect', async () => {
+    const user = userEvent.setup()
+    render(<MultiSelect aria-label="Tags" options={[{ value: 'a', label: 'Alpha' }]} defaultValue={['a']} />)
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    expect(screen.getByRole('combobox', { name: 'Tags' })).toHaveFocus()
+  })
+
+  it('DatePicker and DateRangePicker', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<DatePicker aria-label="Due" defaultValue={new Date(2026, 2, 15)} />)
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    expect(screen.getByRole('button', { name: 'Due' })).toHaveFocus()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    unmount()
+
+    render(<DateRangePicker aria-label="Period" defaultValue={{ from: new Date(2026, 2, 15) }} />)
+    await user.click(screen.getByRole('button', { name: 'Clear' }))
+    expect(screen.getByRole('button', { name: 'Period' })).toHaveFocus()
+  })
+})
+
+describe('TabsList overflow="menu" measures the count and keeps the host’s ref (A-25)', () => {
+  it('draws the count in the mirror row', () => {
+    render(
+      <Tabs defaultValue="a">
+        <TabsList overflow="menu">
+          <TabsTrigger value="a" count={12}>
+            Orders
+          </TabsTrigger>
+          <TabsTrigger value="b">Plans</TabsTrigger>
+        </TabsList>
+      </Tabs>
+    )
+    const mirror = document.querySelector('.mz-tabs-list__mirror')!
+    expect(mirror.querySelectorAll('.mz-tabs-trigger')[0]).toHaveTextContent('Orders12')
+    expect(mirror.querySelector('[data-slot="tabs-count"]')).toHaveTextContent('12')
+  })
+
+  it('hands the host its trigger, object ref or callback', () => {
+    const objectRef = React.createRef<HTMLButtonElement>()
+    const callbackRef = vi.fn()
+    render(
+      <Tabs defaultValue="a">
+        <TabsList overflow="menu">
+          <TabsTrigger value="a" ref={objectRef}>
+            Orders
+          </TabsTrigger>
+          <TabsTrigger value="b" ref={callbackRef}>
+            Plans
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+    )
+    expect(objectRef.current).toBe(screen.getByRole('tab', { name: 'Orders' }))
+    expect(callbackRef).toHaveBeenCalledWith(screen.getByRole('tab', { name: 'Plans' }))
+  })
+})
+
+describe('Command keeps Home/End for the caret and skips disabled items (A-26)', () => {
+  const palette = () => (
+    <Command>
+      <CommandInput aria-label="Command" />
+      <CommandList>
+        <CommandEmpty>Nothing found</CommandEmpty>
+        <CommandItem value="archive" disabled>
+          archive
+        </CommandItem>
+        <CommandItem value="alpha">alpha</CommandItem>
+        <CommandItem value="alps">alps</CommandItem>
+        <CommandItem value="atlas" disabled>
+          atlas
+        </CommandItem>
+      </CommandList>
+    </Command>
+  )
+  const highlighted = () => document.querySelector('[data-highlighted]')?.getAttribute('data-value')
+
+  it('leaves Home and End to the caret once something is typed', () => {
+    render(palette())
+    const input = screen.getByRole('combobox', { name: 'Command' })
+    fireEvent.change(input, { target: { value: 'al' } })
+    expect(fireEvent.keyDown(input, { key: 'Home' })).toBe(true)
+    expect(fireEvent.keyDown(input, { key: 'End' })).toBe(true)
+  })
+
+  it('jumps the list on Home and End with nothing typed, past the disabled ends', () => {
+    render(palette())
+    const input = screen.getByRole('combobox', { name: 'Command' })
+    expect(fireEvent.keyDown(input, { key: 'End' })).toBe(false)
+    expect(highlighted()).toBe('alps')
+    expect(fireEvent.keyDown(input, { key: 'Home' })).toBe(false)
+    expect(highlighted()).toBe('alpha')
+  })
+
+  it('never rests the highlight on a disabled item', () => {
+    render(palette())
+    const input = screen.getByRole('combobox', { name: 'Command' })
+    // The first item drawn is disabled; the default highlight passes it.
+    expect(highlighted()).toBe('alpha')
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(highlighted()).toBe('alps')
+    fireEvent.keyDown(input, { key: 'ArrowDown' })
+    expect(highlighted()).toBe('alpha')
+    fireEvent.keyDown(input, { key: 'ArrowUp' })
+    expect(highlighted()).toBe('alps')
+  })
+
+  it('is not "Nothing found" when only disabled items match', () => {
+    render(palette())
+    fireEvent.change(screen.getByRole('combobox', { name: 'Command' }), { target: { value: 'atl' } })
+    expect(screen.queryByText('Nothing found')).toBeNull()
+    expect(highlighted()).toBeUndefined()
+  })
+})
+
+describe('MultiSelect "None" leaves a disabled choice alone (A-27)', () => {
+  it('drops the options the reader could untick, and keeps the locked one', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <MultiSelect
+        aria-label="Tags"
+        options={[
+          { value: 'locked', label: 'Locked', disabled: true },
+          { value: 'b', label: 'B' },
+          { value: 'c', label: 'C' },
+        ]}
+        defaultValue={['locked', 'b']}
+        onChange={onChange}
+      />
+    )
+    await user.click(screen.getByRole('combobox', { name: 'Tags' }))
+    await user.click(screen.getByRole('button', { name: 'None' }))
+    expect(onChange).toHaveBeenLastCalledWith(['locked'], [{ value: 'locked', label: 'Locked', disabled: true }])
+  })
+})
+
+describe('Breadcrumb and Pagination (A-29)', () => {
+  it('names the trail from the locale, or from label', () => {
+    const { unmount } = render(
+      <MorzeLocaleProvider locale={ru}>
+        <Breadcrumb />
+      </MorzeLocaleProvider>
+    )
+    expect(screen.getByRole('navigation', { name: 'Навигационная цепочка' })).toBeInTheDocument()
+    unmount()
+    render(<Breadcrumb label="Catalogue path" />)
+    expect(screen.getByRole('navigation', { name: 'Catalogue path' })).toBeInTheDocument()
+  })
+
+  it('keeps the focus on Next when the last page arrives, and refuses the next press', async () => {
+    const onPageChange = vi.fn()
+    function Pager() {
+      const [page, setPage] = React.useState(1)
+      return (
+        <Pagination
+          page={page}
+          pageCount={2}
+          onPageChange={(next) => {
+            onPageChange(next)
+            setPage(next)
+          }}
+        />
+      )
+    }
+    const user = userEvent.setup()
+    render(<Pager />)
+    const next = screen.getByRole('button', { name: 'Next page' })
+    await user.click(next)
+    expect(onPageChange).toHaveBeenCalledWith(2)
+    expect(next).toHaveFocus()
+    expect(next).toHaveAttribute('aria-disabled', 'true')
+    expect(next).not.toBeDisabled()
+    await user.keyboard('{Enter}')
+    await user.click(next)
+    expect(onPageChange).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('status')).toHaveTextContent('Page 2 of 2')
+  })
+})

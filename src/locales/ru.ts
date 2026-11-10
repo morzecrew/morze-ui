@@ -123,6 +123,7 @@ export const common: MorzeCommonLabels = {
   close: 'Закрыть',
   loading: 'Загрузка',
   more: 'Ещё',
+  breadcrumb: 'Навигационная цепочка',
   sidebarNavigation: 'Навигация',
   sidebarSections: 'Разделы приложения',
   toggleSidebar: 'Свернуть или развернуть меню',
